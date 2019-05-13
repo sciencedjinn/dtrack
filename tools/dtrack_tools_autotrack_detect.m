@@ -22,7 +22,7 @@ end
 diffim = uint8(abs(double(current_frame) - double(ref)));
 
 %% gray scale conversion
-if strcmp(method, 'absolute');
+if strcmp(method, 'absolute')
     level = greythr;
 else
     level = greythr * graythresh(diffim);
