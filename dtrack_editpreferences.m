@@ -211,7 +211,7 @@ function sub_creategui
     'interruptible', 'off', 'pointer', 'arrow', 'CloseRequestFcn', @sub_close);
 
 %% panels
-    uicontrol(gui.fig, 'style', 'text', 'string', 'DTrack preferences', 'units', 'normalized', 'position', [.02 .91 .96 .07], 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 15, 'fontweight', 'bold');
+    uicontrol(gui.fig, 'style', 'text', 'string', [para.theme.name ' preferences'], 'units', 'normalized', 'position', [.02 .91 .96 .07], 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 15, 'fontweight', 'bold');
     gui.panel1.panel = uipanel(gui.fig, 'position', [.02 .71 .96 .18]);
     gui.panel2.panel = uipanel(gui.fig, 'position', [.02 .51 .96 .18]);
     gui.panel3.panel = uipanel(gui.fig, 'position', [.02 .12 .47 .37]);

@@ -1,8 +1,10 @@
-function [status, para, data] = dtrack_defaults(status, para, data)
+function [status, para, data] = dtrack_defaults(modules)
 % Fields that CAN be empty, MUST be empty in the defaults
 
+if nargin<1, para.modules = {}; else, para.modules = modules; end
+
 %% set the search path
-dtrack_paths;
+dtrack_paths(para.modules);
 
 %% paths
 para.paths.movpath          = '';
@@ -82,12 +84,12 @@ para.ref.frameDiff          = 0; % when set to 0, para.gui.stepsize will be used
 
 %% load local parameter and preferences files
 if exist(fullfile(prefdir, 'dtrack_para.dtp'), 'file')
-    load(fullfile(prefdir, 'dtrack_para.dtp'), '-mat')
+    load(fullfile(prefdir, 'dtrack_para.dtp'), '-mat', 'savepara')
     para = dtrack_support_compstruct(savepara, para, [], false); % non-verbose
     disp('Local default parameters loaded.');
 end
 if exist(fullfile(prefdir, 'dtrack_pref.dtp'), 'file')
-    load(fullfile(prefdir, 'dtrack_pref.dtp'), '-mat');
+    load(fullfile(prefdir, 'dtrack_pref.dtp'), '-mat', 'savepara');
     para = dtrack_support_compstruct(savepara, para, [], false); % non-verbose
     disp('Local preferences loaded.');
 end
@@ -112,5 +114,17 @@ status.lph              = [];
 %% initialize data structure
 data.points             = [];
 data.markers            = [];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Default Dtrack theme
+para.theme.name = 'DTrack';
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Load modules
+for i = 1:length(para.modules)
+    [status, para, data] = feval([para.modules{i} '_defaults'], status, para, data);
+    
+end
 
 

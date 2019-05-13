@@ -520,7 +520,7 @@ else
                 status.currentaction='cancelledsave';
                 saveneeded = 0; 
             end
-            set(gui.f1, 'name', ['DTrack: ' para.paths.resname ' (' para.paths.movname ')']);
+            set(gui.f1, 'name', [para.theme.name ': ' para.paths.resname ' (' para.paths.movname ')']);
             redraw = 0;
             
         case 'file_savefileas'
@@ -532,7 +532,7 @@ else
                 status.currentaction='cancelledsave';
                 saveneeded = 0;
             end
-            set(gui.f1, 'name', ['DTrack: ' para.paths.resname ' (' para.paths.movname ')']);
+            set(gui.f1, 'name', [para.theme.name ': ' para.paths.resname ' (' para.paths.movname ')']);
             redraw = 0;
             
         case 'file_export'
@@ -1099,7 +1099,7 @@ else
             
         case {'vlc', 'm'}
             %First check whether you're on a PC
-            if ~strncmpi(para.os, 'PC', 2) %if not on a PC
+            if ~strncmpi(status.os, 'PC', 2) %if not on a PC
                 warndlg('This function is currently only available for Windows.');
             elseif isempty(para.paths.vlcpath)
                 warndlg('Please enter the path to VLC.EXE in File->Properties.');
@@ -1141,7 +1141,7 @@ else
             saveneeded = 0;
             
         case 'debug_closeall'
-            disp('Closing all other windows. If the DTrack window is closed, try running dtrack_restore()');
+            disp('Closing all other windows. If the main window is closed, try running dtrack_restore()');
             set(0,'ShowHiddenHandles','on');
             figs = get(0,'Children');
             delete(figs(figs~=1));

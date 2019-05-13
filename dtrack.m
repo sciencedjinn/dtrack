@@ -1,7 +1,11 @@
-function dtrack
+function dtrack(modules)
 % DTRACK is a routine to track animals in HD videos. 
 %   The program uses nested functions for a GUI application with 2 figures.
 % 
+% The inpur variable 'modules' (a cell of strings) can be used to load optional modules. They are loaded sequentially in the order that they are submitted.
+% Therefore, later modules can potentially overload earlier modules' variables. The last of those modules also determines the GUI styling.
+% For example 'dtrack({'holo'})' calls dtrack with the holo module, and the GUI will be holo-styled.
+%
 % It includes 4 running variables:
 % - data contains all tracking data, frame markers, etc.
 % - gui contains handles to all user interface objects (menus, toolbars,
@@ -10,20 +14,22 @@ function dtrack
 %   from parameter file)
 % - status contains temporary session variables that change frequently
 %
-% % Copyright 2010 - 2015 Jochen Smolka - Lund Vision Group 
+% % Copyright 2010 - 2019 Jochen Smolka, ScienceDjinn 
 
-v = 1.87;
+v = 1.90;
 fprintf('Starting DTrack %g\n', v);
 
+if nargin<1, modules = {}; end
+
 %% Defaults and paths
-[status, para, data]  = dtrack_defaults;
+[status, para, data]  = dtrack_defaults(modules);
 status.maincb         = @maincb;
 status.movecb         = @movecb;
 status.resizecb       = @resizecb;
 assignin('base', 'dtrack_restore', @nested_restore);
 
 %% version check
-[os, matlabv]         = dtrack_versioncheck; %'PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64'
+[os, matlabv]         = dtrack_versioncheck; % 'PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64'
 
 %% Start with a dialog box offering options:
 [gui, status, para, data, loadaction] = dtrack_fileio_startdlg(status, para); % gui is created inside this function
@@ -47,7 +53,7 @@ switch loadaction
 end
 
 %% save version data
-status.os         = os; %'PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64'
+status.os         = os; % 'PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64'
 status.matlabv    = matlabv;
 status.dtrackv    = v; 
 status.dtrackbase = mfilename('fullpath');

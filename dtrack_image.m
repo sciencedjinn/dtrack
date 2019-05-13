@@ -78,12 +78,7 @@ if ismember(redraw, [1 2 3])
         
     else
         % now stuff for non-thermal images
-        status.currim = status.currim_ori; %reset to original, unaltered image
-        
-        
-        % TODO:
-        % Set default for para.ref.framediff to 0
-        % Change default and every usage for para.ref.use (including GUI and defaults)
+        status.currim = status.currim_ori; % reset to original, unaltered image
         
         % subtract reference frame
         switch para.ref.use
@@ -92,10 +87,10 @@ if ismember(redraw, [1 2 3])
             case 'dynamic'
                 if para.ref.frameDiff > 0
                     % frame diff was set in parameter file, use this
-                    para.ref.framenr = max([0 status.framenr - para.ref.frameDiff]);
+                    para.ref.framenr = max([1 status.framenr - para.ref.frameDiff]);
                 else
                     % frame diff was not set in parameter file, use the step size
-                    para.ref.framenr = max([0 status.framenr - para.gui.stepsize]);
+                    para.ref.framenr = max([1 status.framenr - para.gui.stepsize]);
                 end
                 [status, para] = dtrack_ref_prepare(status, para); % load new ref image
                 status.currim = uint8(125 + 0.5*(double(status.currim) - status.ref.cdata));
@@ -121,9 +116,15 @@ if ismember(redraw, [1 2 3])
                 end
             end
         end
+        
+        %% Before displaying the image, check if the modules have anything to add
+        for i = 1:length(para.modules)
+            [status, para, data] = feval([para.modules{i} '_imagefcn'], status, para, data);
+        end
+        
+        %% Now display the image
         if para.im.imagesc && para.im.greyscale
-            gui.im1 = [];imagesc(status.currim, 'parent', gui.ax1, 'buttondownfcn', status.maincb);
-            %gui.im1=[];imagesc(imresample([1,1],double(status.currim),[0.2,0.2],'spline'), 'parent', gui.ax1, 'buttondownfcn', status.maincb); %%HACK!
+            gui.im1 = []; imagesc(status.currim, 'parent', gui.ax1, 'buttondownfcn', status.maincb);
         else
             if isempty(gui.im1)
                 gui.im1 = image(status.currim, 'parent', gui.ax1, 'buttondownfcn', status.maincb);
@@ -131,6 +132,7 @@ if ismember(redraw, [1 2 3])
                 set(gui.im1, 'cdata', status.currim);
             end
         end
+        
     end %else
     
     

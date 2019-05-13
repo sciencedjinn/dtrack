@@ -39,7 +39,7 @@ figh            = 0.4;
 
 %% draw figure
 figpos          = [0.5-figw/2 0.5-figh/2 figw figh];
-fig             = dialog('Color', figcol, 'name', 'Welcome to DTrack', 'units', 'normalized', 'Position', figpos, 'CloseRequestFcn', @nested_cancel, 'windowstyle', 'normal');
+fig             = dialog('Color', figcol, 'name', ['Welcome to ' para.theme.name], 'units', 'normalized', 'Position', figpos, 'CloseRequestFcn', @nested_cancel, 'windowstyle', 'normal');
 
 %% create buttons
 %col 2 (create first, so it doesnt have focus)
@@ -75,7 +75,7 @@ uicontrol('parent', fig, 'units', 'normalized', 'style', 'pushbutton', 'position
       'fontsize', fontsize, 'tooltip', 'Open a short demonstration video of a rolling beetle, demonstrating point tracking mode.', 'enable', 'off');
 p(2)=p(2)-std_dist_vert-button_height;
 uicontrol('parent', fig, 'units', 'normalized', 'style', 'pushbutton', 'position', p, ...
-      'horizontalalignment', 'center', 'string', 'Quit DTrack', 'callback', @nested_cancel,...
+      'horizontalalignment', 'center', 'string', ['Quit ' para.theme.name], 'callback', @nested_cancel,...
       'fontsize', fontsize, 'tooltip', 'Quit program');
   
 
@@ -104,8 +104,8 @@ end
         switch success
             case 1
                 %TODO: could this be in dtrack?
-                gui=dtrack_gui(status, para);
-                loadaction='new';
+                gui = dtrack_gui(status, para);
+                loadaction = 'new';
                 uiresume(fig);
             otherwise %2 for user canceled or 0
                 set(fig, 'visible', 'on');
@@ -120,8 +120,8 @@ end
             [status, para, data, success]=dtrack_fileio_load(status, para, 0);
         end
         if success
-            gui=dtrack_gui(status, para);
-            loadaction='load';
+            gui = dtrack_gui(status, para);
+            loadaction = 'load';
             uiresume(fig);
         else
             set(fig, 'visible', 'on');

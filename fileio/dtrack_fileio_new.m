@@ -13,28 +13,28 @@ if loadnew
         %same file, new project
         filename = para.paths.movpath;
     else
-        %TODO: remember the last folder then reload from that
+        % TODO: remember the last folder then reload from that
         if ~isempty(para.paths.movpath)
             defpath = fileparts(para.paths.movpath);
         else
             defpath = para.paths.movdef;
         end
-        filename = dtrack_fileio_selectfile('new', defpath); %just acquires a file name, returns 0 if file selection is aborted
+        filename = dtrack_fileio_selectfile('new', defpath); % just acquires a file name, returns 0 if file selection is aborted
     end
 
     if filename~= 0
-        %create defaults
-        oldpara = para; oldstatus = status; %keep stuff
-        [status, para, data] = dtrack_defaults;
-        status.maincb = oldstatus.maincb;status.movecb = oldstatus.movecb; status.resizecb = oldstatus.resizecb; %restore callbacks
+        % create defaults
+        oldpara = para; oldstatus = status; % keep stuff
+        [status, para, data] = dtrack_defaults(para.modules);
+        status.maincb = oldstatus.maincb; status.movecb = oldstatus.movecb; status.resizecb = oldstatus.resizecb; %restore callbacks
 
-        %save filenames
-        [path, name, ext] = fileparts(filename); %#ok<ASGLU>
+        % save filenames
+        [~, name, ext] = fileparts(filename); % #ok<ASGLU>
         para.paths.movpath = filename; para.paths.movname = [name ext]; para.paths.resname = 'Untitled';
 
         if same
-            %restore some stuff
-            %a) para
+            % restore some stuff
+            % a) para
             para.paths.movdef = oldpara.paths.movdef;
             para.paths.resdef = oldpara.paths.resdef;
             para.paths.calibname = oldpara.paths.calibname;
@@ -44,7 +44,7 @@ if loadnew
             para.thermal = oldpara.thermal;
             para.imseq = oldpara.imseq;
             
-            %b) all status except 
+            % b) all status except 
             status.framenr  = oldstatus.framenr;
             status.graycm   = oldstatus.graycm;
             status.trackedpoints = oldstatus.trackedpoints;

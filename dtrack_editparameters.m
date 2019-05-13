@@ -7,7 +7,7 @@ function outpara = dtrack_editparameters(para)
 % Uses:             None
 % See also:         dtrack_fileio_new, dtrack_fileio_startdlg
 
-% TODO: could also use and check para.os and para.matlabv here ('PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64')
+% TODO: could also use and check status.os and status.matlabv here ('PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64')
 
 % Convention: for lines, para.pnr should be 2 for a single line. However, the 'value' of the popup menu would be 1 for a single line
 
@@ -104,6 +104,10 @@ function sub_callback(src, varargin)
             sub_creategui;
             sub_setdef;
             
+        case {'editpara_point', 'editpara_line'}
+            % This is called when point or line is pressed, but already selected.
+            % Do nothing.            
+            
         case 'editpara_pnr'
             temp = get(src, 'string');
             para.pnr = round(str2double(temp{get(src, 'value')}));
@@ -164,7 +168,7 @@ function sub_creategui
     'interruptible', 'off', 'pointer', 'arrow', 'CloseRequestFcn', @sub_close);
 
 %% panels
-    uicontrol(gui.fig, 'style', 'text', 'units', 'normalized', 'position', [.02 .91 .96 .07], 'string', 'DTrack parameters', 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 15, 'fontweight', 'bold');
+    uicontrol(gui.fig, 'style', 'text', 'units', 'normalized', 'position', [.02 .91 .96 .07], 'string', [para.theme.name ' parameters'], 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 15, 'fontweight', 'bold');
     uicontrol(gui.fig, 'style', 'text', 'units', 'normalized', 'position', [.02 .84 .96 .06], 'string', ['Opening movie file ' para.paths.movname], 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 10);
     gui.panel1.panel = uibuttongroup(gui.fig, 'position', [.02 .54 .96 .28], 'tag', 'editpara_trackingtype', 'selectionchangefcn', editcb);
     gui.panel2.panel = uipanel(gui.fig,       'position', [.02 .12 .47 .40]);

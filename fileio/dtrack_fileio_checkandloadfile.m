@@ -41,16 +41,16 @@ if ~exist(para.paths.movpath, 'file')
         
     %if unsuccessful, ask user
     if filename==0
-        filename=dtrack_fileio_selectfile('new', ps, ['Movie file could not be found at ' para.paths.movpath '. Please locate the file.'], [ns es]); %just acquires a file name, returns 0 if file selection is aborted
+        filename = dtrack_fileio_selectfile('new', ps, ['Movie file could not be found at ' para.paths.movpath '. Please locate the file.'], [ns es]); %just acquires a file name, returns 0 if file selection is aborted
     end
     %now replace filename in para
     if filename~=0
-        para.paths.movpath=filename;
-        [path, name, ext]=fileparts(filename); %#ok<ASGLU>
+        para.paths.movpath = filename;
+        [path, name, ext] = fileparts(filename); %#ok<ASGLU>
         if para.imseq.isimseq
-            para.paths.movname=name(1:end-para.imseq.padding);
+            para.paths.movname = name(1:end-para.imseq.padding);
         else
-            para.paths.movname=[name ext];
+            para.paths.movname = [name ext];
         end
     else
         error(['Movie file could not be found at ' para.paths.movpath '.']);
@@ -58,8 +58,8 @@ if ~exist(para.paths.movpath, 'file')
 end
 
 %load movie
-set(gcf, 'pointer', 'watch');drawnow;
-[status, para, success]=dtrack_fileio_openmovie(status, para); %success 0 means file not found. If mmreader can't read it, mmread will be tried (after dialog)
+set(gcf, 'pointer', 'watch'); drawnow;
+[status, para, success] = dtrack_fileio_openmovie(status, para); %success 0 means file not found. If mmreader can't read it, mmread will be tried (after dialog)
 % check if this is a greyscale image sequence
 if status.GSImage
     para.im.greyscale=1;
