@@ -28,11 +28,6 @@ if para.im.roi
 else
     set(findobj('tag', 'roi_display'), 'checked', 'off');
 end
-if para.ref.use
-    set(findobj('tag', 'ref_display'), 'checked', 'on');
-else
-    set(findobj('tag', 'ref_display'), 'checked', 'off');
-end
 if para.gui.navitoolbar
     set(findobj('tag', 'view_navitoolbar'), 'checked', 'on');
 else

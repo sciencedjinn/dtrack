@@ -38,9 +38,31 @@ if isempty(para.paths.roiname)
     set(findobj('tag', 'roi_display'), 'enable', 'off');
 end
 
-% disable ref display
-if isempty(para.ref.framenr)
-    set(findobj('tag', 'ref_display'), 'enable', 'off');
+% ref display
+switch para.ref.use
+    case 'none'
+        set(findobj('tag', 'ref_set_none'), 'checked', 'on');
+        set(findobj('tag', 'ref_set_static'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_dynamic'), 'checked', 'off');
+        set(findobj('tag', 'ref_set'), 'enable', 'off');
+        set(findobj('tag', 'ref_frameDiff'), 'enable', 'off');
+        set(findobj('tag', 'refframe'), 'string', 'no ref frame');
+    case 'static'
+        set(findobj('tag', 'ref_set_none'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_static'), 'checked', 'on');
+        set(findobj('tag', 'ref_set_dynamic'), 'checked', 'off');
+        set(findobj('tag', 'ref_set'), 'enable', 'on');
+        set(findobj('tag', 'ref_frameDiff'), 'enable', 'off');
+        set(findobj('tag', 'refframe'), 'string', ['ref frame ' num2str(para.ref.framenr)]);
+    case 'dynamic'
+        set(findobj('tag', 'ref_set_none'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_static'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_dynamic'), 'checked', 'on');
+        set(findobj('tag', 'ref_set'), 'enable', 'off');
+        set(findobj('tag', 'ref_frameDiff'), 'enable', 'on');
+        set(findobj('tag', 'refframe'), 'string', ['ref diff ' num2str(para.ref.frameDiff)]);
+    otherwise
+        error('Internal error: Incorrect para.ref.use value: %s', para.ref.use);
 end
     
 % disable calibrated plotting

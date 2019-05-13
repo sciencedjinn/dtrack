@@ -358,10 +358,13 @@ function sub_loaddef
         autopara.to         = status.nFrames;
         autopara.step       = 1;
         autopara.pointnr    = status.cpoint;
-        if para.ref.use
-            autopara.ref    = para.ref.framenr;
-        else
-            autopara.ref    = status.framenr;
+        switch para.ref.use
+            case 'none'
+                autopara.ref    = status.framenr;
+            case 'static'
+                autopara.ref    = para.ref.framenr;
+            case 'dynamic'
+                autopara.ref    = -para.ref.frameDiff; %TODO: Make use of this number
         end
         autopara.useroi     = 1;
         autopara.showim     = 1;

@@ -1,20 +1,20 @@
-function [imout, h, timeout]=readframe(h, framenr, para, status, justoneframe)
+function [imout, h, timeout] = readframe(h, framenr, para, status, justoneframe)
 
 if nargin<5
     justoneframe=0; %used to load just one frame, e.g. for reference
 end
 
 if para.thermal.isthermal
-    imout=h.data(:, :, framenr);
-    timeout=0;
+    imout = h.data(:, :, framenr);
+    timeout = 0;
 elseif para.imseq.isimseq
-    imout=imread([h.filename, sprintf(['%0' num2str(para.imseq.padding) '.0f'], framenr), para.imseq.ext]);
-    timeout=0;
+    imout = imread([h.filename, sprintf(['%0' num2str(para.imseq.padding) '.0f'], framenr), para.imseq.ext]);
+    timeout = 0;
 else
     if ~para.usemmread
         %use VideoReader, the internal MATLAB function
         imout = read(h, framenr);
-        timeout=0;
+        timeout = 0;
     else
         if ~ismember(framenr, h.range)
             if justoneframe
@@ -45,7 +45,7 @@ else
         else
 
         end
-        imout=h.data(h.range==framenr).cdata;
-        timeout=h.times(h.range==framenr);
+        imout = h.data(h.range==framenr).cdata;
+        timeout = h.times(h.range==framenr);
     end
 end

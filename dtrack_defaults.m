@@ -70,14 +70,15 @@ para.ls.p{8}.col  = [1 1 1];    para.ls.p{8}.shape  = 'o';    para.ls.p{8}.size 
 para.ls.p{9}.col  = [.5 0 1];   para.ls.p{9}.shape  = 'o';    para.ls.p{9}.size  = 10; para.ls.p{9}.width  = 1.5;
 para.ls.p{10}.col = [0 .5 1];   para.ls.p{10}.shape = 'o';    para.ls.p{10}.size = 10; para.ls.p{10}.width = 1.5;
 para.ls.cp.col    = [1 1 .5];   para.ls.cp.shape    = 'o';    para.ls.cp.size    = 20; para.ls.cp.width    = 1;
-para.ls.lp.col    = [.8 .8 .8]; para.ls.lp.shape    = 'none';    para.ls.lp.size    = 20; para.ls.lp.width    = 1;
+para.ls.lp.col    = [.8 .8 .8]; para.ls.lp.shape    = 'none'; para.ls.lp.size    = 20; para.ls.lp.width    = 1;
 para.ls.roi.col   = [.8 .8 .8]; para.ls.roi.shape   = 'none'; para.ls.roi.size   = 10; para.ls.roi.width   = 1;
 
 %% ROI and reference frame parameters
 para.roix                   = [];
 para.roiy                   = [];
 para.ref.framenr            = [];
-para.ref.use                = false;
+para.ref.use                = 'none'; % can be 'none'/'static'/'dynamic'
+para.ref.frameDiff          = 0; % when set to 0, para.gui.stepsize will be used instead
 
 %% load local parameter and preferences files
 if exist(fullfile(prefdir, 'dtrack_para.dtp'), 'file')

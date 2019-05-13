@@ -67,7 +67,7 @@ function sub_default(varargin)
     savepara.gui.infopanel_points   = para.gui.infopanel_points;
     savepara.gui.infopanel_markers  = para.gui.infopanel_markers;
     savepara.gui.infopanel_mani     = para.gui.infopanel_mani;
-    savepara.gui.minimap            = para.gui.minimap; %#ok<STRNU>
+    savepara.gui.minimap            = para.gui.minimap;
     save(fullfile(prefdir, 'dtrack_pref.dtp'), 'savepara', '-mat');
     disp('Local preferences saved to preferences directory.');
 end

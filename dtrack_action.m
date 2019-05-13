@@ -882,7 +882,7 @@ else
             redraw = 0;
             saveneeded = 1;
             
-      %% ROI menu
+      %% ROI&REF menu
         case 'roi_create_frominput'
             [~, filename] = dtrack_roi_create_frominput(status, fullfile(fileparts(para.paths.movpath), 'defaultroi.roi')); %creates and saves a new ROI
             if filename~=0
@@ -926,26 +926,79 @@ else
             redraw = 2;
             saveneeded = 1/2;
             
-        case 'ref_set'
-            para.ref.framenr = status.framenr;
-            [status, para] = dtrack_ref_prepare(status, para);
-            set(findobj('tag', 'ref_display'), 'enable', 'on', 'checked', 'on');
-            set(findobj('tag', 'refframe'), 'string', ['ref frame ' num2str(status.framenr)]);
-            para.ref.use = 1;
-            redraw = 2;
-            saveneeded = 1;
             
-        case 'ref_display'
-            para.ref.use=support_togglechecked('ref_display');
+            
+%     gui.menus.roi.entries.ref_set_none = uimenu(gui.menus.roi.set_menu, 'label', 'None', 'checked', 'on');
+%     gui.menus.roi.entries.ref_set_static = uimenu(gui.menus.roi.set_menu, 'label', 'Static', 'checked', 'off');
+%     gui.menus.roi.entries.ref_set_dynamic = uimenu(gui.menus.roi.set_menu, 'label', 'Dynamic', 'checked', 'off');
+%     gui.menus.roi.entries.ref_set = uimenu(gui.menus.roi.menu, 'label', 'Use current frame as reference');
+%     gui.menus.roi.entries.ref_frameDiff = uimenu(gui.menus.roi.menu, 'label', 'Set dynamic frame difference...');
+            
+        case 'ref_set_none'
+            para.ref.use = 'none';
+            dtrack_guivisibility(gui, para, status);
             redraw = 2;
             saveneeded = 1/2;
-            
-        case 'ref_clear'
-            para.ref.framenr=[];
-            status.ref.cdata=[];
-            set(findobj('tag', 'ref_display'), 'enable', 'off', 'checked', 'off');
-            set(findobj('tag', 'refframe'), 'string', 'ref frame not set');
-            para.ref.use=0;
+        case 'ref_set_static'
+            para.ref.use = 'static';
+            if isempty(para.ref.framenr)
+                para.ref.framenr = status.framenr;
+                [status, para] = dtrack_ref_prepare(status, para);
+            end
+            dtrack_guivisibility(gui, para, status);
+            redraw = 2;
+            saveneeded = 1/2;
+        case 'ref_set_dynamic'
+            para.ref.use = 'dynamic';
+            dtrack_guivisibility(gui, para, status);
+            redraw = 2;
+            saveneeded = 1/2;
+        case 'ref_set'
+            para.ref.framenr = status.framenr;
+            set(findobj('tag', 'refframe'), 'string', ['ref frame ' num2str(status.framenr)]);
+            [status, para] = dtrack_ref_prepare(status, para);
+            redraw = 2;
+            saveneeded = 1/2;
+        case 'ref_frameDiff' 
+            answer = inputdlg('Please enter the desired frame subtraction distance:', 'New reference difference', 1, {num2str(para.ref.frameDiff)});
+            if ~isempty(answer)
+                answer = abs(round(str2double(answer{1})));
+                answer = max([answer 0]); % minimum 0
+                if ~isnan(answer)
+                    para.ref.frameDiff = answer; 
+                end
+            end
+            dtrack_guivisibility(gui, para, status);
+            redraw = 2;
+            saveneeded = 1;
+        case 'refframe'
+            % Set the reference frame (for static mode) OR frame difference (dynamic mode)
+            switch para.ref.use
+                case 'none'
+                    % do nothing
+                case 'static'
+                    answer = inputdlg('Please enter a new reference frame number:', 'New reference frame', 1, {num2str(para.ref.framenr)});
+                    if ~isempty(answer)
+                        answer = abs(round(str2double(answer{1})));
+                        answer = min([status.nFrames max([answer 1])]); % limit to valid frames
+                        if ~isnan(answer)
+                            para.ref.framenr = answer; 
+                        end
+                    end
+                    [status, para] = dtrack_ref_prepare(status, para);
+                    dtrack_guivisibility(gui, para, status);
+                case 'dynamic'
+                    answer = inputdlg('Please enter the desired frame subtraction distance:', 'New reference difference', 1, {num2str(para.ref.frameDiff)});
+                    if ~isempty(answer)
+                        answer = abs(round(str2double(answer{1})));
+                        answer = max([answer 0]); % minimum 0
+                        if ~isnan(answer)
+                            para.ref.frameDiff = answer; 
+                        end
+                    end
+                    dtrack_guivisibility(gui, para, status);
+                    
+            end
             redraw = 2;
             saveneeded = 1;
             
@@ -1088,7 +1141,7 @@ else
             saveneeded = 0;
             
         case 'debug_closeall'
-            display('Closing all other windows. If the DTrack window is closed, try running dtrack_restore()');
+            disp('Closing all other windows. If the DTrack window is closed, try running dtrack_restore()');
             set(0,'ShowHiddenHandles','on');
             figs = get(0,'Children');
             delete(figs(figs~=1));
@@ -1096,7 +1149,7 @@ else
             saveneeded = 0;
             
         case 'debug_redrawlines'
-            display('Redrawing all points and lines.');
+            disp('Redrawing all points and lines.');
             delete([status.ph{:}]);
             delete(status.cph);
             delete(status.lph);
