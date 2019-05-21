@@ -26,7 +26,7 @@ if loadnew
         % create defaults
         oldpara = para; oldstatus = status; % keep stuff
         [status, para, data] = dtrack_defaults(para.modules);
-        status.maincb = oldstatus.maincb; status.movecb = oldstatus.movecb; status.resizecb = oldstatus.resizecb; %restore callbacks
+        status.maincb = oldstatus.maincb; status.movecb = oldstatus.movecb; status.resizecb = oldstatus.resizecb; status.scrollcb = oldstatus.scrollcb; % restore callbacks
 
         % save filenames
         [~, name, ext] = fileparts(filename); % #ok<ASGLU>

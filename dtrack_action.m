@@ -42,7 +42,7 @@ elseif alt&&shift
         case {'d', 'r', 's', 'e', 'p'}
             % Move to previous pointmarker
             temp = dtrack_findnextmarker(data, status.framenr, action, 'p');
-            if ~isempty(temp), status.framenr = temp; redraw = 1; else redraw = 0; end
+            if ~isempty(temp), status.framenr = temp; redraw = 1; else, redraw = 0; end
             saveneeded = 0;
         otherwise
             status.currentaction = status.lastaction;
@@ -119,7 +119,7 @@ elseif shift
         case {'d', 'r', 's', 'e', 'p'}
             % Move to next pointmarker
             temp = dtrack_findnextmarker(data, status.framenr, action, 'n');
-            if ~isempty(temp), status.framenr = temp; redraw = 1; else redraw = 0; end
+            if ~isempty(temp), status.framenr = temp; redraw = 1; else, redraw = 0; end
             saveneeded = 0;
             
         case {'leftarrow'}
@@ -178,7 +178,7 @@ else
             
       %% Resize
         case 'resize'
-            if ishandle(gui.minimap.panel) %has to be checked because sometimes this is called before the main figure is drawn
+            if ishandle(gui.minimap.panel) % has to be checked because sometimes this is called before the main figure is drawn
                 oldpos = get(gui.minimap.panel, 'position');
                 minisize    = oldpos(3);
                 axsize      = get(gui.f1, 'Position');
@@ -194,15 +194,29 @@ else
             redraw = 0;
             saveneeded = 0;
             
+      %% Scroll
+        case 'scrollup'
+            axes(gui.ax1);
+            zoom(gui.f1, 1.2);
+            redraw = 0;
+            saveneeded = 0;
+            
+        case 'scrolldown'
+            axes(gui.ax1);
+            zoom(gui.f1, 1/1.2);
+            redraw = 0;
+            saveneeded = 0;
+            
+            
       %% Mouse buttons
         case {'leftclick', 'doubleleftclick'}
             % Set current point
-            switch para.trackingtype  %store data
+            switch para.trackingtype  % store data
                 case 'point'
                     data.points(status.framenr, status.cpoint, :) = [x y 1]; % 1 means manually tracked
                 case 'line'
                     h  = imline(gui.ax1, 'PositionConstraintFcn', dtrack_roi_constrain(para, status));
-                    cp = status.cpoint; %current POINT number (e.g. cp is 3 for line #2)
+                    cp = status.cpoint; % current POINT number (e.g. cp is 3 for line #2)
                     % store data
                     data.points(status.framenr, cp:cp+1, 1:2) = getPosition(h);
                     data.points(status.framenr, cp:cp+1, 3)   = 1; % 1 means manually tracked
@@ -353,7 +367,7 @@ else
         case {'d', 'r', 'p'}
             % Move to next point marker
             temp = dtrack_findnextmarker(data, status.framenr, action, 'n');
-            if ~isempty(temp), status.framenr = temp; redraw = 1; else redraw = 0; end 
+            if ~isempty(temp), status.framenr = temp; redraw = 1; else, redraw = 0; end 
             saveneeded = 0;
             
       % Modes
@@ -365,9 +379,13 @@ else
             set(findobj('tag', 'pan'), 'state', 'off'); % toggle the buttons
             set(findobj('tag', 'acquire'), 'state', 'off'); % toggle the buttons
 
-            %replace default keypress callbacks
+            % replace default keypress callbacks
             hManager = uigetmodemanager(gui.f1);
-            set(hManager.WindowListenerHandles,'Enable','off');
+            try
+                set(hManager.WindowListenerHandles, 'Enable', 'off');  % HG1 (Matlab 2014a and before)
+            catch
+                [hManager.WindowListenerHandles.Enabled] = deal(false);  % HG2 (Matlab 2014b and after)
+            end
             set(gui.f1, 'keypressfcn', status.maincb);
 
             status.acquire = 0;
@@ -395,9 +413,13 @@ else
             set(findobj('tag', 'pan'), 'state', 'on'); % toggle the buttons
             set(findobj('tag', 'acquire'), 'state', 'off'); % toggle the buttons
 
-            %replace default keypress callbacks
-            hManager = uigetmodemanager(gui.f1);
-            set(hManager.WindowListenerHandles,'Enable','off');
+            % replace default keypress callbacks
+            hManager = uigetmodemanager(gui.f1); %% NOTE: Does not work anymore in current Matlab version, but seems fine without
+            try
+                set(hManager.WindowListenerHandles, 'Enable', 'off');  % HG1 (Matlab 2014a and before)
+            catch
+                [hManager.WindowListenerHandles.Enabled] = deal(false);  % HG2 (Matlab 2014b and after)
+            end
             set(gui.f1, 'keypressfcn', status.maincb);
 
             status.acquire = 0;
@@ -1187,16 +1209,16 @@ else
             saveneeded = 1/2;
             
         case {'autoforw_1', 'autoforw_x'}
-            para.autoforw=0;
+            para.autoforw = 0;
             if ismember(findobj('tag', 'autoforw_1'), get(findobj('tag', 'autoforwpanel'), 'selectedobject'))
                 set(findobj('tag', 'autoforw_1'), 'cdata', 380-gui.icons.autoforw_1);
-                para.autoforw=1;
+                para.autoforw = 1;
             else
                 set(findobj('tag', 'autoforw_1'), 'cdata', gui.icons.autoforw_1-25);
             end
             if ismember(findobj('tag', 'autoforw_x'), get(findobj('tag', 'autoforwpanel'), 'selectedobject'))
                 set(findobj('tag', 'autoforw_x'), 'cdata', 380-gui.icons.autoforw_x);
-                para.autoforw=2;
+                para.autoforw = 2;
             else
                 set(findobj('tag', 'autoforw_x'), 'cdata', gui.icons.autoforw_x-25);
             end
@@ -1205,7 +1227,17 @@ else
             saveneeded = 1/2;
             
         otherwise
-            error(['Unknown action: ', action]);
+            %% call modules
+            actionFound = false;
+            for i = 1:length(para.modules)
+                [gui, status, para, data, actionFound, redraw, saveneeded] = feval([para.modules{i} '_action'], gui, status, para, data, action, src);
+                if actionFound
+                    break;
+                end
+            end
+            if ~actionFound
+                error(['Unknown action: ', action]);
+            end
     end %switch
 end %if
 
@@ -1259,7 +1291,7 @@ end
 
 %% redraw image
 if redraw
-    [status, gui] = dtrack_image(gui, status, para, data, redraw); %redraw 1 draws image and all points
+    [status, gui] = dtrack_image(gui, status, para, data, redraw); % redraw 1 draws image and all points
 end
 
 %% update number of actions since last save, and autosave if necessary

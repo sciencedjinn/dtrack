@@ -54,7 +54,7 @@ para.im.gs1 = .2989; para.im.gs2 = .5870; para.im.gs3 = .1140;
 para.trackingtype           = 'point'; % 'point'/'line' 
 para.pnr                    = 1; % how many points should be tracked; if trackingtype is 'line', pnr MUST be a multiple of 2
 para.usemmread              = 0;
-para.mmreadsize             = 500; %frame chunk size
+para.mmreadsize             = 500; % frame chunk size
 para.mmreadoverlap          = 20;
 para.forceaspectratio       = [];
 para.saveneeded             = 0;
@@ -72,7 +72,7 @@ para.ls.p{8}.col  = [1 1 1];    para.ls.p{8}.shape  = 'o';    para.ls.p{8}.size 
 para.ls.p{9}.col  = [.5 0 1];   para.ls.p{9}.shape  = 'o';    para.ls.p{9}.size  = 10; para.ls.p{9}.width  = 1.5;
 para.ls.p{10}.col = [0 .5 1];   para.ls.p{10}.shape = 'o';    para.ls.p{10}.size = 10; para.ls.p{10}.width = 1.5;
 para.ls.cp.col    = [1 1 .5];   para.ls.cp.shape    = 'o';    para.ls.cp.size    = 20; para.ls.cp.width    = 1;
-para.ls.lp.col    = [.8 .8 .8]; para.ls.lp.shape    = 'none'; para.ls.lp.size    = 20; para.ls.lp.width    = 1;
+para.ls.lp.col    = [.8 .8 .8]; para.ls.lp.shape    = 'o';    para.ls.lp.size    = 20; para.ls.lp.width    = 1;
 para.ls.roi.col   = [.8 .8 .8]; para.ls.roi.shape   = 'none'; para.ls.roi.size   = 10; para.ls.roi.width   = 1;
 
 %% ROI and reference frame parameters
@@ -119,12 +119,10 @@ data.markers            = [];
 %% Default Dtrack theme
 para.theme.name = 'DTrack';
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load modules
 for i = 1:length(para.modules)
     [status, para, data] = feval([para.modules{i} '_defaults'], status, para, data);
-    
 end
 
 

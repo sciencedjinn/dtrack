@@ -66,6 +66,7 @@ if stat
     status.maincb       = [];
     status.movecb       = [];
     status.resizecb     = [];
+    status.scrollcb     = [];
     status.ph           = {};
     status.cph          = [];
     status.lph          = [];

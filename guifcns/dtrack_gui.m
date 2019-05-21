@@ -1,4 +1,4 @@
-function gui=dtrack_gui(status, para)
+function gui = dtrack_gui(status, para)
 % dungtack_gui sets up figures, menus, buttons and contextmenus
 % gui = dtrack_gui(para, status, status.maincb)
 
@@ -10,7 +10,7 @@ gui.f1 = figure(1);clf;
 set(gui.f1, 'ResizeFcn', []); %for resets
 p = double(imread(fullfile(iconpath, 'crosshair1_16.tif')))+1;p(p==min(p(:))) = 1;p(p==max(p(:)))=2;p(p>2)=NaN;
 gui.pointers.crosshair1_16 = p;
-gui.pointers.crosshair1_32 = double(imread(fullfile(iconpath, 'crosshair1_32.tif')))+1;gui.pointers.crosshair1_32(gui.pointers.crosshair1_32==2)=NaN;
+gui.pointers.crosshair1_32 = double(imread(fullfile(iconpath, 'crosshair1_32.tif'))) + 1; gui.pointers.crosshair1_32(gui.pointers.crosshair1_32==2) = NaN;
 if isempty(para.gui.fig1pos)
     fig1pos = get(0, 'screensize');
 else
@@ -18,7 +18,8 @@ else
 end
 set(gui.f1, 'outerposition', fig1pos, 'name', [para.theme.name ': ' para.paths.resname ' (' para.paths.movname ')'], ...
      'numbertitle', 'off', 'menubar', 'none', 'keypressfcn', status.maincb,...
-     'interruptible', 'off', 'pointer', 'custom', 'pointershapecdata', gui.pointers.crosshair1_16, 'pointershapehotspot', [8.5 8.5]);
+     'interruptible', 'off', 'pointer', 'custom', 'pointershapecdata', gui.pointers.crosshair1_16, 'pointershapehotspot', [8.5 8.5], ...
+     'WindowScrollWheelFcn', status.scrollcb);
 %try, drawnow; pause(3); maxfig; end %#ok<TRYNC,NOCOM> %This line has caused trouble on Windows and Mac: Mouse clicks would not register at the correct screen
 % position until a gui reset was performed or the window minimised and then maximised again
 set(gui.f1, 'ResizeFcn', status.resizecb);
@@ -97,7 +98,7 @@ axwidth = axsize(3)-axsize(1)+1;axheight = axsize(4)-axsize(2)+1;
 if ~isempty(para.forceaspectratio)
     miniheight = minisize*axwidth/para.forceaspectratio(1)*para.forceaspectratio(2)/axheight;
 else
-    miniheight  =minisize;
+    miniheight = minisize;
 end
 gui.minimap.panel = uipanel(gui.f1, 'position', [1-minisize 0 minisize miniheight], 'backgroundcolor', [.5 .5 .5]);
     gui.minimap.axes = axes('parent', gui.minimap.panel, 'units', 'normalized', 'position', [0 0 1 1], 'tag', 'minimap_axes', 'buttondownfcn', status.maincb); 
@@ -237,8 +238,14 @@ gui.menus.help.menu = uimenu(gui.f1, 'label', 'Help');
     gui.menus.help.entries.help_known = uimenu(gui.menus.help.menu, 'label', 'Known bugs');
     gui.menus.help.entries.help_aspectratio = uimenu(gui.menus.help.menu, 'label', 'Fix my aspect ratio!');
 
+
+%% Check if the modules have anything to add
+for i = 1:length(para.modules)
+    gui = feval([para.modules{i} '_gui'], status, para, gui);
+end
+    
 %% Add tags
-types={'menus', 'controls', 'infoarea'};%, 'contextmenus'};
+types = {'menus', 'controls', 'infoarea'};%, 'contextmenus'};
 for i = 1:length(types)
     names = fieldnames(gui.(types{i}));
     for j = 1:length(names)

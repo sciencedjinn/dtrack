@@ -197,12 +197,16 @@ end
 
     function nested_close(varargin)
         % CLOSE: close button callback
-        button=questdlg('Do you want to save the changed values?', 'Save changes', 'Save', 'Don''t save', 'Cancel', 'Don''t save');
-        switch button
-            case 'Save'
-                nested_OK();
-            case 'Don''t save'
-                nested_cancel();
+        try
+            button=questdlg('Do you want to save the changed values?', 'Save changes', 'Save', 'Don''t save', 'Cancel', 'Don''t save');
+            switch button
+                case 'Save'
+                    nested_OK();
+                case 'Don''t save'
+                    nested_cancel();
+            end
+        catch
+           closereq; % make sure you close the window.
         end
     end
 

@@ -26,6 +26,7 @@ if nargin<1, modules = {}; end
 status.maincb         = @maincb;
 status.movecb         = @movecb;
 status.resizecb       = @resizecb;
+status.scrollcb       = @scrollcb;
 assignin('base', 'dtrack_restore', @nested_restore);
 
 %% version check
@@ -72,7 +73,7 @@ status.dtrackbase = mfilename('fullpath');
         
         switch get(src, 'type')
             case {'image', 'figure'} % key or click
-                %a) mouse click
+                % a) mouse click
                 %%%%%% 20150324: in 2014a and older, event is not empty, but EventName does not exist. Introduced "isfield(event, 'EventName') &&" %%%%%% below, which seems to fic it
                 if isempty(event) || strcmp(event.EventName, 'Hit') %isfield(event, 'EventName') && strcmp(event.EventName, 'Hit') % empty happens before 2014b, 'Hit' from 2014b onwards
                     mod = {}; % This cell will collect all modifiers (Alt/Ctrl/Shift) that were pressed while the action happened.
@@ -92,7 +93,7 @@ status.dtrackbase = mfilename('fullpath');
                             mod = {'shift'};
                     end
                 
-                %b) not a mouseclick
+                % b) not a mouseclick
                 else
                     action = event.Key; mod = event.Modifier;
                 end
@@ -105,9 +106,11 @@ status.dtrackbase = mfilename('fullpath');
         end
         
         %fprintf('Entering action %s, with lastaction = %s\n', action, status.lastaction); % for debugging
+        set(gui.f1, 'pointer', 'watch'); drawnow;
         status.currentaction      = action;
         [gui, status, para, data] = dtrack_action(gui, status, para, data, action, mod, x, y, src);
         status.lastaction         = status.currentaction;
+        set(gui.f1, 'pointer', 'custom'); drawnow;
         %fprintf('Finishing action %s, saving it as lastaction = %s\n', action, status.lastaction); % for debugging
     end
 
@@ -121,12 +124,24 @@ status.dtrackbase = mfilename('fullpath');
     end
 
     function resizecb(src, varargin)
-        %main figure window has been resized
-        action='resize';x=[];y=[];mod={};
-        status.lastaction=action;
-        if exist('gui', 'var') %%don't know why, but this is sometimes called before gui is returned
+        % main figure window has been resized
+        action = 'resize'; x = []; y = []; mod = {};
+        status.lastaction = action;
+        if exist('gui', 'var') %% don't know why, but this is sometimes called before gui is returned
             [gui, status, para, data] = dtrack_action(gui, status, para, data, action, mod, x, y, src);
         end
+    end
+
+    function scrollcb(src, callbackdata)
+        % main figure window has had a scroll event
+        if callbackdata.VerticalScrollCount > 0
+            action = 'scrolldown';
+        else
+            action = 'scrollup';
+        end
+        x = []; y = []; mod = {};
+        status.lastaction = action;
+        [gui, status, para, data] = dtrack_action(gui, status, para, data, action, mod, x, y, src);
     end
 
     function nested_restore

@@ -11,6 +11,20 @@ function [status, gui] = dtrack_image(gui, status, para, data, redraw)
 
 %fprintf('     Image function with redraw mode: %d.\n', redraw);
 
+%% set frame number and frame time displays
+if redraw==1 || redraw==3
+    % set framenr display
+    set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(status.framenr), '/', num2str(status.nFrames)]);
+    
+    % set frametime display
+    if para.thermal.isthermal
+        timeNumber = status.mh.ts(status.framenr) - status.mh.ts(1);
+    else
+        timeNumber = status.framenr / status.FrameRate / 24 / 3600; % time in days
+    end
+    set(findobj('tag', 'frametime'), 'string', datestr(timeNumber/24/3600,'HH:MM:SS.FFF'));
+end
+
 %% load new image
 if ismember(redraw, [1 3 30]) % new frame actions
     % calculate framenr
@@ -31,52 +45,13 @@ if ismember(redraw, [1 3 30]) % new frame actions
    end
 end
 
-if redraw==30 %load only, don't display
+if redraw==30 % load only, don't display
     return;
 end
 
-%% set frame number and frame time displays
-if redraw==1 || redraw==3
-    %set framenr display
-    set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(status.framenr), '/', num2str(status.nFrames)]);
-    
-    %set frametime display
-    if para.thermal.isthermal
-        [junk, junk, junk, fth, ftm, ftsraw]=datevec(status.mh.ts(status.framenr)-status.mh.ts(1)); %#ok<ASGLU>
-        fts=floor(ftsraw);
-        ftms=mod(ftsraw, 1)*1000;        
-    else
-        fth=floor(status.framenr/status.FrameRate/3600);
-        ftm=floor(mod(status.framenr/status.FrameRate/60,3600));
-        fts=floor(mod(status.framenr/status.FrameRate,60));
-        ftms=mod(status.framenr/status.FrameRate, 1)*1000;
-    end
-    set(findobj('tag', 'frametime'), 'string', sprintf('time %02.0f:%02.0f:%02.0f.%03.0f', fth, ftm, fts, ftms));
-    
-    %%%%%status.ph={}; %delete point/line handles
-end
-
-%% display image
+%% image manipulation
 if ismember(redraw, [1 2 3])
-    % before drawing
-    status.zoomaxis = axis(gui.ax1); % save zoom before redrawing image
-
-    % image manipulation
-    if para.thermal.isthermal
-        % perform thermal-specific image manipulation
-        status.currim = status.currim_ori-273; %reset to original, unaltered image
-        gui.im1 = [];imagesc(status.currim, 'parent', gui.ax1, 'buttondownfcn', status.maincb);
-        set(gui.ax1, 'yDir', 'normal');
-        colormap('default');
-        if verLessThan('matlab','8.4.0')
-            % execute code for R2014a or earlier
-            gui.cb = colorbar('peer', gui.ax1, 'units', 'normalized', 'position', [.95 .4 .01 .2]);
-        else
-            % execute code for R2014b or later
-            gui.cb = colorbar(gui.ax1, 'units', 'normalized', 'position', [.95 .4 .01 .2]);
-        end
-        
-    else
+    if ~para.thermal.isthermal
         % now stuff for non-thermal images
         status.currim = status.currim_ori; % reset to original, unaltered image
         
@@ -93,36 +68,58 @@ if ismember(redraw, [1 2 3])
                     para.ref.framenr = max([1 status.framenr - para.gui.stepsize]);
                 end
                 [status, para] = dtrack_ref_prepare(status, para); % load new ref image
-                status.currim = uint8(125 + 0.5*(double(status.currim) - status.ref.cdata));
+                status.currim = - double(status.currim) + double(status.ref.cdata); %%TODO uint8 and 125+0.5*I %%FIXME
+%                 maxval = max(abs(status.currim(:)));
+%                 status.currim = (255*(0.5 + status.currim / maxval / 2));
         end
         
         if para.im.manicheck
             if para.im.greyscale
-                if ndims(status.currim)<3 || size(status.currim, 3)<3 
-                    %already a greyscale image, do nothing
+                if ismatrix(status.currim)
+                    % already a greyscale image, do nothing
                 else
-                    status.currim = para.im.gs1*status.currim(:,:,1)+para.im.gs2*status.currim(:,:,2)+para.im.gs3*status.currim(:,:,3);
+                    status.currim = para.im.gs1 * status.currim(:, :, 1) + para.im.gs2 * status.currim(:, :, 2) + para.im.gs3 * status.currim(:, :, 3);
                 end
                 if para.im.imadjust
                     status.currim = imadjust(status.currim);
                 end
                 colormap(status.graycm);
             else
-                if ndims(status.currim)<3 || size(status.currim, 3)<3 
-                    %already a greyscale image, this shouldnt even happen
+                if ismatrix(status.currim) 
+                    % already a greyscale image, this shouldnt even happen
                 else
                     status.currim = cat(3, para.im.rgb1*status.currim(:,:,1), para.im.rgb2*status.currim(:,:,2), para.im.rgb3*status.currim(:,:,3));
                     colormap('default');
                 end
             end
         end
-        
-        %% Before displaying the image, check if the modules have anything to add
-        for i = 1:length(para.modules)
-            [status, para, data] = feval([para.modules{i} '_imagefcn'], status, para, data);
-        end
-        
-        %% Now display the image
+    end
+end
+
+%% Module image manipulation
+if ismember(redraw, [1 2 3])
+    for i = 1:length(para.modules)
+        [status, para, data] = feval([para.modules{i} '_imagefcn'], status, para, data);
+    end 
+end
+
+%% display image
+if ismember(redraw, [1 2 3])
+    % before drawing
+    status.zoomaxis = axis(gui.ax1); % save zoom before redrawing image
+
+    if para.thermal.isthermal
+        status.currim = status.currim_ori - 273; % reset to original, unaltered image
+        gui.im1 = [];
+        imagesc(status.currim, 'parent', gui.ax1, 'buttondownfcn', status.maincb);
+        set(gui.ax1, 'yDir', 'normal');
+        colormap('default');
+        if verLessThan('matlab', '8.4.0')
+            gui.cb = colorbar('peer', gui.ax1, 'units', 'normalized', 'position', [.95 .4 .01 .2]); % execute code for R2014a or earlier
+        else
+            gui.cb = colorbar(gui.ax1, 'units', 'normalized', 'position', [.95 .4 .01 .2]); % execute code for R2014b or later
+        end        
+    else
         if para.im.imagesc && para.im.greyscale
             gui.im1 = []; imagesc(status.currim, 'parent', gui.ax1, 'buttondownfcn', status.maincb);
         else
@@ -132,23 +129,20 @@ if ismember(redraw, [1 2 3])
                 set(gui.im1, 'cdata', status.currim);
             end
         end
-        
-    end %else
-    
-    
+    end
 end
 
 %% draw ROI, region of interest
 if ismember(redraw, [1 2 3])
     status.roih = [];
     delete(findobj('tag', 'roiline'));
-    if para.im.roi && ~isempty(status.roi) %status.roi might be empty after reloading if the roi file has not been found
+    if para.im.roi && ~isempty(status.roi) % status.roi might be empty after reloading if the roi file has not been found
         switch status.roi(1, 1)
-            case 0  %0 indicates polygon vertices
+            case 0  % 0 indicates polygon vertices
                 status.roih = line(status.roi(2:end, 1), status.roi(2:end, 2), 'parent', gui.ax1, 'tag', 'roiline');    
             case 1
                 status.roih = rectangle('parent', gui.ax1, 'Position', status.roi(2:end, 1), 'Curvature', [1 1], 'tag', 'roiline');   
-            otherwise %old roi file
+            otherwise % old roi file
                 disp('No ROI type indicator found, assuming old ROI file.');
                 status.roih = line(status.roi(:, 1), status.roi(:, 2), 'tag', 'roiline');   
         end
@@ -367,16 +361,16 @@ if ismember(redraw, [1 2 3 11 12])
         case 'point'
             for i = 1:para.pnr
                 if length(status.ph)>=i && isobject(status.ph{i})
-                    h2 = get(status.ph{i}, 'children'); %Children has 2 objects: cross, circle
+                    h2 = get(status.ph{i}, 'children'); % Children has 2 objects: cross, circle
                     set(h2(1:2), 'marker', para.ls.p{i}.shape, 'markerfacecolor', 'none', 'color', para.ls.p{i}.col, 'markersize', para.ls.p{i}.size, 'linewidth', para.ls.p{i}.width);
                 end
             end
         case 'line'
             for i = 1:2:para.pnr
                 if length(status.ph)>=i && isobject(status.ph{i})
-                    h2 = get(status.ph{i}, 'children'); %Children has 4 objects: point 2, point 1, coloured line, thick back line (note inverse order of points!)
-                    %each imline has its own context menu, but all 4 points have
-                    %the same one, even after moving/dragging
+                    h2 = get(status.ph{i}, 'children'); % Children has 4 objects: point 2, point 1, coloured line, thick back line (note inverse order of points!)
+                    % each imline has its own context menu, but all 4 points have
+                    % the same one, even after moving/dragging
                     if ~isempty(h2)
                         set(h2(2), 'marker', para.ls.p{i}.shape, 'markerfacecolor', 'none', 'color', para.ls.p{i}.col, 'markersize', para.ls.p{i}.size, 'linewidth', para.ls.p{i}.width);
                         set(h2(1), 'marker', para.ls.p{i+1}.shape, 'markerfacecolor', 'none', 'color', para.ls.p{i+1}.col, 'markersize', para.ls.p{i+1}.size, 'linewidth', para.ls.p{i+1}.width);
@@ -389,13 +383,17 @@ end
 
 %% re-set zoom and aspect ratio
 if ismember(redraw, [1 2 3])
-    %after drawing
-    axis(gui.ax1, status.zoomaxis); %re-set zoom
-    if redraw==3, axis(gui.ax1, 'image'); end
-    
-    if ~isempty(para.forceaspectratio)
-        set(gui.ax1, 'dataaspectratiomode', 'auto', 'plotboxaspectratio', [para.forceaspectratio 1]);
+    if ismember(redraw, [1 2])
+        % after drawing
+        axis(gui.ax1, status.zoomaxis); % re-set zoom
     end
+    if ~isempty(para.forceaspectratio)
+        set(gui.ax1, 'dataaspectratiomode', [para.forceaspectratio 1]);
+    else
+        set(gui.ax1, 'dataaspectratio', [1 1 1]);
+    end
+    
+    
     set(gui.ax1, 'visible', 'off');
 end
 

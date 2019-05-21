@@ -33,6 +33,7 @@ Q.para.maxrecent = para.maxrecent;
 Q.status.acquire = 1;
 Q.status.maincb = status.maincb;
 Q.status.movecb = status.movecb;
+Q.status.scrollcb = status.scrollcb;
 
 %% check which fields exist, fill others with defaults
 data = Q.data; 

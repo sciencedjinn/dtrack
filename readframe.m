@@ -18,16 +18,16 @@ else
     else
         if ~ismember(framenr, h.range)
             if justoneframe
-                hh=waitbar(0, 'Reading frame...', 'windowstyle', 'modal');
-                h.range=framenr;
+                hh = waitbar(0, 'Reading frame...', 'windowstyle', 'modal');
+                h.range = framenr;
                 disp(['Reading frame ' num2str(framenr) '.']);
             else
-                hh=waitbar(0, 'Reading new frame block...', 'windowstyle', 'modal');
-                %determine new range and read new chunk
-                x1=floor((framenr-1)/para.mmreadsize)*para.mmreadsize+1-para.mmreadoverlap;
-                x2=floor((framenr-1)/para.mmreadsize+1)*(para.mmreadsize)+para.mmreadoverlap;
-                x1=max([1 x1]); x2=min([status.nFrames x2]);
-                h.range=x1:x2;
+                hh = waitbar(0, 'Reading new frame block...', 'windowstyle', 'modal');
+                % determine new range and read new chunk
+                x1 = floor((framenr-1)/para.mmreadsize)*para.mmreadsize+1-para.mmreadoverlap;
+                x2 = floor((framenr-1)/para.mmreadsize+1)*(para.mmreadsize)+para.mmreadoverlap;
+                x1 = max([1 x1]); x2=min([status.nFrames x2]);
+                h.range = x1:x2;
                 disp(['Reading new frame block from frame ' num2str(x1) ' to frame ', num2str(x2) '.']);
             end
             video = mmread(h.filename, h.range, [], false, true, '', 1, 1);

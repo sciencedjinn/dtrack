@@ -170,3 +170,8 @@ else
 end
     
         
+
+%% Check if the modules have anything to add
+for i = 1:length(para.modules)
+    feval([para.modules{i} '_guivisibility'], gui, para, status);
+end

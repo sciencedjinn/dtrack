@@ -35,9 +35,9 @@ if loadnew
     if filename~=0
         fprintf('\n----------\n\n');
         % create defaults (includes loading para/pref files)
-        maincb = status.maincb; movecb = status.movecb; resizecb = status.resizecb;
+        maincb = status.maincb; movecb = status.movecb; resizecb = status.resizecb; scrollcb = status.scrollcb;
         [status, para, data] = dtrack_defaults(para.modules);
-        status.maincb = maincb; status.movecb = movecb; status.resizecb = resizecb;
+        status.maincb = maincb; status.movecb = movecb; status.resizecb = resizecb; status.scrollcb = scrollcb;
         % save filenames
         [path, name, ext] = fileparts(filename); %#ok<ASGLU>
         para.paths.respath = filename; para.paths.resname = [name ext];
