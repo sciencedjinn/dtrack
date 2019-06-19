@@ -43,11 +43,6 @@ if para.gui.infopanel_points
 else
     set(findobj('tag', 'view_infopanel_points'), 'checked', 'off');
 end
-if para.gui.infopanel_markers
-    set(findobj('tag', 'view_infopanel_markers'), 'checked', 'on');
-else
-    set(findobj('tag', 'view_infopanel_markers'), 'checked', 'off');
-end
 if para.gui.infopanel_mani
     set(findobj('tag', 'view_infopanel_mani'), 'checked', 'on');
 else

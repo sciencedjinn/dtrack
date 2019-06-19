@@ -1,5 +1,5 @@
 function [gui, status, para, data, actionFound, redraw, saveNeeded] = holo_action(gui, status, para, data, action, src)
-% HOLO_ACTION is the holo module version of Dtrack's main callback function. It is called after all option in the main action function are exhausted.
+% HOLO_ACTION is the holo module version of Dtrack's main callback function. It is called after all options in the main action function are exhausted.
 % See dtrack_action for more information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -21,52 +21,54 @@ switch(action)
         returnfocus; 
         redraw = 2;
         saveNeeded = 1/2;
-    case 'holo_zvalue'
+    case 'holo_zvalue_disp'
         status.holo.z = str2double(get(src, 'string'));
         returnfocus;
         redraw = 2;
         saveNeeded = 1/2;
-    case 'holo_zvalue_minus5'
-        status.holo.z = status.holo.z - 5;
-        set(findobj('tag', 'holo_zvalue'), 'string', num2str(status.holo.z));
+    case {'holo_zvalue_minus5', 'holo_zvalue_minus1', 'holo_zvalue_plus1', 'holo_zvalue_plus5'}
+        switch(action)
+            case 'holo_zvalue_minus5'
+                status.holo.z = status.holo.z - 5;
+            case 'holo_zvalue_minus1'
+                status.holo.z = status.holo.z - 1;
+            case 'holo_zvalue_plus1'
+                status.holo.z = status.holo.z + 1;
+            case 'holo_zvalue_plus5'
+                status.holo.z = status.holo.z + 5;
+        end
+        set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
         returnfocus;
         redraw = 2;
         saveNeeded = 1/2;
-    case 'holo_zvalue_minus1'
-        status.holo.z = status.holo.z - 1;
-        set(findobj('tag', 'holo_zvalue'), 'string', num2str(status.holo.z));
-        returnfocus;
-        redraw = 2;
-        saveNeeded = 1/2;
-    case 'holo_zvalue_plus1'
-        status.holo.z = status.holo.z + 1;
-        set(findobj('tag', 'holo_zvalue'), 'string', num2str(status.holo.z));
-        returnfocus;
-        redraw = 2;
-        saveNeeded = 1/2;
-    case 'holo_zvalue_plus5'
-        status.holo.z = status.holo.z + 5;
-        set(findobj('tag', 'holo_zvalue'), 'string', num2str(status.holo.z));
-        returnfocus;
-        redraw = 2;
-        saveNeeded = 1/2;
-    case 'holo_mode'
-        status.show_holo = true;
+    case {'camera_mode', 'holo_mode', 'interference_mode'} %status.show_holo
+        status.holo.image_mode = action(1:end-5);
+        dtrack_guivisibility(gui, para, status);
         returnfocus;
         redraw = 2;
         saveNeeded = 0;
-    case 'interference_mode'
-        status.show_holo = false;
-        returnfocus;
-        redraw = 2;
-        saveNeeded = 0;
-    case 'holo_findZ'        
-        status.holo.z = holo_findFocus(status.diffim, para, data.points(status.framenr, status.cpoint, 1:2));
-        set(findobj('tag', 'holo_zvalue'), 'string', num2str(status.holo.z));
+    case 'holo_findZ'
+        bestZ = holo_findFocus(status.diffim, para, data.points(status.framenr, status.cpoint, 1:2)); % find the best z-position for current point
+        data.points(status.framenr, status.cpoint, 4) = bestZ; % assign this found position to the current point
+        status.holo.z = bestZ; % view this new position
+        set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
         returnfocus;
         redraw = 1; % Could be 2, but then we have to save into currim_ori
         saveNeeded = 1/2;
-
+    case 'holo_findZ_local'
+        bestZ = holo_findFocus(status.diffim, para, data.points(status.framenr, status.cpoint, 1:2), status.holo.z); % find the best z-position for current point
+        data.points(status.framenr, status.cpoint, 4) = bestZ; % assign this found position to the current point
+        status.holo.z = bestZ; % view this new position
+        set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
+        returnfocus;
+        redraw = 1; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 1/2;
+    case 'holo_link'
+        status.holo.link = get(src, 'Value');
+        holo_guivisibility(gui, status, para, data)
+        returnfocus;
+        redraw = 1; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 1/2;
     otherwise
         redraw = 0;
         saveNeeded = 0;

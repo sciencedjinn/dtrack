@@ -1,4 +1,4 @@
-function [status, para, data] = holo_defaults(status, para, data)
+function [gui, status, para, data] = holo_defaults(gui, status, para, data)
 % HOLO_DEFAULTS Loads the default parameters for the HOLO module
 
 disp('Loading holo module...');
@@ -16,7 +16,8 @@ para.ref.frameDiff          = 10; % when set to 0, para.gui.stepsize will be use
 para.forceaspectratio       = [];%[1 1];
 
 status.holo.z = 120;
-status.show_holo = false;
+status.image_mode = 'interference';
+status.holo.link = true;
 
 para.holo.mag        = 2;
 para.holo.lambda_nm  = 780; 

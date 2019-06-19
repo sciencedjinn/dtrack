@@ -20,10 +20,13 @@ if redraw==1 || redraw==3
     if para.thermal.isthermal
         timeNumber = status.mh.ts(status.framenr) - status.mh.ts(1);
     else
-        timeNumber = status.framenr / status.FrameRate / 24 / 3600; % time in days
+        timeNumber = status.framenr / status.FrameRate; % time in seconds
     end
     set(findobj('tag', 'frametime'), 'string', datestr(timeNumber/24/3600,'HH:MM:SS.FFF'));
 end
+
+%% Module display updates
+[~, status, para, data, redraw] = dtrack_support_evalModules('_image1', [], status, para, data, redraw); % redraw might need to be changed here, e.g. for module holo: when z-value has changed, frame needs to be redrawn
 
 %% load new image
 if ismember(redraw, [1 3 30]) % new frame actions
@@ -98,9 +101,7 @@ end
 
 %% Module image manipulation
 if ismember(redraw, [1 2 3])
-    for i = 1:length(para.modules)
-        [status, para, data] = feval([para.modules{i} '_imagefcn'], status, para, data);
-    end 
+    [~, status, para, data] = dtrack_support_evalModules('_imagefcn', [], status, para, data);
 end
 
 %% display image
@@ -151,21 +152,19 @@ end
 
 %% set gui marker values
 if ismember(redraw, [1 2 3 20])
-    if para.gui.infopanel_markers
-        m_dat = data.markers(status.framenr).m;
-        m_but = findobj('-regexp', 'tag', 'marker_[a-z]');
-        for i = 1:length(m_but)
-            m_name = get(m_but(i), 'tag');
-            set(m_but(i), 'value', any(ismember(m_name(end), m_dat)));
-        end
-        others='';
-        for i=1:length(m_dat)
-            if ~ismember(m_dat{i}, {'s', 'e', 'd', 'r', 'p'})
-                others = [others m_dat{i}];
-            end
-        end    
-        set(findobj('tag', 'marker_other'), 'string', others);
+    m_dat = data.markers(status.framenr).m;
+    m_but = findobj('-regexp', 'tag', 'marker_[a-z]');
+    for i = 1:length(m_but)
+        m_name = get(m_but(i), 'tag');
+        set(m_but(i), 'value', any(ismember(m_name(end), m_dat)));
     end
+    others='';
+    for i=1:length(m_dat)
+        if ~ismember(m_dat{i}, {'s', 'e', 'd', 'r', 'p'})
+            others = [others m_dat{i}];
+        end
+    end    
+    set(findobj('tag', 'marker_other'), 'string', others);
 end
 
 %% draw or move current point/line

@@ -1,6 +1,7 @@
-function z_focus = holo_findFocus(iDiff, para, pos, verbose)
+function z_focus = holo_findFocus(iDiff, para, pos, z_estimate, verbose)
 
-if nargin < 4, verbose = true; end
+if nargin < 5, verbose = true; end
+if nargin < 4, z_estimate = nan; end
 
 % iDiff - an NxMx1 greyscale difference image
 % zRange - 1x2 double vector, including the minimum and maximum expected z-position (depth, in mm)
@@ -12,10 +13,15 @@ if nargin < 4, verbose = true; end
 iDiffSelection = iDiff(y_selection(1):y_selection(2), x_selection(1):x_selection(2));
 
 %% find the best focus
-% reconstuct for every possible Z
-[z, mins1] = sub_find_focus(iDiffSelection, para.holo.zRange(1):para.holo.stepRange(1):para.holo.zRange(2), para);
-
-% TODO: Check if this actually improves the estimate
+if isnan(z_estimate)
+    % reconstuct for every possible Z
+    [z, mins1] = sub_find_focus(iDiffSelection, para.holo.zRange(1):para.holo.stepRange(1):para.holo.zRange(2), para);
+else
+    z = z_estimate;
+    mins1 = [];
+end
+    
+    
 % TODO: Dynamically go to smaller step sizes
 
 % now do this again, but with finer step size 
@@ -28,7 +34,9 @@ fprintf('Search between %.2f and %.2f mm.\nBest position with %.2f mm resolution
 
 if verbose
     figure(274); clf; hold on;
-    plot(para.holo.zRange(1):para.holo.stepRange(1):para.holo.zRange(2), squeeze(mins1), 'k.');
+    if ~isempty(mins1)
+        plot(para.holo.zRange(1):para.holo.stepRange(1):para.holo.zRange(2), squeeze(mins1), 'k.');
+    end
     plot(zs, squeeze(mins2), 'b.');
     plot(z_focus, max(mins2), 'ro');
     xlabel('z-Position (mm)')
@@ -54,10 +62,15 @@ function [z, allMaxs] = sub_find_focus(iDiff, zRange, para)
     % z-value where the central 8th of the image has the largest value, indicating best focus
     Reconst = holo_analyse2_reconstruct(iDiff, zRange, para);
 
-    % for each z-position, calculate the maximum in Reconst_abs, then find the maximum
+    % for each z-position, calculate the maximum in Reconst, then find the maximum
     allMaxs = max(max(Reconst(7/8*para.holo.boxSize:9/8*para.holo.boxSize, 7/8*para.holo.boxSize:9/8*para.holo.boxSize, :), [], 1), [], 2);
-    [~, max_index] = max(allMaxs, [], 3); 
     
+%     for i = 1:size(allMaxs, 3)
+%         allMaxs(i) = estimate_sharpness(Reconst(7/8*para.holo.boxSize:9/8*para.holo.boxSize, 7/8*para.holo.boxSize:9/8*para.holo.boxSize, i));
+%     end
+    
+    
+    [~, max_index] = max(allMaxs, [], 3); 
     z = zRange(max_index);
 %     best_focus_image_section = Reconst(7/8*para.holo.boxSize:9/8*para.holo.boxSize, 7/8*para.holo.boxSize:9/8*para.holo.boxSize, min_index); %% TODO: Is there a better criterion than just the maximum?
     
@@ -65,4 +78,11 @@ function [z, allMaxs] = sub_find_focus(iDiff, zRange, para)
 %     a = reshape(Reconst, [size(Reconst, 1), size(Reconst, 2), 1, 16]);
 %     figure(734); clf; montage(a(7/8*para.holo.boxSize:9/8*para.holo.boxSize, 7/8*para.holo.boxSize:9/8*para.holo.boxSize, :, :)/max(a(:)), 'BorderSize', [1 1]);
     
+end
+
+function sharpness = estimate_sharpness(I)
+    % https://se.mathworks.com/matlabcentral/fileexchange/32397-sharpness-estimation-from-image-gradients
+    [Gx, Gy] = gradient(I);
+    S = sqrt(Gx.*Gx+Gy.*Gy);
+    sharpness = sum(sum(S))./(numel(Gx));
 end

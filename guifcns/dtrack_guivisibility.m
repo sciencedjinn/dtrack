@@ -1,5 +1,5 @@
 function dtrack_guivisibility(gui, para, status)
-%called in dtrack_gui, dtrack_action, dtrack_tools_autotrack_main
+% called in dtrack_gui, dtrack_action, dtrack_tools_autotrack_main
 
 % toolbar visibility
 if para.gui.navitoolbar
@@ -8,24 +8,19 @@ else
     set(gui.controls.navi.toolbar, 'visible', 'off');
 end
 if para.gui.infopanel
-    set(gui.infoarea.info.panel, 'visible', 'on');
+    set(gui.infoarea.info.tabgroup, 'visible', 'on');
 else
-    set(gui.infoarea.info.panel, 'visible', 'off');
+    set(gui.infoarea.info.tabgroup, 'visible', 'off');
 end
 if para.gui.infopanel_points
-    set(gui.infoarea.points.superpanel, 'visible', 'on');
+    set(gui.infoarea.points.tabgroup, 'visible', 'on');
 else
-    set(gui.infoarea.points.superpanel, 'visible', 'off');
-end
-if para.gui.infopanel_markers
-    set(gui.infoarea.markers.panel, 'visible', 'on');
-else
-    set(gui.infoarea.markers.panel, 'visible', 'off');
+    set(gui.infoarea.points.tabgroup, 'visible', 'off');
 end
 if para.gui.infopanel_mani
-    set(gui.infoarea.image.superpanel, 'visible', 'on');
+    set(gui.infoarea.image.tabgroup, 'visible', 'on');
 else
-    set(gui.infoarea.image.superpanel, 'visible', 'off');
+    set(gui.infoarea.image.tabgroup, 'visible', 'off');
 end
 if para.gui.minimap
     set(gui.minimap.panel, 'visible', 'on');
@@ -169,9 +164,6 @@ else
     set(findobj('tag', 'darken'), 'enable', 'off');
 end
     
-        
-
-%% Check if the modules have anything to add
-for i = 1:length(para.modules)
-    feval([para.modules{i} '_guivisibility'], gui, para, status);
-end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Execute modules
+dtrack_support_evalModules('_guivisibility', gui, status, para, []);

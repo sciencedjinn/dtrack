@@ -37,7 +37,6 @@ para.gui.stepsize           = 10;
 para.gui.navitoolbar        = true;
 para.gui.infopanel          = true;
 para.gui.infopanel_points   = true;
-para.gui.infopanel_markers  = true;
 para.gui.infopanel_mani     = true;
 para.gui.minimap            = true;
 
@@ -62,9 +61,9 @@ para.autosavethresh         = 10;
 
 %% point marker style and colours (can be changed using the colourgui button)
 para.ls.p{1}.col  = [0 0 1];    para.ls.p{1}.shape  = 'o';    para.ls.p{1}.size  = 10; para.ls.p{1}.width  = 1.5;
-para.ls.p{2}.col  = [0 0 1];    para.ls.p{2}.shape  = '*';    para.ls.p{2}.size  = 5; para.ls.p{2}.width  = 1.5;
-para.ls.p{3}.col  = [0 1 0];    para.ls.p{3}.shape  = 'o';    para.ls.p{3}.size  = 10; para.ls.p{3}.width  = 1.5;
-para.ls.p{4}.col  = [0 1 0];    para.ls.p{4}.shape  = '*';    para.ls.p{4}.size  = 5; para.ls.p{4}.width  = 1.5;
+para.ls.p{2}.col  = [0 1 0];    para.ls.p{2}.shape  = 'o';    para.ls.p{2}.size  = 10; para.ls.p{2}.width  = 1.5;
+para.ls.p{3}.col  = [1 0 0];    para.ls.p{3}.shape  = 'o';    para.ls.p{3}.size  = 10; para.ls.p{3}.width  = 1.5;
+para.ls.p{4}.col  = [1 1 0];    para.ls.p{4}.shape  = 'o';    para.ls.p{4}.size  = 10; para.ls.p{4}.width  = 1.5;
 para.ls.p{5}.col  = [1 0 1];    para.ls.p{5}.shape  = 'o';    para.ls.p{5}.size  = 10; para.ls.p{5}.width  = 1.5;
 para.ls.p{6}.col  = [0 1 1];    para.ls.p{6}.shape  = 'o';    para.ls.p{6}.size  = 10; para.ls.p{6}.width  = 1.5;
 para.ls.p{7}.col  = [0 0 0];    para.ls.p{7}.shape  = 'o';    para.ls.p{7}.size  = 10; para.ls.p{7}.width  = 1.5;
@@ -100,7 +99,7 @@ status.cpoint           = 1; % the currently tracked point
 status.framenr          = 1;
 status.acquire          = 1; % set to acquisition mode
 h = figure; status.graycm  = colormap('gray'); close(h);
-status.trackedpoints    = 1:para.pnr;
+status.trackedpoints    = 1;
 status.currentaction    = 'init';
 status.lastaction       = '';
 status.roi              = []; % loaded after new/open
@@ -120,9 +119,7 @@ data.markers            = [];
 para.theme.name = 'DTrack';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Load modules
-for i = 1:length(para.modules)
-    [status, para, data] = feval([para.modules{i} '_defaults'], status, para, data);
-end
+%% Execute modules
+[~, status, para, data] = dtrack_support_evalModules('_defaults', [], status, para, data);
 
 

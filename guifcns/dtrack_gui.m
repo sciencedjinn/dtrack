@@ -27,29 +27,33 @@ gui.ax1 = axes('parent', gui.f1);set(gui.ax1, 'position', [0.001 0.001 1 1], 'bu
 gui.im1 = [];
 
 %% Info Area
-gui.infoarea.info.panel = uipanel(gui.f1, 'position', [.85 .94 .15 .06]);
-    gui.infoarea.info.entries.framenr = uicontrol(gui.infoarea.info.panel, 'style', 'edit', 'string', ['frame ' num2str(status.framenr) '/' num2str(status.nFrames)], 'units', 'normalized', 'position', [0 .5 .5 .5], 'tag', 'framenr', 'enable', 'inactive', 'buttondownfcn', status.maincb);
+% gui.infoarea.info.panel = uipanel(gui.f1, 'position', [.85 .94 .15 .06]);
+gui.infoarea.info.tabgroup = uitabgroup(gui.f1, 'position', [.85 .94 .15 .06]); 
+gui.infoarea.info.tab = uitab(gui.infoarea.info.tabgroup, 'title', 'Info'); 
+    gui.infoarea.info.entries.framenr = uicontrol(gui.infoarea.info.tab, 'style', 'edit', 'string', ['frame ' num2str(status.framenr) '/' num2str(status.nFrames)], 'units', 'normalized', 'position', [0 .5 .5 .5], 'tag', 'framenr', 'enable', 'inactive', 'buttondownfcn', status.maincb);
     fth = floor(status.framenr/status.FrameRate/3600);
     ftm = floor(mod(status.framenr/status.FrameRate/60,3600));
     fts = floor(mod(status.framenr/status.FrameRate,60));
     ftms = mod(status.framenr/status.FrameRate, 1)*1000;
-    gui.infoarea.info.entries.frametime = uicontrol(gui.infoarea.info.panel, 'style', 'edit', 'string', sprintf('time %02.0f:%02.0f:%02.0f.%03.0f', fth, ftm, fts, ftms), 'units', 'normalized', 'position', [0 0 .5 .5], 'tag', 'frametime', 'enable', 'inactive', 'buttondownfcn', status.maincb);
-    gui.infoarea.info.entries.stepsize = uicontrol(gui.infoarea.info.panel, 'style', 'edit', 'string', ['step size ' num2str(para.gui.stepsize)], 'units', 'normalized', 'position', [.5 .5 .5 .5], 'tag', 'stepsize', 'enable', 'inactive', 'buttondownfcn', status.maincb);
-    gui.infoarea.info.entries.refframe = uicontrol(gui.infoarea.info.panel, 'style', 'edit', 'string', '', 'units', 'normalized', 'position', [.5 0 .5 .5], 'tag', 'refframe', 'enable', 'inactive', 'buttondownfcn', status.maincb);
+    gui.infoarea.info.entries.frametime = uicontrol(gui.infoarea.info.tab, 'style', 'edit', 'string', sprintf('time %02.0f:%02.0f:%02.0f.%03.0f', fth, ftm, fts, ftms), 'units', 'normalized', 'position', [0 0 .5 .5], 'tag', 'frametime', 'enable', 'inactive', 'buttondownfcn', status.maincb);
+    gui.infoarea.info.entries.stepsize = uicontrol(gui.infoarea.info.tab, 'style', 'edit', 'string', ['step size ' num2str(para.gui.stepsize)], 'units', 'normalized', 'position', [.5 .5 .5 .5], 'tag', 'stepsize', 'enable', 'inactive', 'buttondownfcn', status.maincb);
+    gui.infoarea.info.entries.refframe = uicontrol(gui.infoarea.info.tab, 'style', 'edit', 'string', '', 'units', 'normalized', 'position', [.5 0 .5 .5], 'tag', 'refframe', 'enable', 'inactive', 'buttondownfcn', status.maincb);
 
-gui.infoarea.points.superpanel = uipanel(gui.f1, 'position', [.85 .88 .15 .06]);
-    gui.infoarea.points.panel = uipanel(gui.infoarea.points.superpanel, 'position', [0 .5 .8 .5], 'tag', 'pointspanel'); 
+% gui.infoarea.points.superpanel = uipanel(gui.f1, 'position', [.85 .88 .15 .06]);
+gui.infoarea.points.tabgroup = uitabgroup(gui.f1, 'position', [.85 .858 .15 .08]); 
+gui.infoarea.points.tab = uitab(gui.infoarea.points.tabgroup, 'title', 'Points'); 
+    gui.infoarea.points.panel = uipanel(gui.infoarea.points.tab, 'position', [0 .5 .8 .5], 'tag', 'pointspanel'); 
         for i = 1:para.pnr/(1+strcmp(para.trackingtype, 'line'))
             gui.infoarea.points.entries.(['p' num2str(i)]) = uicontrol(gui.infoarea.points.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [(i-1)*0.1 0 .1 1], 'string', num2str(i), 'value', any(ismember(status.trackedpoints, i)));
         end
 
-    gui.infoarea.autoforw.panel = uibuttongroup(gui.infoarea.points.superpanel, 'position', [.8 .5 .2 .5], 'tag', 'autoforwpanel'); 
+    gui.infoarea.autoforw.panel = uibuttongroup(gui.infoarea.points.tab, 'position', [.8 .5 .2 .5], 'tag', 'autoforwpanel'); 
         gui.icons.autoforw_1=imread(fullfile(iconpath, 'autoforw_1.tif'));
         gui.infoarea.autoforw.entries.autoforw_1 = uicontrol(gui.infoarea.autoforw.panel, 'units', 'normalized', 'style', 'togglebutton', 'position', [0 0 .5 1], 'cdata', gui.icons.autoforw_1, 'tooltipstring', 'Automatically forward 1 frame after leftclick'); 
         gui.icons.autoforw_x=imread(fullfile(iconpath, 'autoforw_x.tif'));
         gui.infoarea.autoforw.entries.autoforw_x = uicontrol(gui.infoarea.autoforw.panel, 'units', 'normalized', 'style', 'togglebutton', 'position', [.5 0 .5 1], 'cdata', gui.icons.autoforw_x, 'tooltipstring', 'Automatically forward x frames after leftclick'); 
 
-    gui.infoarea.pointsel.panel = uibuttongroup(gui.infoarea.points.superpanel, 'position', [0 0 .8 .5], 'tag', 'pointselpanel', 'selectionchangefcn', status.maincb); 
+    gui.infoarea.pointsel.panel = uibuttongroup(gui.infoarea.points.tab, 'position', [0 0 .8 .5], 'tag', 'pointselpanel', 'selectionchangefcn', status.maincb); 
         for i = 1:para.pnr/(1+strcmp(para.trackingtype, 'line'))
             gui.infoarea.pointsel.entries.(['ps' num2str(i)]) = uicontrol(gui.infoarea.pointsel.panel, 'style', 'radiobutton', 'units', 'normalized', 'position', [(i-1)*0.1 0 .1 1]);
         end
@@ -60,25 +64,26 @@ gui.infoarea.points.superpanel = uipanel(gui.f1, 'position', [.85 .88 .15 .06]);
                 set(gui.infoarea.pointsel.panel, 'selectedobject', gui.infoarea.pointsel.entries.(['ps' num2str((status.cpoint+1)/2)]));
         end
                 
-    gui.infoarea.extrapoints.panel = uipanel(gui.infoarea.points.superpanel, 'position', [.8 0 .2 .5], 'tag', 'extrapointspanel'); 
+    gui.infoarea.extrapoints.panel = uipanel(gui.infoarea.points.tab, 'position', [.8 0 .2 .5], 'tag', 'extrapointspanel'); 
         gui.icons.currpoint                         = imread(fullfile(iconpath, 'currpoint.tif'));
         gui.infoarea.extrapoints.entries.currpoint  = uicontrol(gui.infoarea.extrapoints.panel, 'units', 'normalized', 'style', 'togglebutton', 'position', [0 0 .5 1], 'cdata', gui.icons.currpoint, 'tooltipstring', 'Indicate current point by underlaying it with a light shadow'); 
         gui.icons.lastpoint                         = imread(fullfile(iconpath, 'lastpoint.tif'));
         gui.infoarea.extrapoints.entries.lastpoint  = uicontrol(gui.infoarea.extrapoints.panel, 'units', 'normalized', 'style', 'togglebutton', 'position', [.5 0 .5 1], 'cdata', gui.icons.lastpoint, 'tooltipstring', ['Indicate last position of this point within ' num2str(para.showlastrange) ' frames (can be changed in properties) as a thin grey ring']); 
 
-gui.infoarea.markers.panel = uipanel(gui.f1, 'position', [.85 .855 .15 .025]); 
-    uicontrol(gui.infoarea.markers.panel, 'style', 'edit', 'units', 'normalized', 'position', [0.0051 0 .23 1], 'string', 'Markers', 'horizontalalignment', 'center', 'enable', 'inactive');
-    gui.infoarea.markers.entries.marker_s       = uicontrol(gui.infoarea.markers.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.2451 0.01 .08 1], 'string', 's', 'tooltipstring', 'start marker: first frame to be analysed (Alt + S)');
-    gui.infoarea.markers.entries.marker_e       = uicontrol(gui.infoarea.markers.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.2451+1*0.09 0.01 .08 1], 'string', 'e', 'tooltipstring', 'end marker: last frame to be analysed (Alt + E)');
-    gui.infoarea.markers.entries.marker_r       = uicontrol(gui.infoarea.markers.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.2451+2*0.09 0.01 .08 1], 'string', 'r', 'tooltipstring', 'roll marker: first frame of a rolling phase (lasts until p, d, or e) (Alt + R)');
-    gui.infoarea.markers.entries.marker_p       = uicontrol(gui.infoarea.markers.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.2451+3*0.09 0.01 .08 1], 'string', 'p', 'tooltipstring', 'pause marker: first frame of a pause phase (lasts until r, d, or e) (Alt + P)');
-    gui.infoarea.markers.entries.marker_d       = uicontrol(gui.infoarea.markers.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.2451+4*0.09 0.01 .08 1], 'string', 'd', 'tooltipstring', 'dance marker: first frame of a dance phase (lasts until r, p, or e) (Alt + D)');
-    gui.infoarea.markers.entries.marker_other   = uicontrol(gui.infoarea.markers.panel, 'style', 'edit', 'units', 'normalized', 'position', [0.2451+5*0.09 0.01 .23 1], 'string', '', 'tooltipstring', 'other markers (Alt + letter)', 'enable', 'inactive');
+gui.infoarea.markers.tab = uitab(gui.infoarea.points.tabgroup, 'title', 'Markers'); 
+    gui.infoarea.markers.entries.marker_s       = uicontrol(gui.infoarea.markers.tab, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.001 0.51 .08 .48], 'string', 's', 'tooltipstring', 'start marker: first frame to be analysed (Alt + S)');
+    gui.infoarea.markers.entries.marker_e       = uicontrol(gui.infoarea.markers.tab, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.001+1*0.08 0.51 .08 .48], 'string', 'e', 'tooltipstring', 'end marker: last frame to be analysed (Alt + E)');
+    gui.infoarea.markers.entries.marker_r       = uicontrol(gui.infoarea.markers.tab, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.001+2*0.08 0.51 .08 .48], 'string', 'r', 'tooltipstring', 'roll marker: first frame of a rolling phase (lasts until p, d, or e) (Alt + R)');
+    gui.infoarea.markers.entries.marker_p       = uicontrol(gui.infoarea.markers.tab, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.001+3*0.08 0.51 .08 .48], 'string', 'p', 'tooltipstring', 'pause marker: first frame of a pause phase (lasts until r, d, or e) (Alt + P)');
+    gui.infoarea.markers.entries.marker_d       = uicontrol(gui.infoarea.markers.tab, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.001+4*0.08 0.51 .08 .48], 'string', 'd', 'tooltipstring', 'dance marker: first frame of a dance phase (lasts until r, p, or e) (Alt + D)');
+    gui.infoarea.markers.entries.marker_other   = uicontrol(gui.infoarea.markers.tab, 'style', 'edit', 'units', 'normalized', 'position', [0.001+5*0.08 0.51 .23 .48], 'string', '', 'tooltipstring', 'other markers (Alt + letter)', 'enable', 'inactive');
     
-gui.infoarea.image.superpanel = uipanel(gui.f1, 'position', [.85 .70 .15 .155]);
-    gui.infoarea.info.entries.manicheck = uicontrol(gui.infoarea.image.superpanel, 'style', 'checkbox', 'units', 'normalized', 'position', [0 .85 .08 .14], 'tooltip', 'Activate/Deactivate image manipulation', 'value', para.im.manicheck);
+% gui.infoarea.image.superpanel = uipanel(gui.f1, 'position', [.85 .70 .15 .155]);
+gui.infoarea.image.tabgroup = uitabgroup(gui.f1, 'position', [.85 .701 .15 .155]); 
+gui.infoarea.image.tab = uitab(gui.infoarea.image.tabgroup, 'title', 'Image manipulation'); 
+    gui.infoarea.info.entries.manicheck = uicontrol(gui.infoarea.image.tab, 'style', 'checkbox', 'units', 'normalized', 'position', [0 .85 .08 .14], 'tooltip', 'Activate/Deactivate image manipulation', 'value', para.im.manicheck);
 
-    gui.infoarea.image.panel = uipanel(gui.infoarea.image.superpanel, 'position', [.08 0 .92 1]); 
+    gui.infoarea.image.panel = uipanel(gui.infoarea.image.tab, 'position', [.08 0 .92 1]); 
         gui.infoarea.image.entries.info_greyscale   = uicontrol(gui.infoarea.image.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.01 .82 .12 .17], 'value', para.im.greyscale, 'string', 'GS', 'tooltipstring', 'Toggle gray scale mode');
         gui.infoarea.image.entries.info_imagesc     = uicontrol(gui.infoarea.image.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.13 .82 .12 .17], 'value', para.im.imagesc, 'string', 'SC', 'tooltipstring', 'Toggle image scaling (gray scale only)');
         gui.infoarea.image.entries.info_imadjust    = uicontrol(gui.infoarea.image.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.25 .82 .12 .17], 'value', para.im.imadjust, 'string', 'AD', 'tooltipstring', 'Toggle contrast boost (gray scale only)');
@@ -174,8 +179,7 @@ gui.menus.edit.menu = uimenu(gui.f1, 'label', 'Edit');
 gui.menus.view.menu = uimenu(gui.f1, 'label', 'View');
     gui.menus.view.entries.view_navitoolbar = uimenu(gui.menus.view.menu, 'label', 'File and navigation toolbar');
     gui.menus.view.entries.view_infopanel = uimenu(gui.menus.view.menu, 'label', 'Info panel', 'separator', 'on');
-    gui.menus.view.entries.view_infopanel_points = uimenu(gui.menus.view.menu, 'label', 'Points panel');
-    gui.menus.view.entries.view_infopanel_markers = uimenu(gui.menus.view.menu, 'label', 'Marker panel');
+    gui.menus.view.entries.view_infopanel_points = uimenu(gui.menus.view.menu, 'label', 'Points & Markers panel');
     gui.menus.view.entries.view_infopanel_mani = uimenu(gui.menus.view.menu, 'label', 'Image manipulation panel');
     gui.menus.view.entries.view_minimap = uimenu(gui.menus.view.menu, 'label', 'Mini plot window');
     gui.menus.view.entries.view_greyscale = uimenu(gui.menus.view.menu, 'label', 'Grey scale image', 'checked', 'off', 'separator', 'on');
@@ -238,11 +242,8 @@ gui.menus.help.menu = uimenu(gui.f1, 'label', 'Help');
     gui.menus.help.entries.help_known = uimenu(gui.menus.help.menu, 'label', 'Known bugs');
     gui.menus.help.entries.help_aspectratio = uimenu(gui.menus.help.menu, 'label', 'Fix my aspect ratio!');
 
-
 %% Check if the modules have anything to add
-for i = 1:length(para.modules)
-    gui = feval([para.modules{i} '_gui'], status, para, gui);
-end
+gui = dtrack_support_evalModules('_gui', gui, status, para, []);
     
 %% Add tags
 types = {'menus', 'controls', 'infoarea'};%, 'contextmenus'};
@@ -251,7 +252,7 @@ for i = 1:length(types)
     for j = 1:length(names)
         names2 = fieldnames(gui.(types{i}).(names{j}).entries);
         for k = 1:length(names2)
-            thisobj = gui.(types{i}).(names{j}).entries.(names2{k}); %e.g. gui.menus.file.entries.fileopen
+            thisobj = gui.(types{i}).(names{j}).entries.(names2{k}); % e.g. gui.menus.file.entries.fileopen
             if isempty(get(thisobj, 'tag'))
                 set(thisobj, 'tag', names2{k});
             end

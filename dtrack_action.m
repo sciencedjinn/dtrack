@@ -213,7 +213,7 @@ else
             % Set current point
             switch para.trackingtype  % store data
                 case 'point'
-                    data.points(status.framenr, status.cpoint, :) = [x y 1]; % 1 means manually tracked
+                    data.points(status.framenr, status.cpoint, 1:3) = [x y 1]; % 1 means manually tracked
                 case 'line'
                     h  = imline(gui.ax1, 'PositionConstraintFcn', dtrack_roi_constrain(para, status));
                     cp = status.cpoint; % current POINT number (e.g. cp is 3 for line #2)
@@ -271,7 +271,7 @@ else
             saveneeded  = 1/2; % 1/2 means that this will not increase the count of actions since last save, unless it is 0
                         
       %% delete point
-        case 'delete'
+        case {'delete', 'backspace'}
             % Delete currrent point
             cp = status.cpoint;
             switch para.trackingtype
@@ -638,12 +638,6 @@ else
             para.gui.infopanel_points=support_togglechecked;
             dtrack_guivisibility(gui, para, status);
             redraw = 0;
-            saveneeded = 1/2;
-            
-        case 'view_infopanel_markers'
-            para.gui.infopanel_markers=support_togglechecked;
-            dtrack_guivisibility(gui, para, status);
-            redraw = 20;
             saveneeded = 1/2;
             
         case 'view_infopanel_mani'

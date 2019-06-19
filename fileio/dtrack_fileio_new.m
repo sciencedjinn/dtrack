@@ -1,7 +1,8 @@
 function [status, para, data, success] = dtrack_fileio_new(status, para, confirm, same)
 %main new function, called from startdlg or file menu
 
-success = 0;data = [];
+success = 0;
+data = [];
 if confirm
     button  =  questdlg('Another project is currently open. Are you sure you want to create a new one? Any unsaved changes will be lost!', 'Warning', 'Yes, discard unsaved changes', 'No, go back to the current project', 'No, go back to the current project');
     loadnew  =  strcmp(button, 'Yes, discard unsaved changes');
@@ -85,17 +86,17 @@ if loadnew
                     para.imseq.to = i-1;
                 otherwise
             end
-            para = dtrack_editparameters(para); %parameter dialog
-            if isempty(para) %canceled
-                return; %success is 0, so the output data will not be used
+            para = dtrack_editparameters(para); % parameter dialog
+            if isempty(para) % canceled
+                return; % success is 0, so the output data will not be used
             end
-            pause(0.1); %without this the parameter window doesnt close before the movie loads, which might crash matlab
-            %load movie
+            pause(0.1); % without this the parameter window doesnt close before the movie loads, which might crash matlab
+            % load movie
             set(gcf, 'pointer', 'watch');drawnow;
             status = dtrack_inistatus(status, para);
-            [status, para, success] = dtrack_fileio_openmovie(status, para); %success 0 means file not found, 2 means aborted by user. If mmreader can't read it, mmread will be tried (after dialog)
-            [status, para] = dtrack_roi_prepare(status, para); %loads roi file, finding the default first if necessary
-            [status, para] = dtrack_ref_prepare(status, para); %loads reference frame
+            [status, para, success] = dtrack_fileio_openmovie(status, para); % success 0 means file not found, 2 means aborted by user. If mmreader can't read it, mmread will be tried (after dialog)
+            [status, para] = dtrack_roi_prepare(status, para); % loads roi file, finding the default first if necessary
+            [status, para] = dtrack_ref_prepare(status, para); % loads reference frame
             % check if this is a greyscale image sequence
             if status.GSImage
                 para.im.greyscale = 1;
@@ -112,9 +113,13 @@ if loadnew
             end
         end
         
-        %create empty data structure
+        % create empty data structure
         data.points = zeros(status.nFrames, para.pnr, 3);
         data.markers = struct('m', cell(status.nFrames, 1));
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %% Load modules
+        [~, status, para, data] = dtrack_support_evalModules('_new', [], status, para, data);
     end
 end
 

@@ -4,7 +4,7 @@ function [status, para, data] = dtrack_fileio_loadres(status, para, data)
 
 % check if data is empty
 if any(data.points(:)) || ~isempty(data.markers)
-    button=questdlg('Another project is currently open. Are you sure you want to load a different one? Any unsaved changes will be lost!', 'Warning', 'Yes, discard unsaved changes', 'No, go back to the current project', 'No, go back to the current project');
+    button = questdlg('Another project is currently open. Are you sure you want to load a different one? Any unsaved changes will be lost!', 'Warning', 'Yes, discard unsaved changes', 'No, go back to the current project', 'No, go back to the current project');
     switch button
         case 'Yes, discard unsaved changes'
             %go on with function
@@ -21,6 +21,9 @@ if Q.convert
     Q.data.points(:, :, 2) = full(Q.ydata);
     Q.data.points(:, :, 3) = full(Q.tdata);
     % xdata, ydata tdata and convert are later automatically ignored
+    if isfield(Q, 'zdata')
+        Q.data.points(:, :, 4) = full(Q.zdata);
+    end
 end
 
 %% overwrite a few variables that should not be carried over between sessions
