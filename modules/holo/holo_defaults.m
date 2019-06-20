@@ -16,7 +16,7 @@ para.ref.frameDiff          = 10; % when set to 0, para.gui.stepsize will be use
 para.forceaspectratio       = [];%[1 1];
 
 status.holo.z = 120;
-status.image_mode = 'interference';
+status.holo.image_mode = 'interference';
 status.holo.link = true;
 
 para.holo.mag        = 2;
@@ -25,7 +25,7 @@ para.holo.pix_um     = 0.0052*5.15/para.holo.mag; % 0.0052*5.15 % 0.0052*4.5/4
 
 para.holo.zRange = [105 135];   % min and max acceptable z position (mm)
 para.holo.stepRange = [2 0.05]; % mm step size in z [coarse fine]
-para.holo.boxSize = 128*para.holo.mag; % box size to draw around point for z-finding
+para.holo.boxSize = 64*para.holo.mag; % box size to draw around point for z-finding
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% HOLO theme

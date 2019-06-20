@@ -48,12 +48,8 @@ if ismember(redraw, [1 3 30]) % new frame actions
    end
 end
 
-if redraw==30 % load only, don't display
-    return;
-end
-
 %% image manipulation
-if ismember(redraw, [1 2 3])
+if ismember(redraw, [1 2 3 30])
     if ~para.thermal.isthermal
         % now stuff for non-thermal images
         status.currim = status.currim_ori; % reset to original, unaltered image
@@ -74,6 +70,18 @@ if ismember(redraw, [1 2 3])
                 status.currim = - double(status.currim) + double(status.ref.cdata); %%TODO uint8 and 125+0.5*I %%FIXME
 %                 maxval = max(abs(status.currim(:)));
 %                 status.currim = (255*(0.5 + status.currim / maxval / 2));
+            case 'double_dynamic'
+                if para.ref.frameDiff > 0
+                    % frame diff was set in parameter file, use this
+                    para.ref.framenr = max([1 status.framenr - para.ref.frameDiff]);
+                    para.ref2.framenr = min([status.framenr + para.ref.frameDiff status.nFrames]);
+                else
+                    % frame diff was not set in parameter file, use the step size
+                    para.ref.framenr = max([1 status.framenr - para.gui.stepsize]);
+                    para.ref2.framenr = min([status.framenr + para.gui.stepsize status.nFrames]);
+                end
+                [status, para] = dtrack_ref_prepare(status, para); % load new ref image
+                status.currim = - double(status.currim) + 0.5*double(status.ref.cdata) + 0.5*double(status.ref2.cdata);
         end
         
         if para.im.manicheck
@@ -100,8 +108,12 @@ if ismember(redraw, [1 2 3])
 end
 
 %% Module image manipulation
-if ismember(redraw, [1 2 3])
+if ismember(redraw, [1 2 3 30])
     [~, status, para, data] = dtrack_support_evalModules('_imagefcn', [], status, para, data);
+end
+
+if redraw==30 % load only, don't display
+    return;
 end
 
 %% display image
@@ -210,7 +222,9 @@ if ismember(redraw, [1 2 3 11 14])
                 set(status.cph, 'visible', vis); %turning a 'visible on' back into 'visible on' adds almost no time
         end
     else
-        set(status.cph, 'visible', 'off');
+        try %FIXME
+            set(status.cph, 'visible', 'off');
+        end
     end
     
     if redraw==14
@@ -265,7 +279,9 @@ if ismember(redraw, [1 2 3 11])
                 set(status.lph, 'visible', vis); %turning a 'visible on' back into 'visible on' adds almost no time
         end
     else
-        set(status.lph, 'visible', 'off');
+        try %FIXME
+            set(status.lph, 'visible', 'off');
+        end
     end
 end
 

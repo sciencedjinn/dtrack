@@ -32,7 +32,6 @@ catch anyerror
 end
 
 %%%%%%%%%%%%%%%%%%%
-
 %% Nested functions for callbacks, writing/drawing and panel creation
 
 

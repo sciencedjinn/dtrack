@@ -8,7 +8,7 @@ if ismember(redraw, [1 2 3 11 30])
         if data.points(status.framenr, status.cpoint, 4) > 0 
             status.holo.z = data.points(status.framenr, status.cpoint, 4);
             set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
-            if strcmp(status.holo.image_mode, 'holo')
+            if strcmp(status.holo.image_mode, 'holo') || strcmp(status.holo.image_mode, 'holo_mag')
                 redraw = 1;
             end
         else
@@ -17,5 +17,7 @@ if ismember(redraw, [1 2 3 11 30])
     else
         % keep the selected value
     end
+end    
+if ismember(redraw, [1 2 3 11])
     set(findobj('tag', 'holo_zvalue_point'), 'string', num2str(data.points(status.framenr, status.cpoint, 4))); % either way, set the gui value for the point's z-value
-end        
+end

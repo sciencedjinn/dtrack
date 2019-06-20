@@ -41,7 +41,7 @@ switch(action)
         returnfocus;
         redraw = 2;
         saveNeeded = 1/2;
-    case {'camera_mode', 'holo_mode', 'interference_mode'} %status.show_holo
+    case {'camera_mode', 'holo_mode', 'interference_mode', 'holo_mag_mode'} %status.show_holo
         status.holo.image_mode = action(1:end-5);
         dtrack_guivisibility(gui, para, status);
         returnfocus;
@@ -69,6 +69,16 @@ switch(action)
         returnfocus;
         redraw = 1; % Could be 2, but then we have to save into currim_ori
         saveNeeded = 1/2;
+    case 'holo_autoZ'
+        % ask for parameters
+%         [success, savepara] = dtrack_tools_imageseq(status, para);
+%         if success
+            [gui, status, para, data] = holo_autoZ(gui, status, para, data); 
+            [gui, status, para, data] = dtrack_action(gui, status, para, data, 'redraw');
+%         end
+        returnfocus;
+        redraw = 1;
+        saveNeeded = 0;
     otherwise
         redraw = 0;
         saveNeeded = 0;

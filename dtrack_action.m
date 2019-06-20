@@ -1033,10 +1033,10 @@ else
             
         case 'tools_imageseq'
             % ask for parameters
-            [success, savepara]=dtrack_tools_imageseq(status, para);
+            [success, savepara] = dtrack_tools_imageseq(status, para);
             if success
-                dtrack_tools_imageseq_main(status, para, savepara); 
-                [gui, status, para, data]=dtrack_action(gui, status, para, data, 'redraw');
+                dtrack_tools_imageseq_main(status, para, data, savepara); 
+                [gui, status, para, data] = dtrack_action(gui, status, para, data, 'redraw');
             end
             redraw = 1;
             saveneeded = 0;

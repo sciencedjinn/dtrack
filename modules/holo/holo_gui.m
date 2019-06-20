@@ -10,11 +10,13 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
     uicontrol(gui.infoarea.holo.tab, 'style', 'edit', 'units', 'normalized', 'position', [0.005 .82 .23 .17], 'string', 'Mode: ', 'horizontalalignment', 'right', 'enable', 'inactive', 'backgroundcolor', [.95 .95 .95]);
     gui.infoarea.holo.mode_panel = uibuttongroup(gui.infoarea.holo.tab, 'position', [.24 .82 .3 .17]); 
         gui.icons.camera_mode = imread(fullfile(iconpath, 'camera.tif'));
-        gui.infoarea.holo.entries.camera_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0 0 .333 1], 'cdata', gui.icons.camera_mode, 'tooltip', 'Show camera image');
+        gui.infoarea.holo.entries.camera_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0 0 .25 1], 'cdata', gui.icons.camera_mode, 'tooltip', 'Show camera image');
         gui.icons.interference_mode = imread(fullfile(iconpath, 'interf.tif'));
-        gui.infoarea.holo.entries.interference_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.333 0 .333 1], 'cdata', gui.icons.interference_mode, 'tooltip', 'Show interference patterns');
+        gui.infoarea.holo.entries.interference_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.25 0 .25 1], 'cdata', gui.icons.interference_mode, 'tooltip', 'Show interference patterns');
         gui.icons.holo_mode = imread(fullfile(iconpath, 'holo.tif'));
-        gui.infoarea.holo.entries.holo_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.666 0 .333 1], 'cdata', gui.icons.holo_mode, 'tooltip', 'Show processed hologram');
+        gui.infoarea.holo.entries.holo_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.5 0 .25 1], 'cdata', gui.icons.holo_mode, 'tooltip', 'Show processed hologram');
+        gui.icons.holo_mag_mode = imread(fullfile(iconpath, 'holo_mag.tif'));
+        gui.infoarea.holo.entries.holo_mag_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.75 0 .25 1], 'cdata', gui.icons.holo_mag_mode, 'tooltip', 'Show processed hologram with enhanced area around selected point');
         switch status.holo.image_mode
             case 'camera'
                 set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.camera_mode);
@@ -22,6 +24,8 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
                 set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.interference_mode);
             case 'holo'
                 set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mode);
+            case 'holo_mag'
+                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mag_mode);
         end
 
     gui.infoarea.holo.z_panel = uipanel(gui.infoarea.holo.tab, 'position', [0 .48 1 .34]); 
@@ -43,6 +47,10 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
         gui.icons.link_off = imread(fullfile(iconpath, 'link_off.tif'));
         gui.infoarea.holo.entries.holo_link            = uicontrol(gui.infoarea.holo.z_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.84 .25 .08 .5], 'cdata', gui.icons.link_on, 'tooltipstring', 'Always display the z of the currently selected point');
 
+%% Holo menu
+gui.menus.holo.menu = uimenu(gui.f1, 'label', 'Holo');
+    gui.menus.holo.entries.holo_autoZ     = uimenu(gui.menus.holo.menu, 'label', 'Autodetect z-positions...');
+        
         
 % add a holo default button to the image manipulation panel
 gui.infoarea.image.entries.info_holo   = uicontrol(gui.infoarea.image.panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.38 .03 .2 .1], 'string', 'holo', 'tooltipstring', 'HOLO mode. Uses only the green channel in greyscale mode.');
