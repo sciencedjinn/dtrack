@@ -1021,13 +1021,25 @@ else
       %% Tools menu
         case 'tools_imageone_jpg'
             % dump frame as jpg in data folder
-            dtrack_tools_imageone(status, para, 'jpg'); 
+            dtrack_tools_imageone(status, para, 'jpg', false); 
             redraw = 0;
             saveneeded = 0;
             
         case 'tools_imageone_tif'
             % dump frame as jpg in data folder
-            dtrack_tools_imageone(status, para, 'tif'); 
+            dtrack_tools_imageone(status, para, 'tif', false); 
+            redraw = 0;
+            saveneeded = 0;
+            
+        case 'tools_imageoneproc_jpg'
+            % dump frame as jpg in data folder
+            dtrack_tools_imageone(status, para, 'jpg', true); 
+            redraw = 0;
+            saveneeded = 0;
+            
+        case 'tools_imageoneproc_tif'
+            % dump frame as jpg in data folder
+            dtrack_tools_imageone(status, para, 'tif', true); 
             redraw = 0;
             saveneeded = 0;
             
@@ -1097,9 +1109,19 @@ else
         case 'tools_autotrack_bgs'
             % Autotracking using background subtraction
             %TODO: save last paras
-            [success, autopara] = dtrack_tools_autotrack_select(status, para);
+            [success, autopara] = dtrack_tools_autotrack_select(status, para, data);
             if success
                 [gui, status, para, data] = dtrack_tools_autotrack_main(gui, status, para, data, autopara);
+            end
+            redraw = 1;
+            saveneeded = 1;
+            
+        case 'holo_autotrack_bgs'
+            % Autotracking using background subtraction
+            %TODO: save last paras
+            [success, autopara] = holo_autotrack_select(status, para, data);
+            if success
+                [gui, status, para, data] = holo_autotrack_main(gui, status, para, data, autopara);
             end
             redraw = 1;
             saveneeded = 1;

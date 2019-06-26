@@ -48,11 +48,7 @@ switch status.holo.image_mode
             iReconstructed(y_selection(1):y_selection(2), x_selection(1):x_selection(2)) = enhancedSection;
         end
         
-        status.currim = iReconstructed;
-        
-        % draw a black border
-%         status.currim( = 
-        
+        status.currim = iReconstructed;       
 end
 
 end
