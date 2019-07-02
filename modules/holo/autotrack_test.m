@@ -10,15 +10,17 @@ if 1
     ref2 = ref2(:, :, 1);
     
     autopara = [];
-    autopara.method = 'Max of 3';%'2nd nearest';
-    autopara.greythr = 0.9;
-    autopara.areathr = 10;
+    autopara.method = 'Max of 3'; % '2nd nearest';
+    autopara.greythr = 0.5;
+    autopara.areathr = 5;
     autopara.roimask = [];
 
     holopara.holo.pix_um = 0.0134;
     holopara.holo.lambda_nm = 780;
     holopara.holo.mag = 2;
-    holopara.holo.boxSize = 256;
+    holopara.holo.boxSize_unmag = 64;
+    holopara.holo.zRange = [105 135];
+    holopara.holo.stepRange = [2 0.05];
 
     lastpoint = [672.9312 129.8621 1 102.15];
 
@@ -38,5 +40,5 @@ end
 % [outcentroid, outarea, outimages, allregions] = holo_autotrack_detect(im, ref1, ref2, autopara, holopara, lastpoint)
 [outcentroid, outarea, diagims] = holo_autotrack_detect(im, ref1, ref2, autopara, holopara, lastpoint);
 
-% holo_autotrack_plotdiag(diagims, outcentroid, outarea, gui.prev.ah);
+holo_autotrack_plotdiag(diagims, outcentroid, outarea, gui.prev.ah);
 % axis(gui.prev.ah, [573 773 80 180]);

@@ -25,7 +25,8 @@ para.holo.pix_um     = 0.0052*5.15/para.holo.mag; % 0.0052*5.15 % 0.0052*4.5/4
 
 para.holo.zRange = [105 135];   % min and max acceptable z position (mm)
 para.holo.stepRange = [2 0.05]; % mm step size in z [coarse fine]
-para.holo.boxSize = 64*para.holo.mag; % box size to draw around point for z-finding
+para.holo.boxSize_unmag = 64; % box size to draw around point for z-finding
+para.holo.boxSize = para.holo.boxSize_unmag*para.holo.mag; % box size to draw around point for z-finding
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% HOLO theme

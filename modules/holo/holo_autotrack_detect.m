@@ -24,21 +24,6 @@ function [outcentroid, outarea, outimages, allregions] = holo_autotrack_detect(i
 %     method = 'largest';
 % end
 
-switch autopara.method
-    case '2nd nearest'
-        diffim = - im + ref1;
-        
-    case {'Max of 3', 'Middle of 3'}
-        diffim = - im + 0.5*ref1 + 0.5*ref2;
-end
-
-diffim = diffim - mean(diffim(:));
-diffim = holo_analyse1_magnify(diffim, holopara.holo.mag); % store the magnified difference image in a new variable. This will be reused for findZ
-iReconstructed = holo_analyse2_reconstruct(diffim, lastpoint(4), holopara);
-iReconstructed = max(iReconstructed(:))-iReconstructed;
-iReconstructed = iReconstructed/max(iReconstructed(:));
-% iReconstructed = zeros(size(diffim)); % brings the calculation time down from .37 to .19s in test
-% now replace zoomed-in area
 % 1. find closest tracked point 
 if ~any(isnan(lastpoint))
     pos = lastpoint(1:2);
@@ -46,30 +31,45 @@ else
     error('This point has to be tracked at least once to find a suitable area');
 end
 
-[x_selection, y_selection, cx, cy] = sub_find_section(round(pos), holopara.holo.boxSize, size(iReconstructed));
-iDiffSelection  = diffim(y_selection(1):y_selection(2), x_selection(1):x_selection(2));
+% 2. Calculate difference image
+switch autopara.method
+    case '2nd nearest'
+        iDiff = - im + ref1;
+    case {'Max of 3', 'Middle of 3'}
+        iDiff = - im + 0.5*ref1 + 0.5*ref2;
+end
+iDiff = iDiff - mean(iDiff(:)); x = 1:size(iDiff, 2); y = 1:size(iDiff, 1); % x and y coordinates along original unmagnified image axes
+
+% 3. Cut out area around the last point
+% Find the best section to do the holographic computation on
+% It must be 2*boxSize by 2*boxSize (in the magnified image)
+% cx_unmag and cy_unmag mark the position of pos inside this section
+[x_selection_unmag, y_selection_unmag, cx_unmag, cy_unmag] = sub_find_section(round(pos/holopara.holo.mag), holopara.holo.boxSize_unmag, size(iDiff));
+iDiffSelection = iDiff(y_selection_unmag(1):y_selection_unmag(2), x_selection_unmag(1):x_selection_unmag(2));
+xSelection = x(x_selection_unmag(1):x_selection_unmag(2)); ySelection = y(y_selection_unmag(1):y_selection_unmag(2)); % x and y coordinates along original unmagnified image axes
+
+iDiffSelection_mag = holo_analyse1_magnify(iDiffSelection, holopara.holo.mag); % magnify for reconstruction
+xSelection = xSelection(1)-1 + 1/holopara.holo.mag:1/holopara.holo.mag:xSelection(end); ySelection = ySelection(1)-1 + 1/holopara.holo.mag:1/holopara.holo.mag:ySelection(end);% x and y coordinates along original unmagnified image axes
+
+% 4. Reconstruct holographic image
 % short version
-enhancedSection = holo_analyse2_reconstruct(iDiffSelection, lastpoint(4), holopara);
+% enhancedSection = holo_analyse2_reconstruct(iDiffSelection_mag, lastpoint(4), holopara);
 %             % long version
-%             allSections = holo_analyse2_reconstruct(iDiffSelection, para.holo.zRange(1):para.holo.stepRange(1):para.holo.zRange(2), para);
-%             enhancedSection = mean(allSections, 3);
+            allSections = holo_analyse2_reconstruct(iDiffSelection_mag, holopara.holo.zRange(1):holopara.holo.stepRange(1):holopara.holo.zRange(2), holopara);
+            enhancedSection = mean(allSections, 3);
 
-enhancedSection = max(enhancedSection(:))-enhancedSection;
-enhancedSection = enhancedSection/max(enhancedSection(:));
-iReconstructed(y_selection(1):y_selection(2), x_selection(1):x_selection(2)) = enhancedSection;
+enhancedSection = 1-enhancedSection/max(enhancedSection(:)); % normalise to 1-0, with points being black on white background
 
-diffim = iReconstructed;
-
-diffim([1:round(lastpoint(2)-holopara.holo.boxSize/8) round(lastpoint(2)+holopara.holo.boxSize/8):end], :) = max(diffim(:)); 
-diffim(:, [1:round(lastpoint(1)-holopara.holo.boxSize/8) round(lastpoint(1)+holopara.holo.boxSize/8):end]) = max(diffim(:)); 
+% 5. Cut out area immediately around the point and find connected regions
+[x_selection2_mag, y_selection2_mag] = sub_find_section(round([cx_unmag, cy_unmag]*holopara.holo.mag), holopara.holo.boxSize/8, size(enhancedSection));
+enhancedSectionSelection2 = enhancedSection(y_selection2_mag(1):y_selection2_mag(2), x_selection2_mag(1):x_selection2_mag(2));
+xSelection2 = xSelection(x_selection2_mag(1):x_selection2_mag(2)); ySelection2 = ySelection(y_selection2_mag(1):y_selection2_mag(2)); % x and y coordinates along original unmagnified image axes
 
 %% gray scale conversion
-level = autopara.greythr * graythresh(diffim);
-level = min([level 1]); % limit level to allowed range
-bwi   = im2bw(diffim, level);
+bwi   = imbinarize(enhancedSectionSelection2, 'adaptive', 'foregroundpolarity', 'dark', 'sensitivity', autopara.greythr);
 
 %% cut out points outside region of interest
-bwi2  = ~bwi;
+bwi2 = ~bwi;
 bwi2(~autopara.roimask) = 0;
 
 if nargout>3
@@ -104,7 +104,7 @@ else
 end
 
 if nargout>2 % return diagnostic images (currently only used for preview)
-    outimages{1} = diffim;
+    outimages{1} = enhancedSectionSelection2;
     outimages{2} = bwi; 
     outimages{3} = bwi2;
     outimages{4} = bwi3;
