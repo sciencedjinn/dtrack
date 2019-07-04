@@ -8,6 +8,7 @@ function [status, gui] = dtrack_image(gui, status, para, data, redraw)
 % redraw 14: only current point, will also use uistack to bring impoints/lines to front
 % redraw 20: markers only
 % redraw 30: load only, don't display (gui and data can be empty)
+% redraw 31: load only main image, not references; don't display (gui and data can be empty)
 
 %fprintf('     Image function with redraw mode: %d.\n', redraw);
 
@@ -29,7 +30,7 @@ end
 [~, status, para, data, redraw] = dtrack_support_evalModules('_image1', [], status, para, data, redraw); % redraw might need to be changed here, e.g. for module holo: when z-value has changed, frame needs to be redrawn
 
 %% load new image
-if ismember(redraw, [1 3 30]) % new frame actions
+if ismember(redraw, [1 3 30 31]) % new frame actions
     % calculate framenr
     if para.imseq.isimseq
         status.framenr = min([max([status.framenr para.imseq.from]) status.nFrames]); % restrict range of framenrs, in case it was set out of bounds
@@ -112,7 +113,7 @@ if ismember(redraw, [1 2 3 30])
     [~, status, para, data] = dtrack_support_evalModules('_imagefcn', [], status, para, data);
 end
 
-if redraw==30 % load only, don't display
+if ismember(redraw, [30 31]) % load only, don't display
     return;
 end
 
@@ -237,7 +238,7 @@ if ismember(redraw, [1 2 3 11])
     if para.showlast
         switch para.trackingtype
             case 'point'
-                %first, determine whether this point has been tracked in this frame
+                % first, determine whether this point has been tracked in this frame
                 range = max([1 status.framenr-para.showlastrange]):max([1 status.framenr-1]);
                 sel = find(data.points(range, status.cpoint, 3)>0, 1, 'last');
                 if ~isempty(sel)
@@ -248,38 +249,38 @@ if ismember(redraw, [1 2 3 11])
                     x = -10; y = -10; vis = 'off';
                 end
 
-                %second, determine whether you have to draw the point (if ph is empty; only on first frame after loading) 
+                % second, determine whether you have to draw the point (if ph is empty; only on first frame after loading) 
                 if isempty(status.lph) || ~ishghandle(status.lph)
                     status.lph=line(x, y, 'parent', gui.ax1, 'tag', 'lpoint');  
                 else
                     set(status.lph, 'xdata', x, 'ydata', y);
                 end
-                set(status.lph, 'visible', vis); %turning a 'visible on' back into 'visible on' adds almost no time
+                set(status.lph, 'visible', vis); % turning a 'visible on' back into 'visible on' adds almost no time
             case 'line'
-                %first, determine whether this point has been tracked in this frame
+                % first, determine whether this point has been tracked in this frame
                 i = status.cpoint;
                 range = max([1 status.framenr-para.showlastrange]):max([1 status.framenr-1]);
                 sel = find(data.points(range, i, 3)>0, 1, 'last');
                 if ~isempty(sel)
-                    x1 = data.points(range(1)+sel-1, i, 1); %load data
-                    y1 = data.points(range(1)+sel-1, i, 2); %load data
-                    x2 = data.points(range(1)+sel-1, i+1, 1); %load data
-                    y2 = data.points(range(1)+sel-1, i+1, 2); %load data
+                    x1 = data.points(range(1)+sel-1, i, 1); % load data
+                    y1 = data.points(range(1)+sel-1, i, 2); % load data
+                    x2 = data.points(range(1)+sel-1, i+1, 1); % load data
+                    y2 = data.points(range(1)+sel-1, i+1, 2); % load data
                     vis = 'on';
                 else
                     x1 = -10; y1 = -10; x2 = -10; y2 = -10; vis='off';
                 end
                 
-                %second, determine whether you have to draw the point (if ph is empty; only on first frame after loading)
+                % second, determine whether you have to draw the point (if ph is empty; only on first frame after loading)
                 if isempty(status.lph) || ~ishghandle(status.lph)
                     status.lph = line([x1 x2], [y1 y2], 'parent', gui.ax1, 'tag', 'lline');  
                 else
                     set(status.lph, 'xdata', [x1 x2], 'ydata', [y1 y2]);
                 end
-                set(status.lph, 'visible', vis); %turning a 'visible on' back into 'visible on' adds almost no time
+                set(status.lph, 'visible', vis); % turning a 'visible on' back into 'visible on' adds almost no time
         end
     else
-        try %FIXME
+        try % FIXME
             set(status.lph, 'visible', 'off');
         end
     end
@@ -423,6 +424,8 @@ if ismember(redraw, [1 2 3 11 12])
     end
 end
         
-        
+%% Final module contributions
+[~, status] = dtrack_support_evalModules('_image_final', gui, status, para, data, redraw); % redraw might need to be changed here, e.g. for module holo: when z-value has changed, frame needs to be redrawn
+
         
 

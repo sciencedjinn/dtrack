@@ -76,14 +76,25 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
 %% Diagnostics panel
 gui.diag.tabgroup = uitabgroup(gui.f1, 'position', [.85 .504 .15 .25]); 
 gui.diag.tab = uitab(gui.diag.tabgroup, 'title', 'Diagnostics'); 
-    gui.diag.axes = axes('parent', gui.diag.tab, 'units', 'normalized', 'position', [0 0 1 1], 'tag', 'diag_axes', 'buttondownfcn', status.maincb); 
+    gui.diag.ph(1) = uipanel('parent', gui.diag.tab, 'units', 'normalized', 'position', [0 .5 .5 .5]);
+    gui.diag.ph(2) = uipanel('parent', gui.diag.tab, 'units', 'normalized', 'position', [.5 .5 .5 .5]);
+    gui.diag.ph(3) = uipanel('parent', gui.diag.tab, 'units', 'normalized', 'position', [0 0 .5 .5]);
+    gui.diag.ph(4) = uipanel('parent', gui.diag.tab, 'units', 'normalized', 'position', [.5 0 .5 .5]);
 
+    gui.diag.ah(1) = axes('parent', gui.diag.ph(1), 'units', 'normalized', 'position', [0 0 1 1]);
+    gui.diag.ah(2) = axes('parent', gui.diag.ph(2), 'units', 'normalized', 'position', [0 0 1 1]);
+    gui.diag.ah(3) = axes('parent', gui.diag.ph(3), 'units', 'normalized', 'position', [0 0 1 1]);
+    gui.diag.ah(4) = axes('parent', gui.diag.ph(4), 'units', 'normalized', 'position', [0 0 1 1]);
+    set(gui.diag.ah(1), 'YDir', 'reverse', 'visible', 'off');
+    set(gui.diag.ah(2), 'YDir', 'reverse', 'visible', 'off');
+    set(gui.diag.ah(3), 'YDir', 'reverse', 'visible', 'off');
+    set(gui.diag.ah(4), 'YDir', 'reverse', 'visible', 'off');
 
-       
 %% Holo menu
 gui.menus.holo.menu = uimenu(gui.f1, 'label', 'Holo');
-    gui.menus.holo.entries.holo_autoXY     = uimenu(gui.menus.holo.menu, 'label', 'Autodetect X/Y-positions...');
+    gui.menus.holo.entries.holo_autoXY    = uimenu(gui.menus.holo.menu, 'label', 'Autodetect X/Y-positions...');
     gui.menus.holo.entries.holo_autoZ     = uimenu(gui.menus.holo.menu, 'label', 'Autodetect Z-positions...');
+    gui.menus.holo.entries.holo_plot_speed_2d = uimenu(gui.menus.holo.menu, 'label', 'Plot 2D speeds', 'separator', 'on');
         
         
 % add a holo default button to the image manipulation panel

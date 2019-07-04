@@ -42,7 +42,7 @@ switch status.holo.image_mode
             pos = data.points(allTrackedFrames(i), status.cpoint, 1:2);
         end
         if ~isnan(pos)
-            [x_selection, y_selection, cx, cy] = sub_find_section(round(pos), para.holo.boxSize, size(iReconstructed));
+            [x_selection, y_selection] = sub_find_section(round(pos), para.holo.boxSize, size(iReconstructed));
             iDiffSelection = status.diffim(y_selection(1):y_selection(2), x_selection(1):x_selection(2));
             switch status.holo.z_mode
                 case 'single'

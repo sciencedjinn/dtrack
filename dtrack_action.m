@@ -31,6 +31,9 @@ ctrl  = ismember('control', modifier);
 %% Find the right action %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Init
+autoforward = false;
+
 %% 1. Actions with a modifier
 if alt&&shift&&ctrl
     status.currentaction = status.lastaction;
@@ -160,6 +163,11 @@ else
 %% 2. normal (single) keystrokes/button presses
     switch(action)
       %% Just redraw
+        case 'loadonly_noref'
+            % only load the frame without displaying it
+            redraw = 31;    % this is used by autotracking and "Save as image sequence"
+            saveneeded = 0;
+            
         case 'loadonly'
             % only load the frame without displaying it
             redraw = 30;    % this is used by autotracking and "Save as image sequence"
@@ -223,6 +231,7 @@ else
                     delete(h); %HACK
             end
             % redraw will be set depending on autoforwarding (see bottom of this file)
+            autoforward = true;
             saveneeded = 1;
             
         case 'rightclick'
@@ -1003,7 +1012,7 @@ else
                     end
                     [status, para] = dtrack_ref_prepare(status, para);
                     dtrack_guivisibility(gui, para, status);
-                case 'dynamic'
+                case {'dynamic', 'double_dynamic'}
                     answer = inputdlg('Please enter the desired frame subtraction distance:', 'New reference difference', 1, {num2str(para.ref.frameDiff)});
                     if ~isempty(answer)
                         answer = abs(round(str2double(answer{1})));
@@ -1013,6 +1022,8 @@ else
                         end
                     end
                     dtrack_guivisibility(gui, para, status);
+                otherwise
+                    warning('Uncaptured case, please report this warning');
                     
             end
             redraw = 2;
@@ -1052,76 +1063,13 @@ else
             end
             redraw = 1;
             saveneeded = 0;
-            
-        case 'tools_overlay'
-            videoframes=[3044 3440];%[940 1270];%
-            
-            pointframes={};%{1:767}; %cell of the frames where they should be overlayed; each entry can be a range of frames
-            pointpos={};%{[data.points(1:767, 1, 1:2], [50 60]}; %cell of x/y positions of points to overlay on the movie
-            pointmarkers={};%{'o'};
-            pointcolor={};%{'b'};
-            pointsize={};%{10};
-            pointlinewidth={};%{1};
-
-% START Pachysoma displacement
-            outAR=[16 9];  
-            lineframes={1:767};
-            linepos={squeeze(data.points(1:767, 1, 1:2))};
-            linemarkers={'none'}; %cell of markers for each point of the line. 
-            linemarkersize={};%{5};
-            lineendmarkers={};%{'o'}; %cell of markers for end points of the line. Each entry can be a cell {start,end}
-            linewidth={2};%{2};
-            linecolor={};%{'b'};
-            linestyle={'-'};%{'-'};
-% END Pachysoma displacement
-
-% START walking
-%             outAR=[]; %aspect ratio, use default
-%             tt=videoframes(1):videoframes(2);
-%             lineframes={tt, tt, tt, tt, tt, tt};
-%             linepos={};
-%             for i=1:6
-%                 x=smooth(squeeze(data.points(tt, i, 1)), 3);
-%                 y=smooth(squeeze(data.points(tt, i, 2)), 3);
-%                 linepos=[linepos [x y]];
-%             end
-%             %linepos={squeeze(data.points(tt, 1, 1:2)), squeeze(data.points(tt, 2, 1:2)), squeeze(data.points(tt, 3, 1:2)), squeeze(data.points(tt, 4, 1:2)), squeeze(data.points(tt, 5, 1:2)), squeeze(data.points(tt, 6, 1:2))};%{[data.points(1:767, 1, 1:2], [50 60]}; %cell of x/y positions of points to overlay on the movie
-%             linemarkers={'o'};%{'none'}; %cell of markers for each point of the line. 
-%             linemarkersize={1.5};%{5};
-%             lineendmarkers={};%{'o'}; %cell of markers for end points of the line. Each entry can be a cell {start,end}
-%             linewidth={1};%{2};
-%             linecolor={'r', 'b', 'g', 'r', 'b', 'g'};%{'r', 'b', 'r', 'b', 'r', 'b'};
-%             linestyle={'none'};%{'-'};
-% END walking
-            inpath=fileparts(para.paths.movpath);
-            outpath=inpath;
-            infilename=para.paths.movname;
-            outfilename=[infilename(1:end-4) '_overlay.avi'];
-            outframerate=status.FrameRate;
-            outquality=100;
-            outres=[800 600];%[status.vidWidth status.vidHeight];
-            dynamicline={0, 0, 0, 0, 0, 0};
-            bgr=status.roi; % background roi
-            
-            overlay_on_movie;
-            saveneeded = 0;
-            
+                      
         case 'tools_autotrack_bgs'
             % Autotracking using background subtraction
             %TODO: save last paras
             [success, autopara] = dtrack_tools_autotrack_select(status, para, data);
             if success
                 [gui, status, para, data] = dtrack_tools_autotrack_main(gui, status, para, data, autopara);
-            end
-            redraw = 1;
-            saveneeded = 1;
-            
-        case 'holo_autotrack_bgs'
-            % Autotracking using background subtraction
-            %TODO: save last paras
-            [success, autopara] = holo_autotrack_select(status, para, data);
-            if success
-                [gui, status, para, data] = holo_autotrack_main(gui, status, para, data, autopara);
             end
             redraw = 1;
             saveneeded = 1;
@@ -1137,7 +1085,7 @@ else
             
         case {'vlc', 'm'}
             %First check whether you're on a PC
-            if ~strncmpi(status.os, 'PC', 2) %if not on a PC
+            if ~strncmpi(status.os, 'PC', 2) % if not on a PC
                 warndlg('This function is currently only available for Windows.');
             elseif isempty(para.paths.vlcpath)
                 warndlg('Please enter the path to VLC.EXE in File->Properties.');
@@ -1158,7 +1106,7 @@ else
       %% Debug menu
         case 'debug_publish'
             assignin('base', 'status', status);
-            assignin('base', 'gui', gui); %TODO add more
+            assignin('base', 'gui', gui); % TODO add more
             assignin('base', 'para', para);
             assignin('base', 'data', data);
             redraw = 0;
@@ -1246,7 +1194,7 @@ else
             %% call modules
             actionFound = false;
             for i = 1:length(para.modules)
-                [gui, status, para, data, actionFound, redraw, saveneeded] = feval([para.modules{i} '_action'], gui, status, para, data, action, src);
+                [gui, status, para, data, actionFound, redraw, saveneeded, autoforward] = feval([para.modules{i} '_action'], gui, status, para, data, action, src);
                 if actionFound
                     break;
                 end
@@ -1254,18 +1202,18 @@ else
             if ~actionFound
                 error(['Unknown action: ', action]);
             end
-    end %switch
-end %if
+    end % switch
+end % if
 
 % it would be nice if returnfocus was here, but it only works after buttonpresses
 
 % forward point or frame
-if strcmp(action, 'leftclick') || strcmp(action, 'doubleleftclick')
+if autoforward
     switch para.autoforw
         case 0
-            redraw = 11; %do nothing except refresh points
+            redraw = 11; % do nothing except refresh points
         case {1, 2}
-            %find next point in this frame
+            % find next point in this frame
             switch para.trackingtype
                 case 'point'
                     cp = min(status.trackedpoints(status.trackedpoints>status.cpoint));
@@ -1275,14 +1223,14 @@ if strcmp(action, 'leftclick') || strcmp(action, 'doubleleftclick')
                 otherwise
                     error('error');
             end
-            if ~isempty(cp) %go to this point
+            if ~isempty(cp) % go to this point
                 switch para.trackingtype
                     case 'point'
                         [gui, status, para, data] = dtrack_action(gui, status, para, data, num2str(mod(cp, 10))); %mod(cp, 10) necessary to make 10 into 0
                     case 'line'
                         [gui, status, para, data] = dtrack_action(gui, status, para, data, num2str(mod((cp+1)/2, 10))); %mod(cp, 10) necessary to make 10 into 0
                 end
-            else %forward to next frame
+            else % forward to next frame
                 switch para.trackingtype
                     case 'point'
                         status.cpoint = min(status.trackedpoints);
@@ -1292,14 +1240,14 @@ if strcmp(action, 'leftclick') || strcmp(action, 'doubleleftclick')
                         set(findobj('tag', 'pointselpanel'), 'selectedobject', findobj('tag', ['ps' num2str((status.cpoint+1)/2)]));
                 end
                 
-                if para.autoforw == 1 %forward 1
+                if para.autoforw == 1 % forward 1
                     [gui, status, para, data] = dtrack_action(gui, status, para, data, 'forw1');
-                else %forward x
+                else % forward x
                     [gui, status, para, data] = dtrack_action(gui, status, para, data, 'forwx');
                 end
             end
             
-            redraw = 0; %redrawing was already done in autoforward actions
+            redraw = 0; % redrawing was already done in autoforward actions
         otherwise
             error('Internal error: unknown auto-forward mode');
     end

@@ -43,6 +43,8 @@ end
 
 % [outcentroid, outarea, outimages, allregions] = holo_autotrack_detect(im, ref1, ref2, autopara, holopara, lastpoint)
 [res, diag] = holo_autotrack_detect(im, ref1, ref2, autopara, holopara, lastpoint, 'prediction');
+diag.fnr = 501;
+diag.pnr = 1;
 
 holo_autotrack_plotdiag(diag, gui.prev.ah);
 % axis(gui.prev.ah, [573 773 80 180]);

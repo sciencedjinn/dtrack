@@ -45,7 +45,7 @@ end
 
 assert(ismember(lower(lastPointType), {'lastframe', 'nextframe', 'prediction', 'nearby', 'unknown'}));
 assert(ismember(lower(autopara.refMethod), {'single', 'double'}))
-assert(ismember(lower(autopara.findMethod), {'2nd nearest', 'middle of 3', 'largest', 'brightest'}));
+assert(ismember(lower(autopara.findMethod), {'2nd nearest', 'middle of 3', 'largest', 'darkest'}));
 if strcmpi(autopara.findMethod, 'middle of 3'), assert(strcmpi(autopara.refMethod, 'double')); end
 assert(isa(im, 'double'))
 assert(isa(ref1, 'double'))
@@ -80,11 +80,10 @@ cx_mag = cx_unmag*holopara.mag; cy_mag = cy_unmag*holopara.mag;
 allSections = holo_analyse2_reconstruct(iDiffSelection_mag, holopara.zRange(1):holopara.stepRange(1):holopara.zRange(2), holopara);
 enhancedSection = mean(allSections, 3);
 
-enhancedSection = 1 - enhancedSection/max(enhancedSection(:)); % normalise to 1-0, with points being black on white background
-
 % 5. Cut out area immediately around the point and find connected regions
 [x_selection2_mag, y_selection2_mag] = sub_find_section([cx_mag, cy_mag], holopara.searchBoxSize * holopara.reconBoxSize, size(enhancedSection));
 enhancedSectionSelection2 = enhancedSection(y_selection2_mag(1):y_selection2_mag(2), x_selection2_mag(1):x_selection2_mag(2));
+enhancedSectionSelection2 = 1 - enhancedSectionSelection2/max(enhancedSectionSelection2(:)); % normalise to 1-0, with points being black on white background
 
 % 6. calculate function to transform points back and forth
 fun_full2box = @(p) [p(1) - (x_selection_unmag(1)-1)*holopara.mag - (x_selection2_mag(1)-1), p(2) - (y_selection_unmag(1)-1)*holopara.mag - (y_selection2_mag(1)-1)];
@@ -97,7 +96,7 @@ switch lower(autopara.findMethod)
         nObjRange = [3 3];
     case '2nd nearest'
         nObjRange = [2 5];
-    case {'largest', 'brightest'}
+    case {'largest', 'darkest'}
         nObjRange = [1 5];
 end
 
@@ -134,11 +133,11 @@ end
 
 %% Find the correct object
     % Find the best
-    switch autopara.findMethod
+    switch lower(autopara.findMethod)
         case 'largest'
             [~, idx] = max([props.Area]);
-        case 'brightest'
-            [~, idx] = min([props.MeanIntensity]);
+        case 'darkest'
+            [~, idx] = max([props.MeanIntensity]);
         case '2nd nearest'
             if length(props)<2, error('Fewer than 2 found'); end % Shouldn't happen
             cs = cat(1, props.WeightedCentroid);
@@ -147,7 +146,7 @@ end
             cs(:, 2) = cs(:, 2) - lastpoint_inBox(2);
             d = sqrt(sum(cs.^2, 2)); % square of distance between points
             [~, idx] = min(d);
-        case 'Middle of 3'
+        case 'middle of 3'
             if length(props)<3, error('Fewer than 3 found'); end % Shouldn't happen
             % find the 3 largest
             [~, idxs] = sort([props.Area], 'descend');
@@ -158,7 +157,7 @@ end
             [~, i] = min(totaldist);
             idx = idxs(i);
         otherwise
-            error('Internal error: Unknown autotrack method %s', autopara.method);
+            error('Internal error: Unknown autotrack method %s', autopara.findMethod);
     end
     
     res.centroid = fun_box2full(props(idx).WeightedCentroid);
@@ -198,6 +197,6 @@ function [props, bwImages] = sub_detectObjects(gsImage, autopara)
     bwImages{3}  = bwareaopen(bwImages{2}, autopara.areathr);           % apply area threshold
     
     % find connected regions
-    props = regionprops(bwImages{3}, gsImage, 'Area', 'MeanIntensity', 'WeightedCentroid'); % calculate area and centroid for each region
+    props = regionprops(bwImages{3}, 1-gsImage, 'Area', 'MeanIntensity', 'WeightedCentroid'); % calculate area and centroid for each region
 end
     

@@ -1,10 +1,11 @@
-function [gui, status, para, data, actionFound, redraw, saveNeeded] = holo_action(gui, status, para, data, action, src)
+function [gui, status, para, data, actionFound, redraw, saveNeeded, autoForward] = holo_action(gui, status, para, data, action, src)
 % HOLO_ACTION is the holo module version of Dtrack's main callback function. It is called after all options in the main action function are exhausted.
 % See dtrack_action for more information.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Find the right action %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
+autoForward = false;
 
 actionFound = true;
 switch(action)
@@ -21,6 +22,8 @@ switch(action)
         returnfocus; 
         redraw = 2;
         saveNeeded = 1/2;
+        
+%% Z Navigation
     case 'holo_zvalue_disp'
         status.holo.z = str2double(get(src, 'string'));
         returnfocus;
@@ -41,65 +44,15 @@ switch(action)
         returnfocus;
         redraw = 2;
         saveNeeded = 1/2;
+        
+%% Modes
     case {'camera_mode', 'holo_mode', 'interference_mode', 'holo_mag_mode'} %status.show_holo
         status.holo.image_mode = action(1:end-5);
         dtrack_guivisibility(gui, para, status);
         returnfocus;
         redraw = 2;
         saveNeeded = 0;
-    case 'holo_findZ'
-        bestZ = holo_findFocus(status.diffim, para, data.points(status.framenr, status.cpoint, 1:2)); % find the best z-position for current point
-        data.points(status.framenr, status.cpoint, 4) = bestZ; % assign this found position to the current point
-        status.holo.z = bestZ; % view this new position
-        set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
-        returnfocus;
-        redraw = 1; % Could be 2, but then we have to save into currim_ori
-        saveNeeded = 1/2;
-    case 'holo_findZ_local'
-        bestZ = holo_findFocus(status.diffim, para, data.points(status.framenr, status.cpoint, 1:2), status.holo.z); % find the best z-position for current point
-        data.points(status.framenr, status.cpoint, 4) = bestZ; % assign this found position to the current point
-        status.holo.z = bestZ; % view this new position
-        set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
-        returnfocus;
-        redraw = 1; % Could be 2, but then we have to save into currim_ori
-        saveNeeded = 1/2;
-    case 'holo_findXY'
-        autopara = [];
-        autopara.refMethod = 'double';
-        autopara.findMethod = 'brightest'; % 
-        autopara.greythr = 0.5;
-        autopara.areathr = 5;
-        autopara.roimask = [];
-
-        gui.prev.fig   = figure(2973); clf;
-        gui.prev.ph(1) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [0 .5 .5 .5]);
-        gui.prev.ph(2) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [.5 .5 .5 .5]);
-        gui.prev.ph(3) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [0 0 .5 .5]);
-        gui.prev.ph(4) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [.5 0 .5 .5]);
-
-        gui.prev.ah(1) = axes('parent', gui.prev.ph(1), 'units', 'normalized', 'position', [0 0 1 1]);
-        gui.prev.ah(2) = axes('parent', gui.prev.ph(2), 'units', 'normalized', 'position', [0 0 1 1]);
-        gui.prev.ah(3) = axes('parent', gui.prev.ph(3), 'units', 'normalized', 'position', [0 0 1 1]);
-        gui.prev.ah(4) = axes('parent', gui.prev.ph(4), 'units', 'normalized', 'position', [0 0 1 1]);
-        
-        im = double(readframe(status.mh, status.framenr, para, status));
-        ref1 = double(readframe(status.mh, status.framenr-10, para, status));
-        ref2 = double(readframe(status.mh, status.framenr+10, para, status));
-
-        [res, diag] = holo_autotrack_detect(im, ref1, ref2, autopara, para.holo, data.points(status.framenr-10, status.cpoint, :), 'lastframe');
-        holo_autotrack_plotdiag(diag, gui.prev.ah);
-    
-        data.points(status.framenr, status.cpoint, 1:2) = res.centroid; % assign this found position to the current point
-        returnfocus;
-        redraw = 1; % Could be 2, but then we have to save into currim_ori
-        saveNeeded = 1/2;
-    case 'holo_link'
-        status.holo.link = get(src, 'Value');
-        holo_guivisibility(gui, status, para, data)
-        returnfocus;
-        redraw = 1; % Could be 2, but then we have to save into currim_ori
-        saveNeeded = 1/2;
-    case 'holo_ref_single'
+        case 'holo_ref_single'
         para.ref.use = 'dynamic';
         dtrack_guivisibility(gui, para, status)
         returnfocus;
@@ -123,11 +76,89 @@ switch(action)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;
-    case 'holo_autoXY'
+    case 'holo_link'
+        status.holo.link = get(src, 'Value');
+        holo_guivisibility(gui, status, para, data)
         returnfocus;
-        redraw = 1;
+        redraw = 1; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 1/2;
+    
+%% 
+    case 'holo_plot_speed_2d'
+        figure(274); clf; hold on;
+        for p = 1:para.pnr
+            sel = data.points(:, p, 3)>3;
+            xy = squeeze(data.points(sel, p, 1:2));
+            t = (0:status.nFrames-1)/status.FrameRate;
+            t = t(sel);
+            speed = sqrt(sum(diff(xy, 1).^2, 2))./diff(t); % pixels/s
+            speed = speed*para.holo.pix_um;        % um/s
+            plot(t(2:end), speed, '.-', 'color', para.ls.p{1}.col)
+        end
+        xlabel('Time (s)')
+        ylabel('Movement speed (um/s)');
+        legend(num2str((1:para.pnr)'))
+        
+        redraw = 0; % Could be 2, but then we have to save into currim_ori
         saveNeeded = 0;
-    case 'holo_autoZ'
+        
+%%
+    case 'holo_findZ'
+        bestZ = holo_findFocus(status.diffim, para, data.points(status.framenr, status.cpoint, 1:2)); % find the best z-position for current point
+        data.points(status.framenr, status.cpoint, 4) = bestZ; % assign this found position to the current point
+        status.holo.z = bestZ; % view this new position
+        set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
+        returnfocus;
+        redraw = 1; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 1/2;
+        
+    case 'holo_findZ_local'
+        bestZ = holo_findFocus(status.diffim, para, data.points(status.framenr, status.cpoint, 1:2), status.holo.z); % find the best z-position for current point
+        data.points(status.framenr, status.cpoint, 4) = bestZ; % assign this found position to the current point
+        status.holo.z = bestZ; % view this new position
+        set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
+        returnfocus;
+        redraw = 1; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 1/2;
+        
+    case 'holo_findXY'
+        autopara = [];
+        autopara.refMethod = 'double';
+        autopara.findMethod = 'darkest'; % 
+        autopara.greythr = 0.5;
+        autopara.areathr = 3;
+        autopara.roimask = [];
+        
+        im = double(readframe(status.mh, status.framenr, para, status));
+        ref1 = double(readframe(status.mh, status.framenr-para.ref.frameDiff, para, status));
+        ref2 = double(readframe(status.mh, status.framenr+para.ref.frameDiff, para, status));
+
+        [res, diag] = holo_autotrack_detect(im, ref1, ref2, autopara, para.holo, data.points(status.framenr-para.ref.frameDiff, status.cpoint, :), 'lastframe');
+        if isempty(res.message)
+            diag.fnr = status.framenr;
+            diag.pnr = status.cpoint;
+            holo_autotrack_plotdiag(diag, gui.diag.ah);
+    
+            data.points(status.framenr, status.cpoint, 1:2) = res.centroid; % assign this found position to the current point
+            data.points(status.framenr, status.cpoint, 3) = 42; % assign this found position to the current point
+        else 
+            errordlg(res.message);
+        end
+        returnfocus;
+        autoForward = true;
+        redraw = 1; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 1/2;
+    
+    case 'holo_autoXY'
+        % Autotracking using background subtraction
+        [success, autopara] = holo_autotrack_select(status, para, data);
+        if success
+            [gui, status, para, data] = holo_autotrack_main(gui, status, para, data, autopara);
+        end
+        redraw = 1;
+        saveNeeded = 1;
+        
+     case 'holo_autoZ'
         % ask for parameters
 %         [success, savepara] = dtrack_tools_imageseq(status, para);
 %         if success
@@ -136,7 +167,8 @@ switch(action)
 %         end
         returnfocus;
         redraw = 1;
-        saveNeeded = 0;
+        saveNeeded = 1;
+        
     otherwise
         redraw = 0;
         saveNeeded = 0;

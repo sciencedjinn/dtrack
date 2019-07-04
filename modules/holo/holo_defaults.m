@@ -16,9 +16,9 @@ para.ref.frameDiff          = 10; % when set to 0, para.gui.stepsize will be use
 para.forceaspectratio       = [];%[1 1];
 
 status.holo.z = 120;
-status.holo.image_mode = 'interference';
-status.holo.link = true;
-status.holo.z_mode = 'single';
+status.holo.image_mode      = 'interference';
+status.holo.link            = true;
+status.holo.z_mode          = 'single';
 
 para.holo.mag        = 2;
 para.holo.lambda_nm  = 780; 

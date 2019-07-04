@@ -1,4 +1,4 @@
-function s=dtrack_support_compstruct(s, d, n, verbose)
+function s = dtrack_support_compstruct(s, d, n, verbose)
 % recursive function that compares the fields in s and d (default)
 % if a field does not exist in s, it is copied from d
 
