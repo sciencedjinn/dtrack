@@ -60,7 +60,7 @@ end
 function [z, allMaxs] = sub_find_focus(iDiff, zRange, para, cx, cy, verbose)
     % Given a difference image section and a range of z-values, finds the 
     % z-value where the central 8th of the image has the largest value, indicating best focus
-    Reconst = holo_analyse2_reconstruct(iDiff, zRange, para);
+    Reconst = holo_analyse2_reconstruct(iDiff, zRange, para.holo);
 
     % for each z-position, calculate the maximum in Reconst, then find the maximum
     allMaxs = max(max(Reconst(cy - 1/8*para.holo.boxSize : cy + 1/8*para.holo.boxSize, cx - 1/8*para.holo.boxSize : cx + 1/8*para.holo.boxSize, :), [], 1), [], 2);

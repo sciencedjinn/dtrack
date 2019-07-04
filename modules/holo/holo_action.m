@@ -63,12 +63,70 @@ switch(action)
         returnfocus;
         redraw = 1; % Could be 2, but then we have to save into currim_ori
         saveNeeded = 1/2;
+    case 'holo_findXY'
+        autopara = [];
+        autopara.refMethod = 'double';
+        autopara.findMethod = 'brightest'; % 
+        autopara.greythr = 0.5;
+        autopara.areathr = 5;
+        autopara.roimask = [];
+
+        gui.prev.fig   = figure(2973); clf;
+        gui.prev.ph(1) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [0 .5 .5 .5]);
+        gui.prev.ph(2) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [.5 .5 .5 .5]);
+        gui.prev.ph(3) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [0 0 .5 .5]);
+        gui.prev.ph(4) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [.5 0 .5 .5]);
+
+        gui.prev.ah(1) = axes('parent', gui.prev.ph(1), 'units', 'normalized', 'position', [0 0 1 1]);
+        gui.prev.ah(2) = axes('parent', gui.prev.ph(2), 'units', 'normalized', 'position', [0 0 1 1]);
+        gui.prev.ah(3) = axes('parent', gui.prev.ph(3), 'units', 'normalized', 'position', [0 0 1 1]);
+        gui.prev.ah(4) = axes('parent', gui.prev.ph(4), 'units', 'normalized', 'position', [0 0 1 1]);
+        
+        im = double(readframe(status.mh, status.framenr, para, status));
+        ref1 = double(readframe(status.mh, status.framenr-10, para, status));
+        ref2 = double(readframe(status.mh, status.framenr+10, para, status));
+
+        [res, diag] = holo_autotrack_detect(im, ref1, ref2, autopara, para.holo, data.points(status.framenr-10, status.cpoint, :), 'lastframe');
+        holo_autotrack_plotdiag(diag, gui.prev.ah);
+    
+        data.points(status.framenr, status.cpoint, 1:2) = res.centroid; % assign this found position to the current point
+        returnfocus;
+        redraw = 1; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 1/2;
     case 'holo_link'
         status.holo.link = get(src, 'Value');
         holo_guivisibility(gui, status, para, data)
         returnfocus;
         redraw = 1; % Could be 2, but then we have to save into currim_ori
         saveNeeded = 1/2;
+    case 'holo_ref_single'
+        para.ref.use = 'dynamic';
+        dtrack_guivisibility(gui, para, status)
+        returnfocus;
+        redraw = 1; 
+        saveNeeded = 1/2;
+    case 'holo_ref_double'
+        para.ref.use = 'double_dynamic';
+        dtrack_guivisibility(gui, para, status)
+        returnfocus;
+        redraw = 1; 
+        saveNeeded = 1/2;
+    case 'holo_mean_z_mode'
+        status.holo.z_mode = 'mean';
+        holo_guivisibility(gui, status, para, data)
+        returnfocus;
+        redraw = 1; 
+        saveNeeded = 1/2;
+    case 'holo_single_z_mode'
+        status.holo.z_mode = 'single';
+        holo_guivisibility(gui, status, para, data)
+        returnfocus;
+        redraw = 1; 
+        saveNeeded = 1/2;
+    case 'holo_autoXY'
+        returnfocus;
+        redraw = 1;
+        saveNeeded = 0;
     case 'holo_autoZ'
         % ask for parameters
 %         [success, savepara] = dtrack_tools_imageseq(status, para);

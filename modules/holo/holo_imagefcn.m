@@ -14,11 +14,18 @@ switch status.holo.image_mode
     case 'interference'
         status.currim = status.diffim;
     case 'holo'
-        iReconstructed = holo_analyse2_reconstruct(status.diffim, status.holo.z, para);
+        switch status.holo.z_mode
+            case 'single'
+                iReconstructed = holo_analyse2_reconstruct(status.diffim, status.holo.z, para.holo);
+            case 'mean'
+                allSections = holo_analyse2_reconstruct(status.diffim, para.holo.zRange(1):para.holo.stepRange(1):para.holo.zRange(2), para.holo);
+                iReconstructed = mean(allSections, 3);
+        end
+        
         iReconstructed = max(iReconstructed(:))-iReconstructed;
         status.currim = iReconstructed/max(iReconstructed(:));
     case 'holo_mag'
-        iReconstructed = holo_analyse2_reconstruct(status.diffim, status.holo.z, para);
+        iReconstructed = holo_analyse2_reconstruct(status.diffim, status.holo.z, para.holo);
         iReconstructed = max(iReconstructed(:))-iReconstructed;
         iReconstructed = iReconstructed/max(iReconstructed(:));
         
@@ -37,11 +44,13 @@ switch status.holo.image_mode
         if ~isnan(pos)
             [x_selection, y_selection, cx, cy] = sub_find_section(round(pos), para.holo.boxSize, size(iReconstructed));
             iDiffSelection = status.diffim(y_selection(1):y_selection(2), x_selection(1):x_selection(2));
-            % short version
-            enhancedSection = holo_analyse2_reconstruct(iDiffSelection, status.holo.z, para);
-%             % long version
-%             allSections = holo_analyse2_reconstruct(iDiffSelection, para.holo.zRange(1):para.holo.stepRange(1):para.holo.zRange(2), para);
-%             enhancedSection = mean(allSections, 3);
+            switch status.holo.z_mode
+                case 'single'
+                    enhancedSection = holo_analyse2_reconstruct(iDiffSelection, status.holo.z, para.holo);
+                case 'mean'
+                    allSections = holo_analyse2_reconstruct(iDiffSelection, para.holo.zRange(1):para.holo.stepRange(1):para.holo.zRange(2), para.holo);
+                    enhancedSection = mean(allSections, 3);
+            end
 
             enhancedSection = max(enhancedSection(:))-enhancedSection;
             enhancedSection = enhancedSection/max(enhancedSection(:));

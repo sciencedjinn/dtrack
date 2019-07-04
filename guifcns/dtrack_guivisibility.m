@@ -39,6 +39,7 @@ switch para.ref.use
         set(findobj('tag', 'ref_set_none'), 'checked', 'on');
         set(findobj('tag', 'ref_set_static'), 'checked', 'off');
         set(findobj('tag', 'ref_set_dynamic'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_double_dynamic'), 'checked', 'off');
         set(findobj('tag', 'ref_set'), 'enable', 'off');
         set(findobj('tag', 'ref_frameDiff'), 'enable', 'off');
         set(findobj('tag', 'refframe'), 'string', 'no ref frame');
@@ -46,6 +47,7 @@ switch para.ref.use
         set(findobj('tag', 'ref_set_none'), 'checked', 'off');
         set(findobj('tag', 'ref_set_static'), 'checked', 'on');
         set(findobj('tag', 'ref_set_dynamic'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_double_dynamic'), 'checked', 'off');
         set(findobj('tag', 'ref_set'), 'enable', 'on');
         set(findobj('tag', 'ref_frameDiff'), 'enable', 'off');
         set(findobj('tag', 'refframe'), 'string', ['ref frame ' num2str(para.ref.framenr)]);
@@ -53,6 +55,15 @@ switch para.ref.use
         set(findobj('tag', 'ref_set_none'), 'checked', 'off');
         set(findobj('tag', 'ref_set_static'), 'checked', 'off');
         set(findobj('tag', 'ref_set_dynamic'), 'checked', 'on');
+        set(findobj('tag', 'ref_set_double_dynamic'), 'checked', 'off');
+        set(findobj('tag', 'ref_set'), 'enable', 'off');
+        set(findobj('tag', 'ref_frameDiff'), 'enable', 'on');
+        set(findobj('tag', 'refframe'), 'string', ['ref diff ' num2str(para.ref.frameDiff)]);
+    case 'double_dynamic'
+        set(findobj('tag', 'ref_set_none'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_static'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_dynamic'), 'checked', 'off');
+        set(findobj('tag', 'ref_set_double_dynamic'), 'checked', 'on');
         set(findobj('tag', 'ref_set'), 'enable', 'off');
         set(findobj('tag', 'ref_frameDiff'), 'enable', 'on');
         set(findobj('tag', 'refframe'), 'string', ['ref diff ' num2str(para.ref.frameDiff)]);

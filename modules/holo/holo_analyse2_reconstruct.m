@@ -14,11 +14,11 @@ function iReconstructed = holo_analyse2_reconstruct(iMagnified, zRange, para)
     [p, j] = meshgrid(floor(-iSize(2)/2):floor(iSize(2)/2)-1,floor(-iSize(1)/2):floor(iSize(1)/2)-1);
 
     %% calculate some constants
-    Ro2 = (j*para.holo.pix_um).^2+(p*para.holo.pix_um).^2;
+    Ro2 = (j*para.pix_um).^2+(p*para.pix_um).^2;
     fft_hol = fft2(iMagnified);
 
     for i = 1:numel(zRange)
-        iReconstructed(:, :, i) = 1/1i/(para.holo.lambda_nm/1e6)/zRange(i).*fftshift(ifft2(fft_hol.*fft2(exp(1i*pi*Ro2/(para.holo.lambda_nm/1e6)/zRange(i)))));
+        iReconstructed(:, :, i) = 1/1i/(para.lambda_nm/1e6)/zRange(i).*fftshift(ifft2(fft_hol.*fft2(exp(1i*pi*Ro2/(para.lambda_nm/1e6)/zRange(i)))));
     end
     
     iReconstructed = iReconstructed.*conj(iReconstructed);

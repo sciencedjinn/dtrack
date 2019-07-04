@@ -216,6 +216,7 @@ gui.menus.roi.menu = uimenu(gui.f1, 'label', 'RoI&&Ref');
     gui.menus.roi.entries.ref_set_none = uimenu(gui.menus.roi.set_menu, 'label', 'None', 'checked', 'on');
     gui.menus.roi.entries.ref_set_static = uimenu(gui.menus.roi.set_menu, 'label', 'Static', 'checked', 'off');
     gui.menus.roi.entries.ref_set_dynamic = uimenu(gui.menus.roi.set_menu, 'label', 'Dynamic', 'checked', 'off');
+    gui.menus.roi.entries.ref_set_double_dynamic = uimenu(gui.menus.roi.set_menu, 'label', 'Double dynamic', 'checked', 'off');
     gui.menus.roi.entries.ref_set = uimenu(gui.menus.roi.menu, 'label', 'Use current frame as reference');
     gui.menus.roi.entries.ref_frameDiff = uimenu(gui.menus.roi.menu, 'label', 'Set dynamic frame difference...');
     
