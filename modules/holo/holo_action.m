@@ -97,7 +97,7 @@ switch(action)
             plot(f(2:end), speed, '.-', 'color', para.ls.p{p}.col)
         end
         xlabel('Frame number')
-        ylabel('2D Movement speed (\mum/s)');
+        ylabel('2D Movement speed (mm/s)');
         legend(num2str((1:para.pnr)'))
         
         redraw = 0; % Could be 2, but then we have to save into currim_ori
@@ -115,7 +115,7 @@ switch(action)
             plot(f(2:end), speed, '.-', 'color', para.ls.p{p}.col)
         end
         xlabel('Frame number')
-        ylabel('3D Movement speed (\mum/s)');
+        ylabel('3D Movement speed (mm/s)');
         legend(num2str((1:para.pnr)'))
         
         redraw = 0; % Could be 2, but then we have to save into currim_ori
@@ -129,8 +129,8 @@ switch(action)
             f{p} = find(sel);
             line(xy(:, 1), xy(:, 2), 'marker', '.', 'linestyle', '-', 'color', para.ls.p{p}.col, 'tag', num2str(p))
         end
-        xlabel('x (\mum)');
-        ylabel('y (\mum)');
+        xlabel('x (mm)');
+        ylabel('y (mm)');
         set(gca, 'YDir', 'reverse');
         axis equal;
         legend(num2str((1:para.pnr)'))
@@ -150,9 +150,9 @@ switch(action)
             f{p} = find(sel);
             line(xyz(:, 1), xyz(:, 2), xyz(:, 3), 'marker', '.', 'linestyle', '-', 'color', para.ls.p{p}.col, 'tag', num2str(p))
         end
-        xlabel('x (\mum)');
-        ylabel('y (\mum)');
-        zlabel('z (\mum)');
+        xlabel('x (mm)');
+        ylabel('y (mm)');
+        zlabel('z (mm)');
         set(gca, 'YDir', 'reverse');
         legend(num2str((1:para.pnr)'))
         axis equal;

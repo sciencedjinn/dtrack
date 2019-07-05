@@ -80,7 +80,9 @@ for trackframe = autopara.from:autopara.step:autopara.to
         lastPoint = data.points(allTrackedFrames(i), status.cpoint, 1:2);
         lastPointType = 'nearby';
     else
-        error('Invalid last point. Please start the autotracking only after manually tracking the point at least once within 100 frames of the starting frame.')
+        warndlg('Invalid last point. Please start the autotracking only after manually tracking the point at least once within 100 frames of the starting frame.')
+        cancelled = true;
+        break;
     end     
     
     %% TODO: Buffer frames

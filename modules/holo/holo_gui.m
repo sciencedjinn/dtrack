@@ -92,7 +92,7 @@ gui.diag.tab = uitab(gui.diag.tabgroup, 'title', 'Diagnostics');
 
 %% Holo menu
 gui.menus.holo.menu = uimenu(gui.f1, 'label', 'Holo');
-    gui.menus.holo.entries.holo_autoXY    = uimenu(gui.menus.holo.menu, 'label', 'Autodetect X/Y-positions...');
+    gui.menus.holo.entries.holo_autoXY    = uimenu(gui.menus.holo.menu, 'label', 'Autodetect X/Y-positions...', 'accelerator', 'T');
     gui.menus.holo.entries.holo_autoXYcontinue = uimenu(gui.menus.holo.menu, 'label', 'Continue autotracking...', 'accelerator', 'D');
     gui.menus.holo.entries.holo_autoZ     = uimenu(gui.menus.holo.menu, 'label', 'Autodetect Z-positions...');
     gui.menus.holo.entries.holo_plot_speed_2d = uimenu(gui.menus.holo.menu, 'label', 'Plot 2D speeds', 'separator', 'on');
