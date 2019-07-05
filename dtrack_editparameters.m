@@ -189,7 +189,7 @@ function sub_creategui
         case 'line',  pnrlist = {'2', '4', '6', '8', '10'};
         case 'point', pnrlist = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '10'};
     end
-                                    uicontrol(gui.panel2.panel, opts{:}, 'position', [.01 .5 .78 .3], 'style', 'text', 'string', {'How many points do you want to track?' '(A line counts as two points)'});
+                                    uicontrol(gui.panel2.panel, opts{:}, 'position', [.01 .5 .78 .3], 'style', 'text', 'string', {'How many objects do you want to track?' '(A line counts as two objects)'});
     gui.panel2.pnr                = uicontrol(gui.panel2.panel, opts{:}, 'position', [.8 .5 .15 .3], 'style', 'popupmenu', 'horizontalalignment', 'center', 'string', pnrlist, 'tag', 'editpara_pnr');
 
 %% panel 3

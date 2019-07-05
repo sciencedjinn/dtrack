@@ -251,7 +251,7 @@ function sub_updatePreview(type)
             pos = data.points(allTrackedFrames(i), status.cpoint, 1:2);
             lastPointType = 'nearby';
         else
-            warndlg('This point has to be tracked at least once within +-100 frames');
+            warndlg('This object has to be tracked at least once within +-100 frames');
             return
         end
         

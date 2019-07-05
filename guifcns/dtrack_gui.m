@@ -41,7 +41,7 @@ gui.infoarea.info.tab = uitab(gui.infoarea.info.tabgroup, 'title', 'Info');
 
 % gui.infoarea.points.superpanel = uipanel(gui.f1, 'position', [.85 .88 .15 .06]);
 gui.infoarea.points.tabgroup = uitabgroup(gui.f1, 'position', [.85 .858 .15 .08]); 
-gui.infoarea.points.tab = uitab(gui.infoarea.points.tabgroup, 'title', 'Points'); 
+gui.infoarea.points.tab = uitab(gui.infoarea.points.tabgroup, 'title', 'Objects'); 
     gui.infoarea.points.panel = uipanel(gui.infoarea.points.tab, 'position', [0 .5 .8 .5], 'tag', 'pointspanel'); 
         for i = 1:para.pnr/(1+strcmp(para.trackingtype, 'line'))
             gui.infoarea.points.entries.(['p' num2str(i)]) = uicontrol(gui.infoarea.points.panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [(i-1)*0.1 0 .1 1], 'string', num2str(i), 'value', any(ismember(status.trackedpoints, i)));
@@ -179,7 +179,7 @@ gui.menus.edit.menu = uimenu(gui.f1, 'label', 'Edit');
 gui.menus.view.menu = uimenu(gui.f1, 'label', 'View');
     gui.menus.view.entries.view_navitoolbar = uimenu(gui.menus.view.menu, 'label', 'File and navigation toolbar');
     gui.menus.view.entries.view_infopanel = uimenu(gui.menus.view.menu, 'label', 'Info panel', 'separator', 'on');
-    gui.menus.view.entries.view_infopanel_points = uimenu(gui.menus.view.menu, 'label', 'Points & Markers panel');
+    gui.menus.view.entries.view_infopanel_points = uimenu(gui.menus.view.menu, 'label', 'Objects & Markers panel');
     gui.menus.view.entries.view_infopanel_mani = uimenu(gui.menus.view.menu, 'label', 'Image manipulation panel');
     gui.menus.view.entries.view_minimap = uimenu(gui.menus.view.menu, 'label', 'Mini plot window');
     gui.menus.view.entries.view_greyscale = uimenu(gui.menus.view.menu, 'label', 'Grey scale image', 'checked', 'off', 'separator', 'on');

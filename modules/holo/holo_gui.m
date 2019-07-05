@@ -16,7 +16,7 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
         gui.icons.holo_mode = imread(fullfile(iconpath, 'holo.tif'));
         gui.infoarea.holo.entries.holo_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.5 0 .25 1], 'cdata', gui.icons.holo_mode, 'tooltip', 'Show processed hologram');
         gui.icons.holo_mag_mode = imread(fullfile(iconpath, 'holo_mag.tif'));
-        gui.infoarea.holo.entries.holo_mag_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.75 0 .25 1], 'cdata', gui.icons.holo_mag_mode, 'tooltip', 'Show processed hologram with enhanced area around selected point');
+        gui.infoarea.holo.entries.holo_mag_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.75 0 .25 1], 'cdata', gui.icons.holo_mag_mode, 'tooltip', 'Show processed hologram with enhanced area around selected object');
         switch status.holo.image_mode
             case 'camera'
                 set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.camera_mode);
@@ -58,7 +58,7 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
 %         axis([0 1 -1 1]); axis off;
         gui.icons.link_on = imread(fullfile(iconpath, 'link_on.tif'));
         gui.icons.link_off = imread(fullfile(iconpath, 'link_off.tif'));
-        gui.infoarea.holo.entries.holo_link            = uicontrol(gui.infoarea.holo.z_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.005 .25 .08 .5], 'cdata', gui.icons.link_on, 'tooltipstring', 'Always display the z of the currently selected point');
+        gui.infoarea.holo.entries.holo_link            = uicontrol(gui.infoarea.holo.z_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.005 .25 .08 .5], 'cdata', gui.icons.link_on, 'tooltipstring', 'Always display the z of the currently selected object');
 
         uicontrol(gui.infoarea.holo.z_panel, 'style', 'edit', 'units', 'normalized', 'position', [0.09 .5 .23 0.5], 'string', 'Display z (mm): ', 'horizontalalignment', 'right', 'enable', 'inactive', 'backgroundcolor', [.95 .95 .95]);
         gui.infoarea.holo.entries.holo_zvalue_minus5   = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.33 .5 .06 .5], 'string', '-5', 'tooltipstring', 'Reduce displayed z-distance by 5 mm');
@@ -67,11 +67,11 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
         gui.infoarea.holo.entries.holo_zvalue_plus1    = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.57 .5 .06 .5], 'string', '+1', 'tooltipstring', 'Increase displayed z-distance by 1 mm');
         gui.infoarea.holo.entries.holo_zvalue_plus5    = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.63 .5 .06 .5], 'string', '+5', 'tooltipstring', 'Increase displayed z-distance by 5 mm');
         uicontrol(gui.infoarea.holo.z_panel, 'style', 'edit', 'units', 'normalized', 'position', [0.09 0 .23 .5], 'string', 'Point z (mm): ', 'horizontalalignment', 'right', 'enable', 'inactive', 'backgroundcolor', [.95 .95 .95]);
-        gui.infoarea.holo.entries.holo_zvalue_point    = uicontrol(gui.infoarea.holo.z_panel, 'style', 'edit', 'units', 'normalized', 'position',       [.45 0 .12 .5], 'string', '0', 'tooltipstring', 'z-position of current point (mm)', 'enable', 'inactive');
+        gui.infoarea.holo.entries.holo_zvalue_point    = uicontrol(gui.infoarea.holo.z_panel, 'style', 'edit', 'units', 'normalized', 'position',       [.45 0 .12 .5], 'string', '0', 'tooltipstring', 'Z-position of current object (mm)', 'enable', 'inactive');
         
-        gui.infoarea.holo.entries.holo_findXY          = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.70 .5 .30 .5], 'string', 'X/Y auto', 'tooltipstring', 'Auto-detect x/y-position of current point');
-        gui.infoarea.holo.entries.holo_findZ           = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.70 0 .15 .5], 'string', 'Z auto', 'tooltipstring', 'Auto-detect z-position of current point');
-        gui.infoarea.holo.entries.holo_findZ_local     = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.85 0 .15 .5], 'string', 'Z local', 'tooltipstring', 'Auto-detect z-position of current point, but only near closeby points');
+        gui.infoarea.holo.entries.holo_findXY          = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.70 .5 .30 .5], 'string', 'X/Y auto', 'tooltipstring', 'Auto-detect x/y-position of current object');
+        gui.infoarea.holo.entries.holo_findZ           = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.70 0 .15 .5], 'string', 'Z auto', 'tooltipstring', 'Auto-detect z-position of current object');
+        gui.infoarea.holo.entries.holo_findZ_local     = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.85 0 .15 .5], 'string', 'Z local', 'tooltipstring', 'Auto-detect z-position of current object, but only near closeby points');
 
 %% Diagnostics panel
 gui.diag.tabgroup = uitabgroup(gui.f1, 'position', [.85 .504 .15 .25]); 

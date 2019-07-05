@@ -2,7 +2,7 @@ function data=dtrack_datafcns_clearrange(status, para, data, frange, prange)
 
 if nargin<4
     % ask for data range
-    prompt = {'Frame range','Point range'};
+    prompt = {'Frame range', 'Object range'};
     dlg_title = 'Clear data range';
     num_lines = 1;
     def = {['1:' num2str(status.nFrames)],num2str(status.cpoint)};
@@ -29,7 +29,7 @@ if isempty(frange_c)
     return;
 end
 if isempty(prange_c)
-    errordlg(['None of these points are tracked in this video (' answer{2} ')']);
+    errordlg(['None of these objects are tracked in this video (' answer{2} ')']);
     uiwait;
     return;
 end
@@ -40,7 +40,7 @@ for i = prange_c
 end
 
 if ~any(num2del)
-    errordlg(['No points were tracked in the given range (frames ' answer{1} ', points ' answer{2} ')']);
+    errordlg(['No objects were tracked in the given range (frames ' answer{1} ', objects ' answer{2} ')']);
     uiwait;
     return;
 end
@@ -48,7 +48,7 @@ end
 % confirm
 prompt = {'The following numbers of positions have been tracked in the given range:', ''};
 for i = prange_c
-    prompt = [prompt, ['     Point ' num2str(i), ': ' num2str(num2del(i)) ' positions.']];
+    prompt = [prompt, ['     Object ' num2str(i), ': ' num2str(num2del(i)) ' positions.']];
 end
 prompt = [prompt, {''}];
 prompt = [prompt, 'Do you really want to delete these entries?'];
@@ -58,7 +58,7 @@ button = questdlg(prompt, 'Confirm delete', 'Yes, delete', 'No, cancel', 'No, ca
 switch button
     case 'Yes, delete'
         data.points(frange_c, prange_c, :) = 0;
-        helpdlg([num2str(sum(num2del)) ' points successfully deleted.'],'Points deleted');
+        helpdlg([num2str(sum(num2del)) ' points successfully deleted.'], 'Points deleted');
         uiwait;
     case {'No, cancel', ''}
         disp('Delete operation canceled');

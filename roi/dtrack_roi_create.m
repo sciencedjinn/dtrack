@@ -19,11 +19,11 @@ else
 end
 
 % select which point, and conversion method
-happy=0;
+happy = 0;
 while ~happy
-    answer=inputdlg({sprintf('Which point (1-%0.0f)?', size(points, 2)), 'Which method (e=exact, other=convex hull)?'}, '', 1, {'1', 'c'});
+    answer = inputdlg({sprintf('Which point (1-%0.0f)?', size(points, 2)), 'Which method (e=exact, other=convex hull)?'}, '', 1, {'1', 'c'});
     if isempty(answer)
-        happy=2;
+        happy = 2;
     else
         x=points(:, str2double(answer{1}), 1);y=points(:, str2double(answer{1}), 2);
         sel=x&y; x=x(sel); y=y(sel);

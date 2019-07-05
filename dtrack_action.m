@@ -441,7 +441,7 @@ else
             redraw = 12;
             saveneeded = 1;
                         
-      %% Point and marker selection
+      %% Object and marker selection
         case {'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10'}
             % Select which points are active
             status.trackedpoints = [];

@@ -240,21 +240,21 @@ function sub_creategui
     gui.panel2.maxrecent      = uicontrol(gui.panel2.panel, opts{:}, 'position', [.50 .19 .10 .31], 'style', 'edit', 'tag', 'editpref_maxrecent');
     
 %% panel 3
-    gui.panel3.showcurr       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .85 .9 .12], 'style', 'checkbox', 'string', 'Highlight current point', 'tag', 'editpref_showcurr');
-    gui.panel3.showlast       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .7 .9 .12], 'style', 'checkbox', 'string', 'Show previous position for current point,', 'tag', 'editpref_showlast');
+    gui.panel3.showcurr       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .85 .9 .12], 'style', 'checkbox', 'string', 'Highlight current object', 'tag', 'editpref_showcurr');
+    gui.panel3.showlast       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .7 .9 .12], 'style', 'checkbox', 'string', 'Show previous position for current object,', 'tag', 'editpref_showlast');
                                 uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .6 .5 .08], 'style', 'text', 'string', 'if it was marked in the last', 'HorizontalAlignment', 'left');
     gui.panel3.showlastrange  = uicontrol(gui.panel3.panel, opts{:}, 'position', [.55 .57 .1 .12], 'style', 'edit', 'tag', 'editpref_showlastrange');
                                 uicontrol(gui.panel3.panel, opts{:}, 'position', [.67 .6 .3 .08], 'style', 'text', 'string', 'frames.', 'HorizontalAlignment', 'left');
                                 uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .33 .39 .13], 'style', 'text', 'string', 'Large step:', 'HorizontalAlignment', 'left');
     gui.panel3.stepsize       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .35 .4 .13], 'style', 'edit', 'tag', 'editpref_stepsize', 'tooltipstring', 'Select number of frames to jump in a large step (by default done with left/right arrow)');
                                 uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .18 .39 .13], 'style', 'text', 'string', 'Autoforward mode:', 'HorizontalAlignment', 'left');
-    gui.panel3.autoforw       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .2 .4 .13], 'style', 'popupmenu', 'string', 'nothing|small step|large step', 'tag', 'editpref_autoforw', 'tooltipstring', 'What to do after all points in a frame are marked?');
+    gui.panel3.autoforw       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .2 .4 .13], 'style', 'popupmenu', 'string', 'nothing|small step|large step', 'tag', 'editpref_autoforw', 'tooltipstring', 'What to do after all objects in a frame are marked?');
     
 %% panel 4
                                 uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .87 .5 .12], 'style', 'text', 'string', 'Show by default:', 'HorizontalAlignment', 'left');
     gui.panel4.navitoolbar    = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .74 .9 .12], 'style', 'checkbox', 'string', 'File and navigation toolbar', 'tag', 'editpref_navitoolbar');
     gui.panel4.infopanel      = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .61 .9 .12], 'style', 'checkbox', 'string', 'Info panel', 'tag', 'editpref_infopanel');
-    gui.panel4.info_points    = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .48 .9 .12], 'style', 'checkbox', 'string', 'Points panel', 'tag', 'editpref_info_points');
+    gui.panel4.info_points    = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .48 .9 .12], 'style', 'checkbox', 'string', 'Object panel', 'tag', 'editpref_info_points');
     gui.panel4.info_markers   = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .35 .9 .12], 'style', 'checkbox', 'string', 'Marker panel', 'tag', 'editpref_info_markers');
     gui.panel4.info_mani      = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .22 .9 .12], 'style', 'checkbox', 'string', 'Image manipulation panel', 'tag', 'editpref_info_mani');
     gui.panel4.minimap        = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .09 .9 .12], 'style', 'checkbox', 'string', 'Miniplot window', 'tag', 'editpref_minimap');

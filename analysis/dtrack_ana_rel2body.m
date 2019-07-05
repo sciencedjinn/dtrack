@@ -47,7 +47,7 @@ end
 if length(unique(trackedpoints(ind_all))) > 1
     [maxnum, ind] = max(trackedpoints);
     assignin('base', 'f', f)
-    error('Point #%d has been tracked in %d frames, but some of the others only in fewer. Please check the variable f in your workspace to see which frames each point has been tracked in.', ind, maxnum);
+    error('Object #%d has been tracked in %d frames, but some of the others only in fewer. Please check the variable f in your workspace to see which frames each object has been tracked in.', ind, maxnum);
 end
 
 % Find breaks > 1 frame in head tracking and assume they are valid for all points

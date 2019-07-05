@@ -34,7 +34,7 @@ switch status.holo.image_mode
         if data.points(status.framenr, status.cpoint, 3)>0
             pos = data.points(status.framenr, status.cpoint, 1:2);
         elseif all(data.points(:, status.cpoint, 3)==0)
-            warning('This point has to be tracked at least once to find a suitable area');
+            warning('This object has to be tracked at least once to find a suitable area');
             pos = NaN;
         else
             allTrackedFrames = find(data.points(:, status.cpoint, 3)>0);
