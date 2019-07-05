@@ -88,6 +88,9 @@ gui.menus.holo.menu = uimenu(gui.f1, 'label', 'Holo');
     gui.menus.holo.entries.holo_plot_track_2d = uimenu(gui.menus.holo.menu, 'label', 'Plot 2D tracks');
     gui.menus.holo.entries.holo_plot_track_3d = uimenu(gui.menus.holo.menu, 'label', 'Plot 3D tracks');
         
-        
+%% Help manu
+gui.menus.help.entries.holo_help_gettingstarted = uimenu(gui.menus.help.menu, 'label', 'Getting started with HOLO', 'separator', 'on');
+    
+    
 % add a holo default button to the image manipulation panel
 gui.infoarea.image.entries.info_holo   = uicontrol(gui.infoarea.image.panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.38 .03 .2 .1], 'string', 'holo', 'tooltipstring', 'HOLO mode. Uses only the green channel in greyscale mode.');

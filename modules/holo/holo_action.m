@@ -236,6 +236,12 @@ switch(action)
         redraw = 1;
         saveNeeded = 1;
         
+    
+    case 'holo_help_gettingstarted'
+        open(fullfile(pwd, 'documentation', 'Getting Started With HOLO.pdf'));
+        redraw = 0;
+        saveNeeded = 0;
+        
     otherwise
         redraw = 0;
         saveNeeded = 0;
