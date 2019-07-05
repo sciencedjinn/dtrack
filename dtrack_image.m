@@ -13,6 +13,12 @@ function [status, gui] = dtrack_image(gui, status, para, data, redraw)
 %fprintf('     Image function with redraw mode: %d.\n', redraw);
 
 %% set frame number and frame time displays
+% calculate framenr
+if para.imseq.isimseq
+    status.framenr = min([max([status.framenr para.imseq.from]) status.nFrames]); % restrict range of framenrs, in case it was set out of bounds
+else
+    status.framenr = min([max([status.framenr 1]) status.nFrames]); % restrict range of framenrs, in case it was set out of bounds
+end
 if redraw==1 || redraw==3
     % set framenr display
     set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(status.framenr), '/', num2str(status.nFrames)]);
@@ -31,13 +37,6 @@ end
 
 %% load new image
 if ismember(redraw, [1 3 30 31]) % new frame actions
-    % calculate framenr
-    if para.imseq.isimseq
-        status.framenr = min([max([status.framenr para.imseq.from]) status.nFrames]); % restrict range of framenrs, in case it was set out of bounds
-    else
-        status.framenr = min([max([status.framenr 1]) status.nFrames]); % restrict range of framenrs, in case it was set out of bounds
-    end
-    
     % read new frame (this takes more than 95% of the whole function time)
     [status.currim_ori, status.mh, status.timestamp] = readframe(status.mh, status.framenr, para, status); % this timestamp seems to start at 0, as well. So it's no use.
     

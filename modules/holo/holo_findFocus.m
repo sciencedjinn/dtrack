@@ -7,9 +7,9 @@ if nargin < 4, z_estimate = nan; end
 % zRange - 1x2 double vector, including the minimum and maximum expected z-position (depth, in mm)
 % stepRange - 1x2 double vector [startStep finalStep], containing the starting step size and final step size, in mm. This determines the accuracy with which z will be determined.
 % pos - 1x2 double vector [x y], contains the x/y coordinates of the object whose z-position is of interest
-% boxSize - 1x1 double, the edge size of the box drawn around pos. This needs to be large enough to create a reasonable fourier signal (guess: at least 10x the object size???)
+% reconBoxSize - 1x1 double, the edge size of the box drawn around pos. This needs to be large enough to create a reasonable fourier signal (guess: at least 10x the object size???)
 
-[x_selection, y_selection, cx, cy] = sub_find_section(round(pos), para.holo.boxSize, size(iDiff));
+[x_selection, y_selection, cx, cy] = sub_find_section(round(pos), para.holo.reconBoxSize, size(iDiff));
 iDiffSelection = iDiff(y_selection(1):y_selection(2), x_selection(1):x_selection(2));
 
 %% find the best focus
@@ -63,7 +63,8 @@ function [z, allMaxs] = sub_find_focus(iDiff, zRange, para, cx, cy, verbose)
     Reconst = holo_analyse2_reconstruct(iDiff, zRange, para.holo);
 
     % for each z-position, calculate the maximum in Reconst, then find the maximum
-    allMaxs = max(max(Reconst(cy - 1/8*para.holo.boxSize : cy + 1/8*para.holo.boxSize, cx - 1/8*para.holo.boxSize : cx + 1/8*para.holo.boxSize, :), [], 1), [], 2);
+    bs = para.holo.searchBoxSize*para.holo.reconBoxSize;
+    allMaxs = max(max(Reconst(cy - bs : cy + bs, cx - bs : cx + bs, :), [], 1), [], 2);
     
 %     for i = 1:size(allMaxs, 3)
 %         allMaxs(i) = estimate_sharpness(Reconst(7/8*para.holo.boxSize:9/8*para.holo.boxSize, 7/8*para.holo.boxSize:9/8*para.holo.boxSize, i));
@@ -80,9 +81,9 @@ function [z, allMaxs] = sub_find_focus(iDiff, zRange, para, cx, cy, verbose)
     
     if verbose
         cm = colormap('gray');
-        figure(3); clf; montage(64-round(63*Reconst(cy - 1/8*para.holo.boxSize : cy + 1/8*para.holo.boxSize, cx - 1/8*para.holo.boxSize : cx + 1/8*para.holo.boxSize, :)/max(Reconst(:))), cm, 'bordersize', [1 1])
+        figure(3); clf; montage(64-round(63*Reconst(cy - bs : cy + bs, cx - bs : cx + bs, :)/max(Reconst(:))), cm, 'bordersize', [1 1])
         figure(4); clf; imagesc(64-round(63*mean(Reconst, 3)/max(Reconst(:)))); colormap('gray');
-        hold on; rectangle('Position', [cx - 1/8*para.holo.boxSize, cy - 1/8*para.holo.boxSize, 1/4*para.holo.boxSize, 1/4*para.holo.boxSize])
+        hold on; rectangle('Position', [cx - bs, cy - bs, 2*bs, 2*bs])
     end
 end
 

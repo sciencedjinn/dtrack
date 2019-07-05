@@ -464,6 +464,11 @@ else
             switch para.trackingtype
                 case 'point'
                     status.cpoint = str2double(action(3:end));
+                    status.trackedpoints = status.cpoint;
+                    for i = 1:para.pnr
+                        set(findobj('tag', ['p' num2str(i)]), 'value', 0);
+                    end
+                    set(findobj('tag', ['p' num2str(status.cpoint)]), 'value', 1);
                 case 'line'
                     % for lines, this sets the current line. The current point (in status) is always the POINT, however.
                     status.cpoint = 2*str2double(action(3:end))-1;
@@ -480,6 +485,11 @@ else
                 case 'point'
                     if n<=para.pnr
                         status.cpoint = n; 
+                        status.trackedpoints = status.cpoint;
+                        for i = 1:para.pnr
+                            set(findobj('tag', ['p' num2str(i)]), 'value', 0);
+                        end
+                        set(findobj('tag', ['p' num2str(status.cpoint)]), 'value', 1);
                         set(findobj('tag', 'pointselpanel'), 'selectedobject', findobj('tag', ['ps' num2str(n)]));
                     end
                 case 'line'

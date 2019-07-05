@@ -80,6 +80,7 @@ para.roiy                   = [];
 para.ref.framenr            = [];
 para.ref.use                = 'none'; % can be 'none'/'static'/'dynamic'
 para.ref.frameDiff          = 0; % when set to 0, para.gui.stepsize will be used instead
+para.ref2.framenr           = [];
 
 %% load local parameter and preferences files
 if exist(fullfile(prefdir, 'dtrack_para.dtp'), 'file')

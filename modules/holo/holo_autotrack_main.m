@@ -107,11 +107,11 @@ for trackframe = autopara.from:autopara.step:autopara.to
             data.points(trackframe, autopara.pointnr, 1:2)  = res.centroid;
             data.points(trackframe, autopara.pointnr, 3)    = 42; % DEF: 42 means autotracked point
         case 'Invalid lastPoint'
-            warndlg('Invalid last point. Please start the autotracking only after manually tracking the point at least once within 100 frames of the starting frame.')
+            warndlg('Autotracking has lost the point for too many frames to continue. This is often due to the tracked object approaching the boundaries of the trackable area. Switch to interference mode and forward the video until you can find the object again. Then, manually track one point and press CTRL+D (CMD+D) to continue tracking.')
             cancelled = true;
             break;
         otherwise
-            data.points(trackframe, autopara.pointnr, 1:2)  = [0 0];
+            data.points(trackframe, autopara.pointnr, 1:2)  = [nan nan];
             data.points(trackframe, autopara.pointnr, 3)    = 43; % DEF: 43 means autotracked point, no point found
             continue
     end

@@ -1,4 +1,4 @@
-function [success, autopara] = holo_autotrack_select(status, para, data)
+function [success, autopara] = holo_autotrack_select(status, para, data, continueMode)
 % holo_autotrack_select opens a dialog to select parameters for autotracking
 % Call: [success, autopara] = dtrack_tools_autotrack_select(status, para)
 %
@@ -7,6 +7,17 @@ function [success, autopara] = holo_autotrack_select(status, para, data)
 % See also: dtrack_tools_autotrack_detect, dtrack_tools_autotrack_main
 % Data paradigm: autopara contains the current representation of data at any time. GUI should be close to being controlled components.
 
+if nargin<4, continueMode = false; end % continueMode just loads the last sessions settings, and continues tracking from the current frame
+
+if continueMode
+    autopara      = [];
+    sub_load('lastSession');
+    autopara.from = status.framenr;
+    autopara.to   = status.nFrames;
+    success       = true;
+    return
+end
+    
 %% init parameters
 gui          = [];
 autopara     = [];

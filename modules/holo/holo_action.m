@@ -83,22 +83,83 @@ switch(action)
         redraw = 1; % Could be 2, but then we have to save into currim_ori
         saveNeeded = 1/2;
     
-%% 
+%% Analysis functions
+        
     case 'holo_plot_speed_2d'
         figure(274); clf; hold on;
         for p = 1:para.pnr
-            sel = data.points(:, p, 3)>3;
+            sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
             xy = squeeze(data.points(sel, p, 1:2));
-            t = (0:status.nFrames-1)/status.FrameRate;
-            t = t(sel);
-            speed = sqrt(sum(diff(xy, 1).^2, 2))./diff(t); % pixels/s
+            f = find(sel); % selected frame numbers
+            t = (f-1)/status.FrameRate; % time in seconds for each selected frame
+            speed = sqrt(sum(diff(xy, 1).^2, 2))./diff(t(:)); % pixels/s
             speed = speed*para.holo.pix_um;        % um/s
-            plot(t(2:end), speed, '.-', 'color', para.ls.p{1}.col)
+            plot(f(2:end), speed, '.-', 'color', para.ls.p{p}.col)
         end
-        xlabel('Time (s)')
-        ylabel('Movement speed (um/s)');
+        xlabel('Frame number')
+        ylabel('2D Movement speed (\mum/s)');
         legend(num2str((1:para.pnr)'))
         
+        redraw = 0; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 0;
+        
+    case 'holo_plot_speed_3d'
+        figure(275); clf; hold on;
+        for p = 1:para.pnr
+            sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43 & data.points(:, p, 4)>0; % select all successfully tracked and z-tracked frames
+            xyz = squeeze(data.points(sel, p, [1:2 4]));
+            xyz(:, 1:2) = xyz(:, 1:2)*para.holo.pix_um; % um
+            f = find(sel); % selected frame numbers
+            t = (f-1)/status.FrameRate; % time in seconds for each selected frame
+            speed = sqrt(sum(diff(xyz, 1).^2, 2))./diff(t(:)); % um/s
+            plot(f(2:end), speed, '.-', 'color', para.ls.p{p}.col)
+        end
+        xlabel('Frame number')
+        ylabel('3D Movement speed (\mum/s)');
+        legend(num2str((1:para.pnr)'))
+        
+        redraw = 0; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 0;
+            
+    case 'holo_plot_track_2d'
+        figure(276); clf; hold on;
+        for p = 1:para.pnr
+            sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
+            xy = squeeze(data.points(sel, p, 1:2))*para.holo.pix_um;
+            f{p} = find(sel);
+            line(xy(:, 1), xy(:, 2), 'marker', '.', 'linestyle', '-', 'color', para.ls.p{p}.col, 'tag', num2str(p))
+        end
+        xlabel('x (\mum)');
+        ylabel('y (\mum)');
+        set(gca, 'YDir', 'reverse');
+        axis equal;
+        legend(num2str((1:para.pnr)'))
+        
+        dcm_obj = datacursormode(276);
+        set(dcm_obj, 'UpdateFcn',{@plot2d_updatefcn, f})
+        
+        redraw = 0; % Could be 2, but then we have to save into currim_ori
+        saveNeeded = 0;
+        
+    case 'holo_plot_track_3d'
+        figure(277); clf; hold on;
+        for p = 1:para.pnr
+            sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
+            xyz = squeeze(data.points(sel, p, [1:2 4]));
+            xyz(:, 1:2) = xyz(:, 1:2)*para.holo.pix_um; % um
+            f{p} = find(sel);
+            line(xyz(:, 1), xyz(:, 2), xyz(:, 3), 'marker', '.', 'linestyle', '-', 'color', para.ls.p{p}.col, 'tag', num2str(p))
+        end
+        xlabel('x (\mum)');
+        ylabel('y (\mum)');
+        zlabel('z (\mum)');
+        set(gca, 'YDir', 'reverse');
+        legend(num2str((1:para.pnr)'))
+        axis equal;
+        
+        dcm_obj = datacursormode(277);
+        set(dcm_obj, 'UpdateFcn',{@plot3d_updatefcn, f})
+
         redraw = 0; % Could be 2, but then we have to save into currim_ori
         saveNeeded = 0;
         
@@ -158,6 +219,15 @@ switch(action)
         redraw = 1;
         saveNeeded = 1;
         
+    case 'holo_autoXYcontinue'
+        % Autotracking using background subtraction
+        [success, autopara] = holo_autotrack_select(status, para, data, true); % just loads last ssession's data
+        if success
+            [gui, status, para, data] = holo_autotrack_main(gui, status, para, data, autopara);
+        end
+        redraw = 1;
+        saveNeeded = 1;
+        
      case 'holo_autoZ'
         % ask for parameters
 %         [success, savepara] = dtrack_tools_imageseq(status, para);
@@ -173,4 +243,28 @@ switch(action)
         redraw = 0;
         saveNeeded = 0;
         actionFound = false;
+end
+end % main
+
+function txt = plot2d_updatefcn(~, event_obj, f)
+    % Customizes text of data tips
+    pos = get(event_obj, 'Position');
+    I = get(event_obj, 'DataIndex');
+    p = str2double(get(get(event_obj, 'Target'), 'tag'));
+    txt = {['X: ', num2str(pos(1))],...
+           ['Y: ', num2str(pos(2))],...
+           ['point: ', num2str(p)],...
+           ['frame: ', num2str(f{p}(I))]};
+end
+
+function txt = plot3d_updatefcn(~, event_obj, f)
+    % Customizes text of data tips
+    pos = get(event_obj, 'Position');
+    I = get(event_obj, 'DataIndex');
+    p = str2double(get(get(event_obj, 'Target'), 'tag'));
+    txt = {['X: ', num2str(pos(1))],...
+           ['Y: ', num2str(pos(2))],...
+           ['Z: ', num2str(pos(3))],...
+           ['point: ', num2str(p)],...
+           ['frame: ', num2str(f{p}(I))]};
 end

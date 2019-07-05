@@ -1,7 +1,8 @@
 function holo
-%HOLO Summary of this function goes here
-%   Detailed explanation goes here
+% HOLO Super-function to start dtrack with the HOLO module
 
-    dtrack({'holo'})
+v = 1.00;
+fprintf('Starting HOLO %g\n', v);
+dtrack({'holo'})
 
 
