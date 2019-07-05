@@ -288,7 +288,7 @@ function sub_createGui
 
 %% panels
     uicontrol(gui.fig, 'style', 'text', 'string', 'Autotracking parameters', 'units', 'normalized', 'position', [.02 .81 .96 .17], 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 15, 'fontweight', 'bold');
-    uicontrol(gui.fig, 'style', 'text', 'units', 'normalized', 'position', [.02 .84 .96 .06], 'string', 'Background subtraction findMethod', 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 10);
+    uicontrol(gui.fig, 'style', 'text', 'units', 'normalized', 'position', [.02 .84 .96 .06], 'string', 'Background subtraction method', 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 10);
     gui.panel1.panel = uipanel(gui.fig, 'position', [.02 .22 .32 .57]);
     gui.panel2.panel = uipanel(gui.fig, 'position', [.36 .22 .62 .57]);
 

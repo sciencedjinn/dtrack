@@ -988,6 +988,11 @@ else
             dtrack_guivisibility(gui, para, status);
             redraw = 2;
             saveneeded = 1/2;
+        case 'ref_set_double_dynamic'
+            para.ref.use = 'double_dynamic';
+            dtrack_guivisibility(gui, para, status);
+            redraw = 2;
+            saveneeded = 1/2;
         case 'ref_set'
             para.ref.framenr = status.framenr;
             set(findobj('tag', 'refframe'), 'string', ['ref frame ' num2str(status.framenr)]);

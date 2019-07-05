@@ -33,24 +33,12 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
         gui.infoarea.holo.entries.holo_ref_single = uicontrol(gui.infoarea.holo.ref_mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0 0 .5 1], 'cdata', gui.icons.holo_ref_single, 'tooltip', 'Use only last frame as reference');
         gui.icons.holo_ref_double = imread(fullfile(iconpath, 'holo_ref_double.tif'));
         gui.infoarea.holo.entries.holo_ref_double = uicontrol(gui.infoarea.holo.ref_mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.5 0 .5 1], 'cdata', gui.icons.holo_ref_double, 'tooltip', 'Use last frame and next frame as references (slower)');
-        switch para.ref.use
-            case {'dynamic', 'static'}
-                set(gui.infoarea.holo.ref_mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_ref_single);
-            case 'double_dynamic'
-                set(gui.infoarea.holo.ref_mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_ref_double);
-        end
         
     gui.infoarea.holo.z_depth_panel = uibuttongroup(gui.infoarea.holo.tab, 'position', [.75 .66 .15 .33]); 
         gui.icons.holo_single_z_mode = imread(fullfile(iconpath, 'holo_single_z_mode.tif'));
         gui.infoarea.holo.entries.holo_single_z_mode = uicontrol(gui.infoarea.holo.z_depth_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0 0 .5 1], 'cdata', gui.icons.holo_single_z_mode, 'tooltip', 'Display frame for a single z-value');
         gui.icons.holo_mean_z_mode = imread(fullfile(iconpath, 'holo_mean_z_mode.tif'));
         gui.infoarea.holo.entries.holo_mean_z_mode = uicontrol(gui.infoarea.holo.z_depth_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.5 0 .5 1], 'cdata', gui.icons.holo_mean_z_mode, 'tooltip', 'Display mean of a full z-stack (SLOW!)');
-        switch status.holo.z_mode
-            case 'single'
-                set(gui.infoarea.holo.z_depth_panel, 'selectedobject', gui.infoarea.holo.entries.holo_single_z_mode);
-            case 'mean'
-                set(gui.infoarea.holo.z_depth_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mean_z_mode);
-        end
         
     gui.infoarea.holo.z_panel = uipanel(gui.infoarea.holo.tab, 'position', [0 0 1 .66]); 
 %         axes(gui.infoarea.holo.z_panel, 'units', 'normalized', 'position', [0 0 .25 1]);

@@ -65,7 +65,6 @@ function sub_default(varargin)
     savepara.gui.navitoolbar        = para.gui.navitoolbar;
     savepara.gui.infopanel          = para.gui.infopanel;
     savepara.gui.infopanel_points   = para.gui.infopanel_points;
-    savepara.gui.infopanel_markers  = para.gui.infopanel_markers;
     savepara.gui.infopanel_mani     = para.gui.infopanel_mani;
     savepara.gui.minimap            = para.gui.minimap;
     save(fullfile(prefdir, 'dtrack_pref.dtp'), 'savepara', '-mat');
@@ -184,10 +183,7 @@ function sub_callback(src, varargin)
             
         case 'editpref_info_points'
             para.gui.infopanel_points = get(src, 'value');
-            
-        case 'editpref_info_markers'
-            para.gui.infopanel_markers = get(src, 'value');
-            
+                        
         case 'editpref_info_mani'
             para.gui.infopanel_mani = get(src, 'value');
             
@@ -255,7 +251,6 @@ function sub_creategui
     gui.panel4.navitoolbar    = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .74 .9 .12], 'style', 'checkbox', 'string', 'File and navigation toolbar', 'tag', 'editpref_navitoolbar');
     gui.panel4.infopanel      = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .61 .9 .12], 'style', 'checkbox', 'string', 'Info panel', 'tag', 'editpref_infopanel');
     gui.panel4.info_points    = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .48 .9 .12], 'style', 'checkbox', 'string', 'Object panel', 'tag', 'editpref_info_points');
-    gui.panel4.info_markers   = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .35 .9 .12], 'style', 'checkbox', 'string', 'Marker panel', 'tag', 'editpref_info_markers');
     gui.panel4.info_mani      = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .22 .9 .12], 'style', 'checkbox', 'string', 'Image manipulation panel', 'tag', 'editpref_info_mani');
     gui.panel4.minimap        = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .09 .9 .12], 'style', 'checkbox', 'string', 'Miniplot window', 'tag', 'editpref_minimap');
 
@@ -315,7 +310,6 @@ function sub_setdef
     set(gui.panel4.navitoolbar,     'value', para.gui.navitoolbar);
     set(gui.panel4.infopanel,       'value', para.gui.infopanel);
     set(gui.panel4.info_points,     'value', para.gui.infopanel_points);
-    set(gui.panel4.info_markers,    'value', para.gui.infopanel_markers);
     set(gui.panel4.info_mani,       'value', para.gui.infopanel_mani);
     set(gui.panel4.minimap,         'value', para.gui.minimap);
 

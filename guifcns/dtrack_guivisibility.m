@@ -97,7 +97,7 @@ if para.im.imadjust
 else
     set(findobj('tag', 'view_imadjust'), 'checked', 'off');
 end
-    
+
 % image values
 if para.im.greyscale
     set(findobj('tag', 'rgb1'), 'value', para.im.gs1);

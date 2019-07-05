@@ -221,7 +221,7 @@ switch(action)
         
     case 'holo_autoXYcontinue'
         % Autotracking using background subtraction
-        [success, autopara] = holo_autotrack_select(status, para, data, true); % just loads last ssession's data
+        [success, autopara] = holo_autotrack_select(status, para, data, true); % just loads last session's data
         if success
             [gui, status, para, data] = holo_autotrack_main(gui, status, para, data, autopara);
         end
@@ -229,12 +229,9 @@ switch(action)
         saveNeeded = 1;
         
      case 'holo_autoZ'
-        % ask for parameters
-%         [success, savepara] = dtrack_tools_imageseq(status, para);
-%         if success
-            [gui, status, para, data] = holo_autoZ(gui, status, para, data); 
-            [gui, status, para, data] = dtrack_action(gui, status, para, data, 'redraw');
-%         end
+        % TODO: ask for parameters
+        [gui, status, para, data] = holo_autoZ(gui, status, para, data); 
+        [gui, status, para, data] = dtrack_action(gui, status, para, data, 'redraw');
         returnfocus;
         redraw = 1;
         saveNeeded = 1;

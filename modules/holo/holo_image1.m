@@ -9,7 +9,9 @@ if ismember(redraw, [1 2 3 11 30])
             status.holo.z = data.points(status.framenr, status.cpoint, 4);
             set(findobj('tag', 'holo_zvalue_disp'), 'string', num2str(status.holo.z));
             if strcmp(status.holo.image_mode, 'holo') || strcmp(status.holo.image_mode, 'holo_mag')
-                redraw = 1;
+                if redraw < 30
+                    redraw = 1; % This causes main redraw to break if it was loadonly
+                end
             end
         else
             % this point hasn't had a z-value assigned yet => keep the current value

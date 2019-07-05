@@ -28,7 +28,7 @@ if asVideo
                 error('Internal error: Unknown button name');
         end
     end             
-    v = VideoWriter(filename));
+    v = VideoWriter(filename);
     v.FrameRate = 3*status.FrameRate/savepara.step;
     open(v);
 end
@@ -45,6 +45,8 @@ try
         
         % extract frame
         frame = status.currim;
+        frame = frame - min(frame(:));
+        frame = frame/max(frame(:));
         
         % draw a circle on the current point 1
         for i = 1:para.pnr

@@ -212,7 +212,7 @@ function sub_loaddef
             autopara.folder = para.paths.resdef;
         end
         [~, movbase]        = fileparts(para.paths.movname);
-        autopara.basename   = movbase;
+        autopara.basename   = [movbase '_out'];
         autopara.startfile  = 1;
         autopara.padding    = 4;
     end
@@ -230,7 +230,7 @@ function sub_setdef
         autopara.folder = para.paths.resdef;
     end
     [~, movbase]        = fileparts(para.paths.movname);
-    autopara.basename   = movbase;
+    autopara.basename   = [movbase '_out'];
     set(gui.panel2.folder,    'string', autopara.folder);
     set(gui.panel2.basename,  'string', autopara.basename);        
     set(gui.panel2.startfile, 'string', num2str(autopara.startfile));
