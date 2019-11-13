@@ -57,7 +57,7 @@ for i = 1:size(data.points, 2)
                 dlmwrite(currfile, squeeze(data.points(:, i, :)), 'delimiter', '\t');
             case 'Sparse'
                 ind = find(data.points(:, i, 3));
-                sparsedata = [ind squeeze(data.points(ind, i, :))];
+                sparsedata = [ind reshape(data.points(ind, i, :), [length(ind) size(data.points, 3)])]; % This used to use squeeze, but that creates an error when there is only a single point
                 dlmwrite(currfile, sparsedata, 'delimiter', '\t');
         end
         disp(['Saving file ', currfile]);
