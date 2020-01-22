@@ -5,7 +5,7 @@ function [gui, status, para, data, redraw] = dtrack_support_evalModules(type, gu
 %% Load modules
 for i = 1:length(para.modules)
     if exist([para.modules{i} type], 'file')
-        if nargin<5
+        if nargin<6
             [gui, status, para, data] = feval([para.modules{i} type], gui, status, para, data);
         else
             [gui, status, para, data, redraw] = feval([para.modules{i} type], gui, status, para, data, redraw);
