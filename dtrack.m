@@ -16,7 +16,7 @@ function dtrack(modules)
 %
 % % Copyright 2010 - 2019 Jochen Smolka, ScienceDjinn 
 
-v = 1.911;
+v = 1.912;
 fprintf('Starting DTrack %.2f\n', v);
 
 if nargin<1, modules = {}; end
