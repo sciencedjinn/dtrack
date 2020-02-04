@@ -1,6 +1,5 @@
 function [gui, status, para, data] = holo_autotrack_main(gui, status, para, data, autopara)
-% holo_autotrack_main loads reference frame and ROI, then calls dtrack_tools_autotrack_shikhar for each frame 
-% to detect the main feature of the image and track it.
+% holo_autotrack_main finds XY position for holographic videos, for each frame
 %
 % Call sequence: dtrack_action -> dtrack_tools_autotrack_select
 %                              -> dtrack_tools_autotrack_main -> dtrack_tools_autotrack_detect

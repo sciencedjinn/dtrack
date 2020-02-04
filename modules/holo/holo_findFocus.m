@@ -47,29 +47,40 @@ end % main
 %% Sub-functions
 function [x_section, y_section, cx, cy] = sub_find_section(pos, bx, max_size)
     % Draw a box around the last known position, making sure it is square but not outside the image
+    % 
+    % input:
+    % pos: [x y], the position of the tracked centre in the full image
+    % max_size: [y x], the size of the full image
+    %
+    % output:
+    % x_section, y_section: a 2*bx+1 wide and high section of the original image, surrounding the tracked centre
+    % cx, cy: the position of the tracked centre within that image
+       
     x_section = [pos(1)-bx pos(1)+bx];
     y_section = [pos(2)-bx pos(2)+bx];
     cx = bx + 1; 
     cy = bx + 1;
     if x_section(1)<1, x_section = [1 1+2*bx]; cx = pos(1); end
     if y_section(1)<1, y_section = [1 1+2*bx]; cy = pos(2); end
-    if x_section(2)>max_size(2), x_section = [max_size(2)-2*bx max_size(2)]; cx = pos(1) - (max_size(2)-2*bx-1); end
-    if y_section(2)>max_size(1), y_section = [max_size(1)-2*bx max_size(1)]; cy = pos(2) - (max_size(1)-2*bx-1); end
+    if x_section(2)>max_size(2), x_section = [max_size(2)-2*bx max_size(2)]; cx = pos(1) - max_size(2) + 2*bx+1; end
+    if y_section(2)>max_size(1), y_section = [max_size(1)-2*bx max_size(1)]; cy = pos(2) - max_size(1) + 2*bx+1; end
 end
     
 function [z, allMaxs] = sub_find_focus(iDiff, zRange, para, cx, cy, verbose)
     % Given a difference image section and a range of z-values, finds the 
     % z-value where the central 8th of the image has the largest value, indicating best focus
+    
     Reconst = holo_analyse2_reconstruct(iDiff, zRange, para.holo);
 
     % for each z-position, calculate the maximum in Reconst, then find the maximum
+    % (make sure that the centre does not go past image edges)
     bs = para.holo.searchBoxSize*para.holo.reconBoxSize;
-    allMaxs = max(max(Reconst(cy - bs : cy + bs, cx - bs : cx + bs, :), [], 1), [], 2);
-    
-%     for i = 1:size(allMaxs, 3)
-%         allMaxs(i) = estimate_sharpness(Reconst(7/8*para.holo.boxSize:9/8*para.holo.boxSize, 7/8*para.holo.boxSize:9/8*para.holo.boxSize, i));
-%     end
-    
+    minx = max([cx - bs 1]);
+    maxx = min([cx + bs size(Reconst, 2)]);
+    miny = max([cy - bs 1]);
+    maxy = min([cy + bs size(Reconst, 1)]);
+    ReconstCentre = Reconst(miny:maxy, minx:maxx, :);
+    allMaxs = max(max(ReconstCentre, [], 1), [], 2);
     
     [~, max_index] = max(allMaxs, [], 3); 
     z = zRange(max_index);
