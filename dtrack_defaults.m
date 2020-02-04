@@ -40,6 +40,13 @@ para.gui.infopanel_points   = true;
 para.gui.infopanel_mani     = true;
 para.gui.minimap            = true;
 
+switch computer
+    case {'MACI', 'MACI64'}
+        para.gui.tab_title_spacing = 0.02;
+    otherwise
+        para.gui.tab_title_spacing = 0;
+end
+
 %%
 para.im.roi                 = false;
 para.im.manicheck           = false;   

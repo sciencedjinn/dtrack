@@ -73,7 +73,7 @@ end
 
 function sub_close(varargin)
     % CLOSE: close button callback
-    button=questdlg('Do you want to save the changed values?', 'Save changes', 'Save', 'Don''t save', 'Cancel', 'Don''t save');
+    button = questdlg('Do you want to save the changed values?', 'Save changes', 'Save', 'Don''t save', 'Cancel', 'Don''t save');
     switch button
         case 'Save'
             sub_OK();
@@ -108,7 +108,7 @@ function sub_callback(src, varargin)
             end
             
         case 'editpref_resdefbutton'
-            dirname=uigetdir(para.paths.resdef);
+            dirname = uigetdir(para.paths.resdef);
             if dirname~=0
                 para.paths.resdef=dirname;
                 set(gui.panel1.resdef, 'string', dirname);
@@ -123,16 +123,16 @@ function sub_callback(src, varargin)
             end
             
         case 'editpref_vlcpathbutton'
-            [filename, pathname]=uigetfile('vlc.exe', 'Please enter the location of vlc.exe', para.paths.vlcpath);
+            [filename, pathname] = uigetfile('vlc.exe', 'Please enter the location of vlc.exe', para.paths.vlcpath);
             if filename~=0
-                para.paths.vlcpath=fullfile(pathname, filename);
+                para.paths.vlcpath = fullfile(pathname, filename);
                 set(gui.panel1.vlcpath, 'string', fullfile(pathname, filename));
             end
             
         case 'editpref_maxrecent'
             temp=round(str2double(get(src, 'string')));
             if temp>0
-                para.maxrecent=temp;
+                para.maxrecent = temp;
             else
                 set(src, 'string', num2str(para.maxrecent));
                 errordlg('Invalid entry', 'Invalid entry', 'modal');
@@ -156,9 +156,9 @@ function sub_callback(src, varargin)
             para.showlast = get(src, 'value');
             
         case 'editpref_showlastrange'
-            temp=round(str2double(get(src, 'string')));
+            temp = round(str2double(get(src, 'string')));
             if temp>0
-                para.showlastrange=temp;
+                para.showlastrange = temp;
             else
                 set(src, 'string', num2str(para.showlastrange));
                 errordlg('Invalid entry', 'Invalid entry', 'modal');

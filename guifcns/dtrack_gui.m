@@ -7,7 +7,7 @@ iconpath = fullfile(thispath, '..', 'icons');
 
 %% set up figure
 gui.f1 = figure(1);clf;
-set(gui.f1, 'ResizeFcn', []); %for resets
+set(gui.f1, 'ResizeFcn', []); % for resets
 p = double(imread(fullfile(iconpath, 'crosshair1_16.tif')))+1;p(p==min(p(:))) = 1;p(p==max(p(:)))=2;p(p>2)=NaN;
 gui.pointers.crosshair1_16 = p;
 gui.pointers.crosshair1_32 = double(imread(fullfile(iconpath, 'crosshair1_32.tif'))) + 1; gui.pointers.crosshair1_32(gui.pointers.crosshair1_32==2) = NaN;
@@ -20,15 +20,15 @@ set(gui.f1, 'outerposition', fig1pos, 'name', [para.theme.name ': ' para.paths.r
      'numbertitle', 'off', 'menubar', 'none', 'keypressfcn', status.maincb,...
      'interruptible', 'off', 'pointer', 'custom', 'pointershapecdata', gui.pointers.crosshair1_16, 'pointershapehotspot', [8.5 8.5], ...
      'WindowScrollWheelFcn', status.scrollcb);
-%try, drawnow; pause(3); maxfig; end %#ok<TRYNC,NOCOM> %This line has caused trouble on Windows and Mac: Mouse clicks would not register at the correct screen
+% try, drawnow; pause(3); maxfig; end %#ok<TRYNC,NOCOM> %This line has caused trouble on Windows and Mac: Mouse clicks would not register at the correct screen
 % position until a gui reset was performed or the window minimised and then maximised again
 set(gui.f1, 'ResizeFcn', status.resizecb);
 gui.ax1 = axes('parent', gui.f1);set(gui.ax1, 'position', [0.001 0.001 1 1], 'buttondownfcn', status.maincb);
 gui.im1 = [];
 
 %% Info Area
-% gui.infoarea.info.panel = uipanel(gui.f1, 'position', [.85 .94 .15 .06]);
-gui.infoarea.info.tabgroup = uitabgroup(gui.f1, 'position', [.85 .94 .15 .06]); 
+tts = para.gui.tab_title_spacing;
+gui.infoarea.info.tabgroup = uitabgroup(gui.f1, 'position', [.85 .94-tts .15 .06+tts]); 
 gui.infoarea.info.tab = uitab(gui.infoarea.info.tabgroup, 'title', 'Info'); 
     gui.infoarea.info.entries.framenr = uicontrol(gui.infoarea.info.tab, 'style', 'edit', 'string', ['frame ' num2str(status.framenr) '/' num2str(status.nFrames)], 'units', 'normalized', 'position', [0 .5 .5 .5], 'tag', 'framenr', 'enable', 'inactive', 'buttondownfcn', status.maincb);
     fth = floor(status.framenr/status.FrameRate/3600);
@@ -39,8 +39,7 @@ gui.infoarea.info.tab = uitab(gui.infoarea.info.tabgroup, 'title', 'Info');
     gui.infoarea.info.entries.stepsize = uicontrol(gui.infoarea.info.tab, 'style', 'edit', 'string', ['step size ' num2str(para.gui.stepsize)], 'units', 'normalized', 'position', [.5 .5 .5 .5], 'tag', 'stepsize', 'enable', 'inactive', 'buttondownfcn', status.maincb);
     gui.infoarea.info.entries.refframe = uicontrol(gui.infoarea.info.tab, 'style', 'edit', 'string', '', 'units', 'normalized', 'position', [.5 0 .5 .5], 'tag', 'refframe', 'enable', 'inactive', 'buttondownfcn', status.maincb);
 
-% gui.infoarea.points.superpanel = uipanel(gui.f1, 'position', [.85 .88 .15 .06]);
-gui.infoarea.points.tabgroup = uitabgroup(gui.f1, 'position', [.85 .858 .15 .08]); 
+gui.infoarea.points.tabgroup = uitabgroup(gui.f1, 'position', [.85 .858-2*tts .15 .08+tts]); 
 gui.infoarea.points.tab = uitab(gui.infoarea.points.tabgroup, 'title', 'Objects'); 
     gui.infoarea.points.panel = uipanel(gui.infoarea.points.tab, 'position', [0 .5 .8 .5], 'tag', 'pointspanel'); 
         for i = 1:para.pnr/(1+strcmp(para.trackingtype, 'line'))
@@ -78,8 +77,7 @@ gui.infoarea.markers.tab = uitab(gui.infoarea.points.tabgroup, 'title', 'Markers
     gui.infoarea.markers.entries.marker_d       = uicontrol(gui.infoarea.markers.tab, 'style', 'togglebutton', 'units', 'normalized', 'position', [0.001+4*0.08 0.51 .08 .48], 'string', 'd', 'tooltipstring', 'dance marker: first frame of a dance phase (lasts until r, p, or e) (Alt + D)');
     gui.infoarea.markers.entries.marker_other   = uicontrol(gui.infoarea.markers.tab, 'style', 'edit', 'units', 'normalized', 'position', [0.001+5*0.08 0.51 .23 .48], 'string', '', 'tooltipstring', 'other markers (Alt + letter)', 'enable', 'inactive');
     
-% gui.infoarea.image.superpanel = uipanel(gui.f1, 'position', [.85 .70 .15 .155]);
-gui.infoarea.image.tabgroup = uitabgroup(gui.f1, 'position', [.85 .701 .15 .155]); 
+gui.infoarea.image.tabgroup = uitabgroup(gui.f1, 'position', [.85 .701-3*tts .15 .155+tts]); 
 gui.infoarea.image.tab = uitab(gui.infoarea.image.tabgroup, 'title', 'Image manipulation'); 
     gui.infoarea.info.entries.manicheck = uicontrol(gui.infoarea.image.tab, 'style', 'checkbox', 'units', 'normalized', 'position', [0 .85 .08 .14], 'tooltip', 'Activate/Deactivate image manipulation', 'value', para.im.manicheck);
 
