@@ -30,16 +30,3 @@ switch status.holo.image_mode
     otherwise
         warning('Internal warning: Unhandled image mode. Please report this warning.');
 end
-
-% switch para.ref.use
-%     case {'dynamic', 'static'}
-%         set(gui.infoarea.holo.ref_mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_ref_single);
-%     case 'double_dynamic'
-%         set(gui.infoarea.holo.ref_mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_ref_double);
-% end
-% switch status.holo.z_mode
-%     case 'single'
-%         set(gui.infoarea.holo.z_depth_panel, 'selectedobject', gui.infoarea.holo.entries.holo_single_z_mode);
-%     case 'mean'
-%         set(gui.infoarea.holo.z_depth_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mean_z_mode);
-% end

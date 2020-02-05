@@ -56,7 +56,6 @@ switch(action)
     case 'holo_ref_single'
         para.ref.use = 'dynamic';
         set(gui.infoarea.holo.ref_mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_ref_single);
-%         dtrack_guivisibility(gui, para, status)
         dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
@@ -64,7 +63,6 @@ switch(action)
     case 'holo_ref_double'
         para.ref.use = 'double_dynamic';
         set(gui.infoarea.holo.ref_mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_ref_double);
-%         dtrack_guivisibility(gui, para, status)
         dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
@@ -72,7 +70,6 @@ switch(action)
     case 'holo_mean_z_mode'
         status.holo.z_mode = 'mean';
         set(gui.infoarea.holo.z_depth_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mean_z_mode);
-%         holo_guivisibility(gui, status, para, data)
         dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
@@ -80,7 +77,6 @@ switch(action)
     case 'holo_single_z_mode'
         status.holo.z_mode = 'single';
         set(gui.infoarea.holo.z_depth_panel, 'selectedobject', gui.infoarea.holo.entries.holo_single_z_mode);
-%         holo_guivisibility(gui, status, para, data)
         dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 

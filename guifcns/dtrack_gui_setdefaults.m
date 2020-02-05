@@ -4,16 +4,10 @@ function dtrack_gui_setdefaults(gui, status, para)
 switch para.autoforw
     case 0
         set(findobj('tag', 'autoforwpanel'), 'selectedobject', []);
-%         set(findobj('tag', 'autoforw_1'), 'cdata', gui.icons.autoforw_1);
-%         set(findobj('tag', 'autoforw_x'), 'cdata', gui.icons.autoforw_x);
     case 1
         set(findobj('tag', 'autoforwpanel'), 'selectedobject', findobj('tag', 'autoforw_1'));
-%         set(findobj('tag', 'autoforw_1'), 'cdata', 380-gui.icons.autoforw_1);
-%         set(findobj('tag', 'autoforw_x'), 'cdata', gui.icons.autoforw_x);
     case 2
         set(findobj('tag', 'autoforwpanel'), 'selectedobject', findobj('tag', 'autoforw_x'));
-%         set(findobj('tag', 'autoforw_x'), 'cdata', 380-gui.icons.autoforw_x);
-%         set(findobj('tag', 'autoforw_1'), 'cdata', gui.icons.autoforw_1);
 end
 dtrack_gui_updateTogglegroupIcons(findobj('tag', 'autoforw_x'), gui)
 
