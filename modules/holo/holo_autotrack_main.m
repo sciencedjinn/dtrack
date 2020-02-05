@@ -49,7 +49,6 @@ end
 
 %% Init main loop vars
 cancelled = false;
-stats = nan(1, autopara.to);  % this will save the size of the detected area
 tic
 disp([datestr(now, 13) ' - Autotracking started']);
 waitbar(0.01, autowbh, 'Automatic tracking...');
@@ -108,6 +107,7 @@ for trackframe = autopara.from:autopara.step:autopara.to
             case ''
                 data.points(trackframe, autopara.pointnr, 1:2)  = res.centroid;
                 data.points(trackframe, autopara.pointnr, 3)    = 42; % DEF: 42 means autotracked point
+                data.points(trackframe, autopara.pointnr, 5)    = diag.area; % DEF: 42 means autotracked point
             case 'Invalid lastPoint'
                 warndlg('Autotracking has lost the object for too many frames to continue. This is often due to the tracked object approaching the boundaries of the trackable area. Switch to interference mode and forward the video until you can find the object again. Then, manually track one point and press CTRL+D (CMD+D) to continue tracking.')
                 cancelled = true;
