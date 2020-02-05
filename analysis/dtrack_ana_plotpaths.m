@@ -4,10 +4,15 @@ cla(h); hold(h, 'on');
 
 switch para.trackingtype
     case 'point'
-        sel = data.points(:, 1, 3)~=0;
-        plot(h, data.points(sel, 1, 1), data.points(sel, 1, 2), '.-');
-        plot(h, data.points(:, :, 1), data.points(:, :, 2), '.', data.points(status.framenr, :, 1), data.points(status.framenr, :, 2), 'yo');
+        for p = 1:para.pnr
+            sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
+            xy = squeeze(data.points(sel, p, 1:2));
+            line(xy(:, 1), xy(:, 2), 'marker', '.', 'linestyle', 'none', 'color', para.ls.p{p}.col, 'tag', num2str(p), 'parent', h)
+        end
+        line(data.points(status.framenr, status.cpoint, 1), data.points(status.framenr, status.cpoint, 2),...
+            'marker', '.', 'color', para.ls.cp.col, 'marker', para.ls.cp.shape, 'markersize', para.ls.cp.size, 'tag', 'cpoint', 'parent', h);
         %aa=dtrack_findnextmarker(data, 1, 'a', 'all'); plot(h, data.points(aa, 4, 1), data.points(aa, 4, 2), 'ro');
+        
     case 'line'
         for p = 1:2:size(data.points, 2)
             sel = data.points(:, p, 3)~=0;
@@ -31,3 +36,20 @@ if para.im.roi
 end 
 axis(h, 'equal'); axis(h, [0 status.vidWidth 0 status.vidHeight]);
 set(h, 'YDir', 'reverse', 'visible', 'off');
+
+
+% figure(276); clf; hold on;
+%         for p = 1:para.pnr
+%             sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
+%             xy = squeeze(data.points(sel, p, 1:2))*para.holo.pix_um;
+%             f{p} = find(sel);
+%             line(xy(:, 1), xy(:, 2), 'marker', '.', 'linestyle', '-', 'color', para.ls.p{p}.col, 'tag', num2str(p))
+%         end
+%         xlabel('x (mm)');
+%         ylabel('y (mm)');
+%         set(gca, 'YDir', 'reverse');
+%         axis equal;
+%         legend(num2str((1:para.pnr)'))
+%         
+%         dcm_obj = datacursormode(276);
+%         set(dcm_obj, 'UpdateFcn',{@plot2d_updatefcn, f})
