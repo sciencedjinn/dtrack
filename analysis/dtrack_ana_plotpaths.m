@@ -6,7 +6,7 @@ switch para.trackingtype
     case 'point'
         for p = 1:para.pnr
             sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
-            xy = squeeze(data.points(sel, p, 1:2));
+            xy = reshape(data.points(sel, p, 1:2), [nnz(sel) 2]);
             line(xy(:, 1), xy(:, 2), 'marker', '.', 'linestyle', 'none', 'color', para.ls.p{p}.col, 'tag', num2str(p), 'parent', h)
         end
         line(data.points(status.framenr, status.cpoint, 1), data.points(status.framenr, status.cpoint, 2),...
