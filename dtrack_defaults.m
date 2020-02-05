@@ -66,6 +66,8 @@ para.forceaspectratio       = [];
 para.saveneeded             = 0;
 para.autosavethresh         = 10;
 
+para.defaultz               = 100; % Default z position for plotting of 3D points (holo module)
+
 %% point marker style and colours (can be changed using the colourgui button)
 para.ls.p{1}.col  = [0 0 1];    para.ls.p{1}.shape  = 'o';    para.ls.p{1}.size  = 10; para.ls.p{1}.width  = 1.5;
 para.ls.p{2}.col  = [0 1 0];    para.ls.p{2}.shape  = 'o';    para.ls.p{2}.size  = 10; para.ls.p{2}.width  = 1.5;

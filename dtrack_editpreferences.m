@@ -61,6 +61,8 @@ function sub_default(varargin)
     savepara.showlastrange          = para.showlastrange;
     savepara.maxrecent              = para.maxrecent; 
     savepara.gui.stepsize           = para.gui.stepsize;
+    savepara.gui.tab_title_spacing  = para.gui.tab_title_spacing;
+    savepara.defaultz               = para.defaultz;
     savepara.autoforw               = para.autoforw; 
     savepara.gui.navitoolbar        = para.gui.navitoolbar;
     savepara.gui.infopanel          = para.gui.infopanel;
@@ -172,6 +174,27 @@ function sub_callback(src, varargin)
                 set(src, 'string', num2str(para.gui.stepsize));
                 errordlg('Invalid entry', 'Invalid entry', 'modal');
             end
+            
+        case 'editpref_guispace'
+            temp = str2double(get(src, 'string'));
+            if ~isnan(temp)
+                temp = min([max([temp 0]) 0.1]);
+                para.gui.tab_title_spacing = temp;
+                set(src, 'string', num2str(para.gui.tab_title_spacing));
+            else
+                set(src, 'string', num2str(para.gui.tab_title_spacing));
+                errordlg('Invalid entry', 'Invalid entry', 'modal');
+            end
+            
+        case 'editpref_defaultz'
+            temp = str2double(get(src, 'string'));
+            if ~isnan(temp)
+                para.gui.defaultz = temp;
+            else
+                set(src, 'string', num2str(para.gui.defaultz));
+                errordlg('Invalid entry', 'Invalid entry', 'modal');
+            end
+            
         case 'editpref_autoforw'
             para.autoforw = get(src, 'value')-1;
             
@@ -199,7 +222,7 @@ end
 function sub_creategui
     
     screen  = get(0, 'screensize');
-    figsize = [600 400];
+    figsize = [600 500];
     figpos  = [screen(3)/2-figsize(1)/2 screen(4)/2-figsize(2)/2 figsize(1) figsize(2)];
     %set up the figure
     gui.fig = figure(777); clf;
@@ -208,10 +231,10 @@ function sub_creategui
 
 %% panels
     uicontrol(gui.fig, 'style', 'text', 'string', [para.theme.name ' preferences'], 'units', 'normalized', 'position', [.02 .91 .96 .07], 'backgroundcolor', get(gui.fig, 'color'), 'fontsize', 15, 'fontweight', 'bold');
-    gui.panel1.panel = uipanel(gui.fig, 'position', [.02 .71 .96 .18]);
-    gui.panel2.panel = uipanel(gui.fig, 'position', [.02 .51 .96 .18]);
-    gui.panel3.panel = uipanel(gui.fig, 'position', [.02 .12 .47 .37]);
-    gui.panel4.panel = uipanel(gui.fig, 'position', [.51 .12 .47 .37]);
+    gui.panel1.panel = uipanel(gui.fig, 'position', [.02 .74 .96 .15]);
+    gui.panel2.panel = uipanel(gui.fig, 'position', [.02 .57 .96 .15]);
+    gui.panel3.panel = uipanel(gui.fig, 'position', [.02 .12 .47 .43]);
+    gui.panel4.panel = uipanel(gui.fig, 'position', [.51 .12 .47 .43]);
 
 %% panel 1
     opts = {'units', 'normalized', 'callback', editcb};
@@ -236,16 +259,20 @@ function sub_creategui
     gui.panel2.maxrecent      = uicontrol(gui.panel2.panel, opts{:}, 'position', [.50 .19 .10 .31], 'style', 'edit', 'tag', 'editpref_maxrecent');
     
 %% panel 3
-    gui.panel3.showcurr       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .85 .9 .12], 'style', 'checkbox', 'string', 'Highlight current object', 'tag', 'editpref_showcurr');
-    gui.panel3.showlast       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .7 .9 .12], 'style', 'checkbox', 'string', 'Show previous position for current object,', 'tag', 'editpref_showlast');
-                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .6 .5 .08], 'style', 'text', 'string', 'if it was marked in the last', 'HorizontalAlignment', 'left');
-    gui.panel3.showlastrange  = uicontrol(gui.panel3.panel, opts{:}, 'position', [.55 .57 .1 .12], 'style', 'edit', 'tag', 'editpref_showlastrange');
-                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.67 .6 .3 .08], 'style', 'text', 'string', 'frames.', 'HorizontalAlignment', 'left');
-                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .33 .39 .13], 'style', 'text', 'string', 'Large step:', 'HorizontalAlignment', 'left');
-    gui.panel3.stepsize       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .35 .4 .13], 'style', 'edit', 'tag', 'editpref_stepsize', 'tooltipstring', 'Select number of frames to jump in a large step (by default done with left/right arrow)');
-                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .18 .39 .13], 'style', 'text', 'string', 'Autoforward mode:', 'HorizontalAlignment', 'left');
-    gui.panel3.autoforw       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .2 .4 .13], 'style', 'popupmenu', 'string', 'nothing|small step|large step', 'tag', 'editpref_autoforw', 'tooltipstring', 'What to do after all objects in a frame are marked?');
-    
+    gui.panel3.showcurr       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .87 .9 .1], 'style', 'checkbox', 'string', 'Highlight current object', 'tag', 'editpref_showcurr');
+    gui.panel3.showlast       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .75 .9 .1], 'style', 'checkbox', 'string', 'Show previous position for current object,', 'tag', 'editpref_showlast');
+                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .63 .5 .09], 'style', 'text', 'string', 'if it was marked in the last', 'HorizontalAlignment', 'left');
+    gui.panel3.showlastrange  = uicontrol(gui.panel3.panel, opts{:}, 'position', [.55 .63 .1 .1], 'style', 'edit', 'tag', 'editpref_showlastrange');
+                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.67 .63 .3 .09], 'style', 'text', 'string', 'frames.', 'HorizontalAlignment', 'left');
+                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .43 .39 .1], 'style', 'text', 'string', 'Large step:', 'HorizontalAlignment', 'left');
+    gui.panel3.stepsize       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .45 .4 .1], 'style', 'edit', 'tag', 'editpref_stepsize', 'tooltipstring', 'Select number of frames to jump in a large step (by default done with left/right arrow)');
+                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .3 .39 .1], 'style', 'text', 'string', 'Autoforward mode:', 'HorizontalAlignment', 'left');
+    gui.panel3.autoforw       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .32 .4 .1], 'style', 'popupmenu', 'string', 'nothing|small step|large step', 'tag', 'editpref_autoforw', 'tooltipstring', 'What to do after all objects in a frame are marked?');
+                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .17 .39 .1], 'style', 'text', 'string', 'Default z-position:', 'HorizontalAlignment', 'left');
+    gui.panel3.defaultz       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .19 .4 .1], 'style', 'edit', 'tag', 'editpref_defaultz', 'tooltipstring', 'For 3D-tracking, use this z-value to plot points with untracked z-depth.');
+                                uicontrol(gui.panel3.panel, opts{:}, 'position', [.05 .04 .44 .1], 'style', 'text', 'string', 'Panel spacing (0-0.1):', 'HorizontalAlignment', 'left');
+    gui.panel3.guispace       = uicontrol(gui.panel3.panel, opts{:}, 'position', [.5 .06 .4 .1], 'style', 'edit', 'tag', 'editpref_guispace', 'tooltipstring', 'An extra spacing value for each each tab. Use to unclutter the panels on the right of the screen.');
+
 %% panel 4
                                 uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .87 .5 .12], 'style', 'text', 'string', 'Show by default:', 'HorizontalAlignment', 'left');
     gui.panel4.navitoolbar    = uicontrol(gui.panel4.panel, opts{:}, 'position', [.05 .74 .9 .12], 'style', 'checkbox', 'string', 'File and navigation toolbar', 'tag', 'editpref_navitoolbar');
@@ -304,6 +331,8 @@ function sub_setdef
     set(gui.panel3.showlast,        'value', para.showlast);
     set(gui.panel3.showlastrange,   'string', num2str(para.showlastrange));
     set(gui.panel3.stepsize,        'string', num2str(para.gui.stepsize));
+    set(gui.panel3.guispace,        'string', num2str(para.gui.tab_title_spacing));
+    set(gui.panel3.defaultz,        'string', num2str(para.defaultz));
     set(gui.panel3.autoforw,        'value', para.autoforw+1);
     
     % panel 4
