@@ -62,74 +62,80 @@ for trackframe = autopara.from:autopara.step:autopara.to
         break;
     end
     
-    %% find where this point was last tracked
-    refstep = autopara.refstep;
-    if trackframe-refstep>0 && data.points(trackframe-refstep, status.cpoint, 3)>0
-        lastPoint = data.points(trackframe-refstep, status.cpoint, 1:2);
-        lastPointType = 'lastframe';
-    elseif data.points(trackframe, status.cpoint, 3)>0
-        lastPoint = data.points(trackframe, status.cpoint, 1:2);
-        lastPointType = 'prediction';
-    elseif size(data.points, 1)>=trackframe+refstep && data.points(trackframe+refstep, status.cpoint, 3)>0
-        lastPoint = data.points(trackframe+refstep, status.cpoint, 1:2);
-        lastPointType = 'nextframe';
-    elseif any(data.points(max([1 trackframe-100]):min([size(data.points, 1) trackframe+100]), status.cpoint, 3)>0)
-        allTrackedFrames = find(data.points(max([1 trackframe-100]):min([size(data.points, 1) trackframe+100]), status.cpoint, 3)>0);
-        [~, i] = min(abs(allTrackedFrames-trackframe));
-        lastPoint = data.points(allTrackedFrames(i), status.cpoint, 1:2);
-        lastPointType = 'nearby';
-    else
-        warndlg('Invalid last point. Please start the autotracking only after manually tracking the object at least once within 100 frames of the starting frame.')
-        cancelled = true;
-        break;
-    end     
-    
-    %% TODO: Buffer frames
-    
-    % load ref1
-    ref1 = nested_loadframe(trackframe-refstep);
-
-    % load ref2     
-    if strcmp(autopara.refMethod, 'double')
-        ref2 = nested_loadframe(trackframe+refstep);
-    else
-        ref2 = [];
-    end
-    
-    % load image
-    im = nested_loadframe(trackframe);
-    
-    nested_purgebuffer([trackframe-refstep trackframe+refstep])
-    
-    % calculate centroids
-    [res, diag] = holo_autotrack_detect(im, ref1, ref2, autopara, para.holo, lastPoint, lastPointType);
-    switch res.message
-        case ''
-            data.points(trackframe, autopara.pointnr, 1:2)  = res.centroid;
-            data.points(trackframe, autopara.pointnr, 3)    = 42; % DEF: 42 means autotracked point
-        case 'Invalid lastPoint'
-            warndlg('Autotracking has lost the object for too many frames to continue. This is often due to the tracked object approaching the boundaries of the trackable area. Switch to interference mode and forward the video until you can find the object again. Then, manually track one point and press CTRL+D (CMD+D) to continue tracking.')
+    try
+        %% find where this point was last tracked
+        refstep = autopara.refstep;
+        if trackframe-refstep>0 && data.points(trackframe-refstep, status.cpoint, 3)>0
+            lastPoint = data.points(trackframe-refstep, status.cpoint, 1:2);
+            lastPointType = 'lastframe';
+        elseif data.points(trackframe, status.cpoint, 3)>0
+            lastPoint = data.points(trackframe, status.cpoint, 1:2);
+            lastPointType = 'prediction';
+        elseif size(data.points, 1)>=trackframe+refstep && data.points(trackframe+refstep, status.cpoint, 3)>0
+            lastPoint = data.points(trackframe+refstep, status.cpoint, 1:2);
+            lastPointType = 'nextframe';
+        elseif any(data.points(max([1 trackframe-100]):min([size(data.points, 1) trackframe+100]), status.cpoint, 3)>0)
+            allTrackedFrames = find(data.points(max([1 trackframe-100]):min([size(data.points, 1) trackframe+100]), status.cpoint, 3)>0);
+            [~, i] = min(abs(allTrackedFrames-trackframe));
+            lastPoint = data.points(allTrackedFrames(i), status.cpoint, 1:2);
+            lastPointType = 'nearby';
+        else
+            warndlg('Invalid last point. Please start the autotracking only after manually tracking the object at least once within 100 frames of the starting frame.')
             cancelled = true;
             break;
-        otherwise
-            data.points(trackframe, autopara.pointnr, 1:2)  = [nan nan];
-            data.points(trackframe, autopara.pointnr, 3)    = 43; % DEF: 43 means autotracked point, no point found
-            continue
-    end
+        end     
 
-    % plot
-    if autopara.showim
-        status.framenr    = trackframe;
-        [~, status, para] = dtrack_action(gui, status, para, data, 'redraw');
-    end
-    if autopara.showdiag
-        diag.fnr = trackframe;
-        diag.pnr = autopara.pointnr;
-        holo_autotrack_plotdiag(diag, gui.diag.ah);   
-    end
-%     set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(trackframe), '/', num2str(status.nFrames)]); % takes an extra 1 second per 100 frames
-    if mod((trackframe-autopara.from)/autopara.step, 10)==0
-        waitbar((trackframe-autopara.from+1)/(autopara.to-autopara.from+1), autowbh);
+        %% Buffer frames
+
+        % load ref1
+        ref1 = nested_loadframe(trackframe-refstep);
+
+        % load ref2     
+        if strcmp(autopara.refMethod, 'double')
+            ref2 = nested_loadframe(trackframe+refstep);
+        else
+            ref2 = [];
+        end
+
+        % load image
+        im = nested_loadframe(trackframe);
+
+        nested_purgebuffer([trackframe-refstep trackframe+refstep])
+
+        % calculate centroids
+        [res, diag] = holo_autotrack_detect(im, ref1, ref2, autopara, para.holo, lastPoint, lastPointType);
+        switch res.message
+            case ''
+                data.points(trackframe, autopara.pointnr, 1:2)  = res.centroid;
+                data.points(trackframe, autopara.pointnr, 3)    = 42; % DEF: 42 means autotracked point
+            case 'Invalid lastPoint'
+                warndlg('Autotracking has lost the object for too many frames to continue. This is often due to the tracked object approaching the boundaries of the trackable area. Switch to interference mode and forward the video until you can find the object again. Then, manually track one point and press CTRL+D (CMD+D) to continue tracking.')
+                cancelled = true;
+                break;
+            otherwise
+                data.points(trackframe, autopara.pointnr, 1:2)  = [nan nan];
+                data.points(trackframe, autopara.pointnr, 3)    = 43; % DEF: 43 means autotracked point, no point found
+                continue
+        end
+
+        % plot
+        if autopara.showim
+            status.framenr    = trackframe;
+            [~, status, para] = dtrack_action(gui, status, para, data, 'redraw');
+        end
+        if autopara.showdiag
+            diag.fnr = trackframe;
+            diag.pnr = autopara.pointnr;
+            holo_autotrack_plotdiag(diag, gui.diag.ah);   
+        end
+    %     set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(trackframe), '/', num2str(status.nFrames)]); % takes an extra 1 second per 100 frames
+        if mod((trackframe-autopara.from)/autopara.step, 10)==0
+            waitbar((trackframe-autopara.from+1)/(autopara.to-autopara.from+1), autowbh);
+        end
+    catch me
+        warndlg(sprintf('Autotracking stopped with a %s error: %s.', me.identifier, me.message))
+        cancelled = true;
+        break;
     end
 end
 
