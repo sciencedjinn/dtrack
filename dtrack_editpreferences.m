@@ -189,9 +189,9 @@ function sub_callback(src, varargin)
         case 'editpref_defaultz'
             temp = str2double(get(src, 'string'));
             if ~isnan(temp)
-                para.gui.defaultz = temp;
+                para.defaultz = temp;
             else
-                set(src, 'string', num2str(para.gui.defaultz));
+                set(src, 'string', num2str(para.defaultz));
                 errordlg('Invalid entry', 'Invalid entry', 'modal');
             end
             
