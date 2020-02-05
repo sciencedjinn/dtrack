@@ -34,7 +34,7 @@ diag.para = [];
 diag.images = [];
 
 %% Check inputs
-if isempty(lastPoint) || any(isnan(lastPoint(1:2))) || any(lastPoint(1:2)<=0) || lastPoint(1)/holopara.mag>size(im, 1) || lastPoint(2)/holopara.mag>size(im, 2)
+if isempty(lastPoint) || any(isnan(lastPoint(1:2))) || any(lastPoint(1:2)<=0) || lastPoint(1)/holopara.mag>size(im, 2) || lastPoint(2)/holopara.mag>size(im, 1)
     % If no position estimate or an invalid estimate is given, tracking is not available. 
     % The calling function should ask for a valid estimate from the user.
     res.message = 'Invalid lastPoint';
