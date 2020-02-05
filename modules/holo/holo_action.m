@@ -147,6 +147,8 @@ switch(action)
             sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
             xyz = squeeze(data.points(sel, p, [1:2 4]));
             xyz(:, 1:2) = xyz(:, 1:2)*para.holo.pix_um; % um
+            untracked_z = xyz(:, 3)==0;
+            xyz(untracked_z, :) = para.defaultz;
             f{p} = find(sel);
             line(xyz(:, 1), xyz(:, 2), xyz(:, 3), 'marker', '.', 'linestyle', '-', 'color', para.ls.p{p}.col, 'tag', num2str(p))
         end
