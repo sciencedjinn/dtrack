@@ -274,5 +274,5 @@ for i = 1:length(types)
 end
 
 %% set defaults and visibility
-dtrack_gui_setdefaults(para, gui);
+dtrack_gui_setdefaults(gui, status, para)
 dtrack_guivisibility(gui, para, status);

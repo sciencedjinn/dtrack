@@ -18,17 +18,7 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
         gui.infoarea.holo.entries.holo_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.5 0 .25 1], 'cdata', gui.icons.holo_mode, 'tooltip', 'Show processed hologram');
         gui.icons.holo_mag_mode = imread(fullfile(iconpath, 'holo_mag.tif'));
         gui.infoarea.holo.entries.holo_mag_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.75 0 .25 1], 'cdata', gui.icons.holo_mag_mode, 'tooltip', 'Show processed hologram with enhanced area around selected object');
-        switch status.holo.image_mode
-            case 'camera'
-                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.camera_mode);
-            case 'interference'
-                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.interference_mode);
-            case 'holo'
-                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mode);
-            case 'holo_mag'
-                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mag_mode);
-        end
-        
+                
     gui.infoarea.holo.ref_mode_panel = uibuttongroup(gui.infoarea.holo.tab, 'position', [.57 .66 .15 .33]); 
         gui.icons.holo_ref_single = imread(fullfile(iconpath, 'holo_ref_single.tif'));
         gui.infoarea.holo.entries.holo_ref_single = uicontrol(gui.infoarea.holo.ref_mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0 0 .5 1], 'cdata', gui.icons.holo_ref_single, 'tooltip', 'Use only last frame as reference');
