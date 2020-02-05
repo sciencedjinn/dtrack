@@ -49,30 +49,35 @@ switch(action)
     case {'camera_mode', 'holo_mode', 'interference_mode', 'holo_mag_mode'} %status.show_holo
         status.holo.image_mode = action(1:end-5);
         dtrack_guivisibility(gui, para, status);
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 2;
         saveNeeded = 0;
-        case 'holo_ref_single'
+    case 'holo_ref_single'
         para.ref.use = 'dynamic';
         dtrack_guivisibility(gui, para, status)
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;
     case 'holo_ref_double'
         para.ref.use = 'double_dynamic';
         dtrack_guivisibility(gui, para, status)
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;
     case 'holo_mean_z_mode'
         status.holo.z_mode = 'mean';
         holo_guivisibility(gui, status, para, data)
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;
     case 'holo_single_z_mode'
         status.holo.z_mode = 'single';
         holo_guivisibility(gui, status, para, data)
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;

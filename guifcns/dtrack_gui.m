@@ -47,9 +47,9 @@ gui.infoarea.points.tab = uitab(gui.infoarea.points.tabgroup, 'title', 'Objects'
         end
 
     gui.infoarea.autoforw.panel = uibuttongroup(gui.infoarea.points.tab, 'position', [.8 .5 .2 .5], 'tag', 'autoforwpanel'); 
-        gui.icons.autoforw_1=imread(fullfile(iconpath, 'autoforw_1.tif'));
+        gui.icons.autoforw_1 = imread(fullfile(iconpath, 'autoforw_1.tif'));
         gui.infoarea.autoforw.entries.autoforw_1 = uicontrol(gui.infoarea.autoforw.panel, 'units', 'normalized', 'style', 'togglebutton', 'position', [0 0 .5 1], 'cdata', gui.icons.autoforw_1, 'tooltipstring', 'Automatically forward 1 frame after leftclick'); 
-        gui.icons.autoforw_x=imread(fullfile(iconpath, 'autoforw_x.tif'));
+        gui.icons.autoforw_x = imread(fullfile(iconpath, 'autoforw_x.tif'));
         gui.infoarea.autoforw.entries.autoforw_x = uicontrol(gui.infoarea.autoforw.panel, 'units', 'normalized', 'style', 'togglebutton', 'position', [.5 0 .5 1], 'cdata', gui.icons.autoforw_x, 'tooltipstring', 'Automatically forward x frames after leftclick'); 
 
     gui.infoarea.pointsel.panel = uibuttongroup(gui.infoarea.points.tab, 'position', [0 0 .8 .5], 'tag', 'pointselpanel', 'selectionchangefcn', status.maincb); 
