@@ -19,7 +19,7 @@ function holo_autotrack_plotdiag(diag, ah)
     colormap('gray')
 
     imagesc(diag.images{2}, 'parent', ah(2));
-    text(s2/2, s1, sprintf('thresholded d-frame (%.2f)', diag.para.greythr), 'horizontalalignment', 'center', 'verticalalignment', 'bottom', 'color', 'r', 'parent', ah(2));
+    text(s2/2, s1, sprintf('thresholded d-frame (%.2f)', diag.para.greyThr), 'horizontalalignment', 'center', 'verticalalignment', 'bottom', 'color', 'r', 'parent', ah(2));
     colormap('gray')
 
     imagesc(diag.images{3}, 'parent', ah(3));

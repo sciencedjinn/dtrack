@@ -1,4 +1,4 @@
-function [res, diag] = holo_autotrack_detect(im, ref1, ref2, autopara, holopara, lastPoint, lastPointType)
+function [res, diag] = holo_autotrack_detect(im, ref1, ref2, autoPara, holopara, lastPoint, lastPointType)
 % holo_autotrack_detect
 %
 % autopara.roimask, autopara.greythr, autopara.areathr, autopara.method
@@ -44,17 +44,17 @@ else
 end
 
 assert(ismember(lower(lastPointType), {'lastframe', 'nextframe', 'prediction', 'nearby', 'unknown'}));
-assert(ismember(lower(autopara.refMethod), {'single', 'double'}))
-assert(ismember(lower(autopara.findMethod), {'2nd nearest', 'middle of 3', 'largest', 'darkest'}));
-if strcmpi(autopara.findMethod, 'middle of 3'), assert(strcmpi(autopara.refMethod, 'double')); end
+assert(ismember(lower(autoPara.refMethod), {'single', 'double'}))
+assert(ismember(lower(autoPara.findMethod), {'2nd nearest', 'middle of 3', 'largest', 'darkest'}));
+if strcmpi(autoPara.findMethod, 'middle of 3'), assert(strcmpi(autoPara.refMethod, 'double')); end
 assert(isa(im, 'double'))
 assert(isa(ref1, 'double'))
-if strcmpi(autopara.refMethod, 'double'), assert(~isempty(ref2) && isa(ref2, 'double')); end
+if strcmpi(autoPara.refMethod, 'double'), assert(~isempty(ref2) && isa(ref2, 'double')); end
 
 %%
 
 % 1. Calculate difference image
-switch lower(autopara.refMethod)
+switch lower(autoPara.refMethod)
     case 'single'
         iDiff = - im + ref1;
     case 'double'
@@ -91,7 +91,7 @@ fun_box2full = @(p) [p(1) + (x_selection_unmag(1)-1)*holopara.mag + (x_selection
 
 %% Binarise image and detect objects
 % Depending on the algorithm, the number of detected objects must be within a certain range.
-switch lower(autopara.findMethod)
+switch lower(autoPara.findMethod)
     case 'middle of 3'
         nObjRange = [3 3];
     case '2nd nearest'
@@ -101,29 +101,29 @@ switch lower(autopara.findMethod)
 end
 
 % Now find objects, and repeat until within range
-[props, bwImages] = sub_detectObjects(enhancedSectionSelection2, autopara);
+[props, bwImages] = sub_detectObjects(enhancedSectionSelection2, autoPara);
 adjustments = 0;
 maxAdjustments = 3; % Only allow this process to occur a limited number of times per frame
 while length(props)<nObjRange(1) || length(props)>nObjRange(2)
     adjustments = adjustments + 1;
     if length(props)<nObjRange(1)
         if adjustments>maxAdjustments
-            res.message = sprintf('Grey threshold adjusted %d times, up to %.2f; Still not enough objects found (%d)', adjustments-1, autopara.greythr, length(props));
+            res.message = sprintf('Grey threshold adjusted %d times, up to %.2f; Still not enough objects found (%d)', adjustments-1, autoPara.greyThr, length(props));
             return;
         end
         % More objects needed, relax thresholds
         % NOTE: Currently, only the grey threshold is adjusted. Area threshold could also be lowered.
-        autopara.greythr = 1.2*autopara.greythr;
-        [props, bwImages] = sub_detectObjects(enhancedSectionSelection2, autopara);
+        autoPara.greyThr = 1.2*autoPara.greyThr;
+        [props, bwImages] = sub_detectObjects(enhancedSectionSelection2, autoPara);
     elseif length(props)>nObjRange(2)
         if adjustments>maxAdjustments
-            res.message = sprintf('Grey threshold adjusted %d times, down to %.2f; Still too many objects found (%d)', adjustments-1, autopara.greythr, length(props));
+            res.message = sprintf('Grey threshold adjusted %d times, down to %.2f; Still too many objects found (%d)', adjustments-1, autoPara.greyThr, length(props));
             return;
         end
         % More objects needed, relax thresholds
         % NOTE: Currently, only the grey threshold is adjusted. Area threshold could also be lowered.
-        autopara.greythr = 0.8*autopara.greythr;
-        [props, bwImages] = sub_detectObjects(enhancedSectionSelection2, autopara);
+        autoPara.greyThr = 0.8*autoPara.greyThr;
+        [props, bwImages] = sub_detectObjects(enhancedSectionSelection2, autoPara);
         
 %         % Alt: Too many objects, select the three largest (doesn't work)
 %         [~, idxs] = sort([props.Area]);
@@ -133,7 +133,7 @@ end
 
 %% Find the correct object
     % Find the best
-    switch lower(autopara.findMethod)
+    switch lower(autoPara.findMethod)
         case 'largest'
             [~, idx] = max([props.Area]);
         case 'darkest'
@@ -157,7 +157,7 @@ end
             [~, i] = min(totaldist);
             idx = idxs(i);
         otherwise
-            error('Internal error: Unknown autotrack method %s', autopara.findMethod);
+            error('Internal error: Unknown autotrack method %s', autoPara.findMethod);
     end
     
     res.centroid = fun_box2full(props(idx).WeightedCentroid);
@@ -165,7 +165,7 @@ end
 
 
 if nargout>=2 % return diagnostics
-    diag.para = autopara;
+    diag.para = autoPara;
     diag.images{1} = enhancedSectionSelection2;
     diag.images{2} = bwImages{1}; 
     diag.images{3} = bwImages{2};
@@ -191,10 +191,10 @@ function [x_section, y_section, cx, cy] = sub_find_section(pos, bx, max_size)
     y_section = round(y_section);
 end
 
-function [props, bwImages] = sub_detectObjects(gsImage, autopara)
-    bwImages{1}  = imbinarize(gsImage, 'adaptive', 'foregroundpolarity', 'dark', 'sensitivity', autopara.greythr);
-    bwImages{2}  = ~bwImages{1}; bwImages{2}(~autopara.roimask) = 0;    % apply RoI
-    bwImages{3}  = bwareaopen(bwImages{2}, autopara.areathr);           % apply area threshold
+function [props, bwImages] = sub_detectObjects(gsImage, autoPara)
+    bwImages{1}  = imbinarize(gsImage, 'adaptive', 'foregroundpolarity', 'dark', 'sensitivity', autoPara.greyThr);
+    bwImages{2}  = ~bwImages{1}; bwImages{2}(~autoPara.roiMask) = 0;    % apply RoI
+    bwImages{3}  = bwareaopen(bwImages{2}, autoPara.areaThr);           % apply area threshold
     
     % find connected regions
     props = regionprops(bwImages{3}, 1-gsImage, 'Area', 'MeanIntensity', 'WeightedCentroid'); % calculate area and centroid for each region

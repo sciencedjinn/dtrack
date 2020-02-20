@@ -1,7 +1,7 @@
 function [imout, h, timeout] = readframe(h, framenr, para, status, justoneframe)
 
 if nargin<5
-    justoneframe=0; %used to load just one frame, e.g. for reference
+    justoneframe = false; %used to load just one frame, e.g. for reference
 end
 
 if para.thermal.isthermal
@@ -26,7 +26,8 @@ else
                 % determine new range and read new chunk
                 x1 = floor((framenr-1)/para.mmreadsize)*para.mmreadsize+1-para.mmreadoverlap;
                 x2 = floor((framenr-1)/para.mmreadsize+1)*(para.mmreadsize)+para.mmreadoverlap;
-                x1 = max([1 x1]); x2=min([status.nFrames x2]);
+                x1 = max([1 x1]); 
+                x2 = min([status.nFrames x2]);
                 h.range = x1:x2;
                 disp(['Reading new frame block from frame ' num2str(x1) ' to frame ', num2str(x2) '.']);
             end
@@ -35,13 +36,6 @@ else
             close(hh);
             h.data = video.frames;
             h.times = video.times;
-    %         %alternative version with continuous waitbar; takes about 3 times as long
-    %         for i=x1:x2
-    %             video = mmread(h.filename, i, [], false, true, '', 1, 1);
-    %             h.data(i-x1+1) = video.frames;
-    %             waitbar((i-x1+1)/(x2-x1+1), hh);
-    %         end
-    %         close(hh);toc
         else
 
         end
