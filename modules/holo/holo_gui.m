@@ -3,7 +3,8 @@ function [gui, status, para, data] = holo_gui(gui, status, para, data)
 thispath = fileparts(mfilename('fullpath'));
 iconpath = fullfile(thispath, 'icons');
 
-gui.infoarea.holo.tabgroup = uitabgroup(gui.f1, 'position', [.85 .756 .15 .1]); 
+tts = para.gui.tab_title_spacing;
+gui.infoarea.holo.tabgroup = uitabgroup(gui.f1, 'position', [.85 .756-3*tts .15 .1+tts]); 
 gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo settings'); 
 %     uicontrol(gui.infoarea.holo.panel, 'style', 'text', 'units', 'normalized', 'position', [.01 .82 .30 .17], 'string', 'HOLO z-distance (mm)')%, 'verticalalignment', 'center');
     
@@ -17,17 +18,7 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
         gui.infoarea.holo.entries.holo_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.5 0 .25 1], 'cdata', gui.icons.holo_mode, 'tooltip', 'Show processed hologram');
         gui.icons.holo_mag_mode = imread(fullfile(iconpath, 'holo_mag.tif'));
         gui.infoarea.holo.entries.holo_mag_mode = uicontrol(gui.infoarea.holo.mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [.75 0 .25 1], 'cdata', gui.icons.holo_mag_mode, 'tooltip', 'Show processed hologram with enhanced area around selected object');
-        switch status.holo.image_mode
-            case 'camera'
-                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.camera_mode);
-            case 'interference'
-                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.interference_mode);
-            case 'holo'
-                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mode);
-            case 'holo_mag'
-                set(gui.infoarea.holo.mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mag_mode);
-        end
-        
+                
     gui.infoarea.holo.ref_mode_panel = uibuttongroup(gui.infoarea.holo.tab, 'position', [.57 .66 .15 .33]); 
         gui.icons.holo_ref_single = imread(fullfile(iconpath, 'holo_ref_single.tif'));
         gui.infoarea.holo.entries.holo_ref_single = uicontrol(gui.infoarea.holo.ref_mode_panel, 'style', 'togglebutton', 'units', 'normalized', 'position', [0 0 .5 1], 'cdata', gui.icons.holo_ref_single, 'tooltip', 'Use only last frame as reference');
@@ -62,7 +53,7 @@ gui.infoarea.holo.tab = uitab(gui.infoarea.holo.tabgroup, 'title', 'Holo setting
         gui.infoarea.holo.entries.holo_findZ_local     = uicontrol(gui.infoarea.holo.z_panel, 'style', 'pushbutton', 'units', 'normalized', 'position', [.85 0 .15 .5], 'string', 'Z local', 'tooltipstring', 'Auto-detect z-position of current object, but only near closeby points');
 
 %% Diagnostics panel
-gui.diag.tabgroup = uitabgroup(gui.f1, 'position', [.85 .504 .15 .25]); 
+gui.diag.tabgroup = uitabgroup(gui.f1, 'position', [.85 .504-4*tts .15 .25+tts]); 
 gui.diag.tab = uitab(gui.diag.tabgroup, 'title', 'Diagnostics'); 
     gui.diag.ph(1) = uipanel('parent', gui.diag.tab, 'units', 'normalized', 'position', [0 .5 .5 .5]);
     gui.diag.ph(2) = uipanel('parent', gui.diag.tab, 'units', 'normalized', 'position', [.5 .5 .5 .5]);
@@ -88,7 +79,7 @@ gui.menus.holo.menu = uimenu(gui.f1, 'label', 'Holo');
     gui.menus.holo.entries.holo_plot_track_2d = uimenu(gui.menus.holo.menu, 'label', 'Plot 2D tracks');
     gui.menus.holo.entries.holo_plot_track_3d = uimenu(gui.menus.holo.menu, 'label', 'Plot 3D tracks');
         
-%% Help manu
+%% Help menu
 gui.menus.help.entries.holo_help_gettingstarted = uimenu(gui.menus.help.menu, 'label', 'Getting started with HOLO', 'separator', 'on');
     
     

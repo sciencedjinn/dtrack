@@ -40,6 +40,13 @@ para.gui.infopanel_points   = true;
 para.gui.infopanel_mani     = true;
 para.gui.minimap            = true;
 
+switch computer
+    case {'MACI', 'MACI64'}
+        para.gui.tab_title_spacing = 0.02;
+    otherwise
+        para.gui.tab_title_spacing = 0;
+end
+
 %%
 para.im.roi                 = false;
 para.im.manicheck           = false;   
@@ -58,6 +65,8 @@ para.mmreadoverlap          = 20;
 para.forceaspectratio       = [];
 para.saveneeded             = 0;
 para.autosavethresh         = 10;
+
+para.defaultz               = 100; % Default z position for plotting of 3D points (holo module)
 
 %% point marker style and colours (can be changed using the colourgui button)
 para.ls.p{1}.col  = [0 0 1];    para.ls.p{1}.shape  = 'o';    para.ls.p{1}.size  = 10; para.ls.p{1}.width  = 1.5;

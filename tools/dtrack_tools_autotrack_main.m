@@ -88,7 +88,7 @@ for trackframe=autopara.from:autopara.step:autopara.to
     [centroid, stats(status.framenr)] = dtrack_tools_autotrack_detect(status.autoref, status.currim_ori, roimask, autopara.greythresh, autopara.areathresh, autopara.method, lastpoint);
     if isnan(stats(status.framenr)) % no large enough area was found
         data.points(status.framenr, autopara.pointnr, 1:2)  = [0 0];
-        data.points(status.framenr, autopara.pointnr, 3)    = 43; % DEF: 43 means autotracked point, no point found
+        data.points(status.framenr, autopara.pointnr, 3)    = -43; % DEF: -43 means autotracked point, no point found
         lastpoint = nan;
     else
         data.points(status.framenr, autopara.pointnr, 1:2)  = centroid;

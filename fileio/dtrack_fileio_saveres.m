@@ -83,7 +83,12 @@ if stat
             case 4 % happens for modules, e.g. HOLO
                 zdata = sparse(data.points(:, :, 4));
                 data.points = [];
-                save(savepath, 'para', 'status', 'data', 'convert', 'xdata', 'ydata', 'tdata', 'zdata', '-mat');                
+                save(savepath, 'para', 'status', 'data', 'convert', 'xdata', 'ydata', 'tdata', 'zdata', '-mat');   
+            case 5 % happens for modules, e.g. HOLO
+                zdata = sparse(data.points(:, :, 4));
+                adata = sparse(data.points(:, :, 5));
+                data.points = [];
+                save(savepath, 'para', 'status', 'data', 'convert', 'xdata', 'ydata', 'tdata', 'zdata', 'adata', '-mat');                   
             otherwise
                 error('Internal error: data.points is too large')
         end

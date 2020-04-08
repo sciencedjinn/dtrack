@@ -49,30 +49,35 @@ switch(action)
     case {'camera_mode', 'holo_mode', 'interference_mode', 'holo_mag_mode'} %status.show_holo
         status.holo.image_mode = action(1:end-5);
         dtrack_guivisibility(gui, para, status);
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 2;
         saveNeeded = 0;
-        case 'holo_ref_single'
+    case 'holo_ref_single'
         para.ref.use = 'dynamic';
-        dtrack_guivisibility(gui, para, status)
+        set(gui.infoarea.holo.ref_mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_ref_single);
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;
     case 'holo_ref_double'
         para.ref.use = 'double_dynamic';
-        dtrack_guivisibility(gui, para, status)
+        set(gui.infoarea.holo.ref_mode_panel, 'selectedobject', gui.infoarea.holo.entries.holo_ref_double);
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;
     case 'holo_mean_z_mode'
         status.holo.z_mode = 'mean';
-        holo_guivisibility(gui, status, para, data)
+        set(gui.infoarea.holo.z_depth_panel, 'selectedobject', gui.infoarea.holo.entries.holo_mean_z_mode);
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;
     case 'holo_single_z_mode'
         status.holo.z_mode = 'single';
-        holo_guivisibility(gui, status, para, data)
+        set(gui.infoarea.holo.z_depth_panel, 'selectedobject', gui.infoarea.holo.entries.holo_single_z_mode);
+        dtrack_gui_updateTogglegroupIcons(gcbo, gui)
         returnfocus;
         redraw = 1; 
         saveNeeded = 1/2;
@@ -147,6 +152,8 @@ switch(action)
             sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
             xyz = squeeze(data.points(sel, p, [1:2 4]));
             xyz(:, 1:2) = xyz(:, 1:2)*para.holo.pix_um; % um
+            untracked_z = xyz(:, 3)==0;
+            xyz(untracked_z, :) = para.defaultz;
             f{p} = find(sel);
             line(xyz(:, 1), xyz(:, 2), xyz(:, 3), 'marker', '.', 'linestyle', '-', 'color', para.ls.p{p}.col, 'tag', num2str(p))
         end

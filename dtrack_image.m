@@ -41,11 +41,11 @@ if ismember(redraw, [1 3 30 31]) % new frame actions
     [status.currim_ori, status.mh, status.timestamp] = readframe(status.mh, status.framenr, para, status); % this timestamp seems to start at 0, as well. So it's no use.
     
     % deinterlace
-   if ~isempty(gui) && strcmp(get(gui.controls.navi.entries.deinterlace, 'State'), 'on') % TODO: This should get an entry in para, which should be remembered between sessions
-       hfm = repmat(rot90([0, 1]), status.vidHeight/2, status.vidWidth);
-       output = cat(3, hfm, hfm, hfm);
-       status.currim_ori = imresize(reshape(status.currim_ori(output>0), [], status.vidWidth, 3), [status.vidHeight status.vidWidth]);
-   end
+    if ~isempty(gui) && strcmp(get(gui.controls.navi.entries.deinterlace, 'State'), 'on') % TODO: This should get an entry in para, which should be remembered between sessions
+        hfm = repmat(rot90([0, 1]), status.vidHeight/2, status.vidWidth);
+        output = cat(3, hfm, hfm, hfm);
+        status.currim_ori = imresize(reshape(status.currim_ori(output>0), [], status.vidWidth, 3), [status.vidHeight status.vidWidth]);
+    end
 end
 
 %% image manipulation

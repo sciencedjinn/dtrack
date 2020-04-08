@@ -1,4 +1,4 @@
-function [success, autopara] = holo_autotrack_select(status, para, data, continueMode)
+function [success, autoPara] = holo_autotrack_select(status, para, data, continueMode)
 % holo_autotrack_select opens a dialog to select parameters for autotracking
 % Call: [success, autopara] = dtrack_tools_autotrack_select(status, para)
 %
@@ -10,28 +10,28 @@ function [success, autopara] = holo_autotrack_select(status, para, data, continu
 if nargin<4, continueMode = false; end % continueMode just loads the last sessions settings, and continues tracking from the current frame
 
 if continueMode
-    autopara      = [];
+    autoPara      = [];
     sub_load('lastSession');
-    autopara.from = status.framenr;
-    autopara.to   = status.nFrames;
+    autoPara.from = status.framenr;
+    autoPara.to   = status.nFrames;
     success       = true;
     return
 end
     
 %% init parameters
 gui          = [];
-autopara     = [];
+autoPara     = [];
 prevpara     = [];
 success      = false;
 editcb       = @sub_callback;
 
 % load last session's parameters, and change the ones that depend on this dataset
 sub_load('lastSession');
-autopara.from    = status.framenr;
-autopara.to      = status.nFrames;
-autopara.pointnr = status.cpoint;
+autoPara.from    = status.framenr;
+autoPara.to      = status.nFrames;
+autoPara.pointNr = status.cpoint;
 if isempty(status.roi)
-    autopara.useroi = 0;
+    autoPara.useROI = 0;
 end
 sub_saveLastSession;
 
@@ -59,7 +59,6 @@ end
 
 
 
-
 %% General callback: Updates autopara, and applies limits to all parameters
 function sub_callback(src, varargin)
     switch get(src, 'tag')
@@ -70,45 +69,48 @@ function sub_callback(src, varargin)
             sub_limit_fnrs('to', 0);
         case 'autotrack_step'
             sub_limit_fnrs('step', 0);
-        case 'autotrack_refstep'
+        case 'autotrack_refStep'
             sub_limit_fnrs('refstep', 0);
             sub_limit_fnrs('all');
             sub_updatePreview('im');         
             
-        case 'autotrack_pointnr'
-            autopara.pointnr = get(src, 'value');
+        case 'autotrack_pointNr'
+            autoPara.pointNr = get(src, 'value') - 1;
             sub_updatePreview('im');
             
-        case 'autotrack_areathr'
-            autopara.areathr = str2double(get(src, 'string'));
+        case 'autotrack_areaThr'
+            autoPara.areaThr = str2double(get(src, 'string'));
             sub_updatePreview('area');
             
-        case 'autotrack_greythr'
-            autopara.greythr = str2double(get(src, 'string'));
+        case 'autotrack_greyThr'
+            autoPara.greyThr = str2double(get(src, 'string'));
             sub_updatePreview('grey');
             
         case 'autotrack_findMethod'
             strings = get(src, 'string');
-            autopara.findMethod = strings{get(src, 'Value')};
+            autoPara.findMethod = strings{get(src, 'Value')};
             sub_limit_fnrs('all');
             sub_updatePreview('findMethod');
             
         case 'autotrack_refMethod'
             strings = get(src, 'string');
-            autopara.refMethod = strings{get(src, 'Value')};
+            autoPara.refMethod = strings{get(src, 'Value')};
             sub_limit_fnrs('all');
             sub_updatePreview('refMethod');
             
         case 'autotrack_para4'
             
-        case 'autotrack_showim'
-            autopara.showim = get(src, 'value');
-            
-        case 'autotrack_showdiag'
-            autopara.showdiag = get(src, 'value');
-            
-        case 'autotrack_useroi'
-            autopara.useroi = get(src, 'value');
+        case 'autotrack_showIm'
+            autoPara.showIm = get(src, 'value');
+        case 'autotrack_showDiag'
+            autoPara.showDiag = get(src, 'value');
+        case 'autotrack_overwritePoints'
+            autoPara.overwritePoints = get(src, 'value');
+        case 'autotrack_skipGaps'
+            autoPara.skipGaps = get(src, 'value');
+
+        case 'autotrack_useROI'
+            autoPara.useROI = get(src, 'value');
             sub_updatePreview('roi');
             
         % plus/minus buttons
@@ -126,36 +128,36 @@ function sub_callback(src, varargin)
             sub_limit_fnrs('step', -1);
         case 'autotrack_step_plus'
             sub_limit_fnrs('step', +1);
-        case 'autotrack_refstep_minus'
+        case 'autotrack_refStep_minus'
             sub_limit_fnrs('refstep', -1);
             sub_limit_fnrs('all');
             sub_updatePreview('im');
-        case 'autotrack_refstep_plus'
+        case 'autotrack_refStep_plus'
             sub_limit_fnrs('refstep', +1);
             sub_limit_fnrs('all');
             sub_updatePreview('im');
 
-        case 'autotrack_areathr_minus'
+        case 'autotrack_areaThr_minus'
             newval = str2double(get(gui.panel2.areathr, 'string')) - 1;
-            autopara.areathr = newval;
+            autoPara.areaThr = newval;
             set(gui.panel2.areathr, 'string', num2str(newval));
             sub_updatePreview('area');
             
-        case 'autotrack_areathr_plus'
+        case 'autotrack_areaThr_plus'
             newval = str2double(get(gui.panel2.areathr, 'string')) + 1;
-            autopara.areathr = newval;
+            autoPara.areaThr = newval;
             set(gui.panel2.areathr, 'string', num2str(newval));
             sub_updatePreview('area');
             
-        case 'autotrack_greythr_minus'
+        case 'autotrack_greyThr_minus'
             newval = str2double(get(gui.panel2.greythr, 'string')) - 0.05;
-            autopara.greythr = newval;
+            autoPara.greyThr = newval;
             set(gui.panel2.greythr, 'string', num2str(newval));
             sub_updatePreview('grey');
             
-        case 'autotrack_greythr_plus'
+        case 'autotrack_greyThr_plus'
             newval = str2double(get(gui.panel2.greythr, 'string')) + 0.05;
-            autopara.greythr = newval;
+            autoPara.greyThr = newval;
             set(gui.panel2.greythr, 'string', num2str(newval));
             sub_updatePreview('grey');
             
@@ -201,7 +203,7 @@ function sub_updatePreview(type)
         
         % load ref2
         if ismember(type, {'all', 'im', 'findMethod', 'refMethod'})            
-            if strcmp(autopara.refMethod, 'double')
+            if strcmp(autoPara.refMethod, 'double')
                 status.framenr  = framenr + refstep;
                 [~, status]     = dtrack_action([], status, para, data, 'loadonly');
                 image3d         = double(status.currim_ori);
@@ -229,10 +231,10 @@ function sub_updatePreview(type)
         end
         
         if ismember(type, {'all', 'grey', 'area', 'findMethod', 'refMethod'})
-            prevpara.greythr    = autopara.greythr;
-            prevpara.areathr    = autopara.areathr;
-            prevpara.findMethod = autopara.findMethod;
-            prevpara.refMethod = autopara.refMethod;
+            prevpara.greythr    = autoPara.greyThr;
+            prevpara.areathr    = autoPara.areaThr;
+            prevpara.findMethod = autoPara.findMethod;
+            prevpara.refMethod = autoPara.refMethod;
         end
         
         % find where this point was last tracked
@@ -301,24 +303,27 @@ function sub_createGui
                             uicontrol(gui.panel1.panel, opts{:}, 'position', [.05 .45 .5 .08], 'style', 'text', 'string', 'every', 'horizontalalignment', 'right');
     gui.panel1.step       = sub_plusminustext(gui.panel1.panel, [.68 .45 .2 .1], 'autotrack_step', 0.08, 'How many frames to jump after each tracked frame');
                             uicontrol(gui.panel1.panel, opts{:}, 'position', [.05 .3 .5 .08], 'style', 'text', 'string', 'ref interval', 'horizontalalignment', 'right');
-    gui.panel1.refstep    = sub_plusminustext(gui.panel1.panel, [.68 .3 .2 .1], 'autotrack_refstep', 0.08, 'Distance (in frames) between a frame and its reference frame(s)');
+    gui.panel1.refstep    = sub_plusminustext(gui.panel1.panel, [.68 .3 .2 .1], 'autotrack_refStep', 0.08, 'Distance (in frames) between a frame and its reference frame(s)');
                             uicontrol(gui.panel1.panel, opts{:}, 'position', [.05 .15 .5 .08], 'style', 'text', 'string', 'Tracked point', 'horizontalalignment', 'right');
-    gui.panel1.pointnr    = uicontrol(gui.panel1.panel, opts{:}, 'position', [.68 .15 .2 .1], 'style', 'popupmenu', 'string', num2str((1:para.pnr)'), 'horizontalalignment', 'center', 'tag', 'autotrack_pointnr');
+    gui.panel1.pointnr    = uicontrol(gui.panel1.panel, opts{:}, 'position', [.68 .15 .2 .1], 'style', 'popupmenu', 'string', [{'all'}; cellstr(num2str((1:15)'))], 'horizontalalignment', 'center', 'tag', 'autotrack_pointNr');
 
 %% panel 2
-    gui.panel2.useroi     = uicontrol(gui.panel2.panel, opts{:}, 'position', [.03 .55 .35 .1], 'style', 'checkbox', 'string', 'Use ROI', 'value', 0, 'tag', 'autotrack_useroi');
-    gui.panel2.showim     = uicontrol(gui.panel2.panel, opts{:}, 'position', [.53 .55 .35 .1], 'style', 'checkbox', 'string', 'Show tracking', 'value', 0, 'tag', 'autotrack_showim', 'tooltipstring', 'Display the tracked points while they are calculated. This takes at least 3x longer!');
-    gui.panel2.showdiag   = uicontrol(gui.panel2.panel, opts{:}, 'position', [.53 .45 .35 .1], 'style', 'checkbox', 'string', 'Show diagnostics', 'value', 0, 'tag', 'autotrack_showdiag', 'tooltipstring', 'Display diagnostic plots during tracking. This increases tracking time by about 50-100%!');
+    gui.panel2.overwritePoints  = uicontrol(gui.panel2.panel, opts{:}, 'position', [.03 .7 .35 .1], 'style', 'checkbox', 'string', 'Overwrite tracked points', 'value', 0, 'tag', 'autotrack_overwritePoints', 'tooltipstring', 'Overwrite already tracked points');
+    gui.panel2.skipGaps         = uicontrol(gui.panel2.panel, opts{:}, 'position', [.53 .7 .35 .1], 'style', 'checkbox', 'string', 'Skip gaps', 'value', 0, 'tag', 'autotrack_skipGaps', 'tooltipstring', 'Skip to next pre-tracked point when object is lost');
+
+    gui.panel2.useroi           = uicontrol(gui.panel2.panel, opts{:}, 'position', [.03 .55 .35 .1], 'style', 'checkbox', 'string', 'Use ROI', 'value', 0, 'tag', 'autotrack_useROI');
+    gui.panel2.showim           = uicontrol(gui.panel2.panel, opts{:}, 'position', [.53 .55 .35 .1], 'style', 'checkbox', 'string', 'Show tracking', 'value', 0, 'tag', 'autotrack_showIm', 'tooltipstring', 'Display the tracked points while they are calculated. This takes at least 3x longer!');
+    gui.panel2.showdiag         = uicontrol(gui.panel2.panel, opts{:}, 'position', [.53 .45 .35 .1], 'style', 'checkbox', 'string', 'Show diagnostics', 'value', 0, 'tag', 'autotrack_showDiag', 'tooltipstring', 'Display diagnostic plots during tracking. This increases tracking time by about 50-100%!');
     %                         uicontrol(gui.panel2.panel, opts{:}, 'position', [.07 .55 .31 .1], 'style', 'text', 'string', 'Reference frame', 'horizontalalignment', 'left');
     % gui.panel2.ref        = uicontrol(gui.panel2.panel, opts{:}, 'position', [.07 .45 .69 .1], 'style', 'edit', 'tag', 'autotrack_ref', 'horizontalalignment', 'right');
     %                         uicontrol(gui.panel2.panel, opts{:}, 'position', [.78 .45 .15 .1], 'style', 'pushbutton', 'string', 'Use Ref', 'tag', 'autotrack_useref');
     
                             uicontrol(gui.panel2.panel, opts{:}, 'position', [.03 .21 .31 .08], 'style', 'text', 'string', 'Area threshold', 'horizontalalignment', 'left');
-    gui.panel2.areathr = sub_plusminustext(gui.panel2.panel, [.3 .21 .13 .1], 'autotrack_areathr', 0.04);
+    gui.panel2.areathr    = sub_plusminustext(gui.panel2.panel, [.3 .21 .13 .1], 'autotrack_areaThr', 0.04);
                             set(gui.panel2.areathr, 'tooltipstring', 'Smallest area (in square pixels) that will be accepted as a trackable object.');
                             
                             uicontrol(gui.panel2.panel, opts{:}, 'position', [.53 .21 .31 .08], 'style', 'text', 'string', 'Grey threshold', 'horizontalalignment', 'left', 'enable', 'on');
-    gui.panel2.greythr = sub_plusminustext(gui.panel2.panel, [.8 .21 .13 .1], 'autotrack_greythr', 0.04);
+    gui.panel2.greythr    = sub_plusminustext(gui.panel2.panel, [.8 .21 .13 .1], 'autotrack_greyThr', 0.04);
                             set(gui.panel2.greythr, 'tooltipstring', 'Grey threshold (0-1). The lower this value, the more different an object has to be from the background to be detected.');
                             
                             uicontrol(gui.panel2.panel, opts{:}, 'position', [.03 .06 .31 .08], 'style', 'text', 'string', 'Ref frame', 'horizontalalignment', 'left', 'enable', 'on');
@@ -355,49 +360,59 @@ end
 
 %% Defaults
     function sub_load(type)
-        defaults.from       = 1;
-        defaults.to         = status.nFrames;
-        defaults.step       = 1;
-        defaults.refstep    = para.ref.frameDiff;
-        defaults.pointnr    = status.cpoint;
-        defaults.useroi     = 1;
-        defaults.showim     = 1;
-        defaults.showdiag   = 1;
-        defaults.areathr = 3;
-        defaults.greythr = 0.5;
-        defaults.refMethod  = 'double';
-        defaults.findMethod = 'darkest';
-        defaults.para4      = NaN;
+        defaults.from               = 1;
+        defaults.to                 = status.nFrames;
+        defaults.step               = 1;
+        defaults.refStep            = para.ref.frameDiff;
+        defaults.pointNr            = status.cpoint;
+        defaults.useROI             = 1;
+        defaults.showIm             = 1;
+        defaults.showDiag           = 1;
+        defaults.areaThr            = 3;
+        defaults.greyThr            = 0.5;
+        defaults.refMethod          = 'double';
+        defaults.findMethod         = 'darkest';
+        defaults.para4              = NaN;
+        defaults.overwritePoints    = false;
+        defaults.skipGaps           = true;
         
         switch type
             case 'lastSession'
                 if exist(fullfile(prefdir, 'holo_autopara_bgs_current.dtp'), 'file')
-                    temp = load(fullfile(prefdir, 'holo_autopara_bgs_current.dtp'), 'autopara', '-mat');
-                    autopara = dtrack_support_compstruct(temp.autopara, defaults);
+                    temp = load(fullfile(prefdir, 'holo_autopara_bgs_current.dtp'), 'autoPara', '-mat');
+                    if isfield(temp, 'autoPara')
+                        autoPara = dtrack_support_compstruct(temp.autoPara, defaults);
+                    else
+                        autoPara = defaults;
+                    end
                 else
-                    autopara = defaults;
+                    autoPara = defaults;
                 end
             case 'savedDefaults'
                 if exist(fullfile(prefdir, 'holo_autopara_bgs.dtp'), 'file')
                     temp = load(fullfile(prefdir, 'holo_autopara_bgs.dtp'), 'autopara', '-mat');
-                    autopara = dtrack_support_compstruct(temp.autopara, defaults);
+                    if isfield(temp, 'autoPara')
+                        autoPara = dtrack_support_compstruct(temp.autoPara, defaults);
+                    else
+                        autoPara = defaults;
+                    end
                 else
-                    autopara = defaults;
+                    autoPara = defaults;
                 end
             case 'defaults'
-                autopara = defaults;
+                autoPara = defaults;
             otherwise
                 error('Unknown type');
         end
     end
 
     function sub_saveDefaults
-        save(fullfile(prefdir, 'holo_autopara_bgs.dtp'), 'autopara', '-mat');
+        save(fullfile(prefdir, 'holo_autopara_bgs.dtp'), 'autoPara', '-mat');
         disp('Autotracking parameters saved to preferences directory.');
     end
 
     function sub_saveLastSession
-        save(fullfile(prefdir, 'holo_autopara_bgs_current.dtp'), 'autopara', '-mat');
+        save(fullfile(prefdir, 'holo_autopara_bgs_current.dtp'), 'autoPara', '-mat');
         disp('Current parameters saved to preferences directory.');
     end
 
@@ -435,7 +450,7 @@ end
 
     function buttonCallback_cancel(varargin)
         % CANCEL: cancel button callback finishes execution
-        autopara = [];
+        autoPara = [];
         success  = false;
         if isfield(gui, 'prev') && isfield(gui.prev, 'fig') && isvalid(gui.prev.fig)
             close(gui.prev.fig);
@@ -456,44 +471,49 @@ end
 %%
     function sub_setDef
         %% set defaults
-        set(gui.panel1.from,    'string', num2str(autopara.from));
-        set(gui.panel1.to,      'string', num2str(autopara.to));
-        set(gui.panel1.step,    'string', num2str(autopara.step));
-        set(gui.panel1.pointnr, 'value',  autopara.pointnr);
-        set(gui.panel1.refstep, 'string', num2str(autopara.refstep));
-        set(gui.panel2.useroi,  'value',  autopara.useroi);
-        set(gui.panel2.showim,  'value',  autopara.showim);   
-        set(gui.panel2.showdiag,'value',  autopara.showdiag);         
-        set(gui.panel2.areathr, 'string', num2str(autopara.areathr));
-        set(gui.panel2.greythr, 'string', num2str(autopara.greythr));
+        set(gui.panel1.from,    'string', num2str(autoPara.from));
+        set(gui.panel1.to,      'string', num2str(autoPara.to));
+        set(gui.panel1.step,    'string', num2str(autoPara.step));
+        set(gui.panel1.pointnr, 'value',  autoPara.pointNr+1);
+        set(gui.panel1.refstep, 'string', num2str(autoPara.refStep));
+        set(gui.panel2.useroi,  'value',  autoPara.useROI);
+        set(gui.panel2.showim,  'value',  autoPara.showIm);   
+        set(gui.panel2.showdiag,'value',  autoPara.showDiag);         
+        set(gui.panel2.areathr, 'string', num2str(autoPara.areaThr));
+        set(gui.panel2.greythr, 'string', num2str(autoPara.greyThr));
         strings = get(gui.panel2.findMethod, 'string');
-        set(gui.panel2.findMethod,  'value', find(strcmp(strings, autopara.findMethod)));
+        set(gui.panel2.findMethod,  'value', find(strcmp(strings, autoPara.findMethod)));
         strings = get(gui.panel2.refMethod, 'string');
-        set(gui.panel2.refMethod,  'value', find(strcmp(strings, autopara.refMethod)));
+        set(gui.panel2.refMethod,  'value', find(strcmp(strings, autoPara.refMethod)));
+        set(gui.panel2.overwritePoints, 'value', autoPara.overwritePoints)
+        set(gui.panel2.skipGaps, 'value', autoPara.skipGaps)
     end % sub_setdef
 
     function sub_limit_fnrs(autotrack_field, offset)
-    if strcmp(autotrack_field, 'all')
-        sub_limit_fnrs('from', 0)
-        sub_limit_fnrs('to', 0)
-        sub_limit_fnrs('step', 0)
-        return
-    end
-    newval = str2double(get(gui.panel1.(autotrack_field), 'string')) + offset;
-    if ismember(autotrack_field, {'refstep', 'step'})
-        limval = min([status.nFrames max([newval 1])]); % limit to possible frame numbers
-    else
-        switch autopara.refMethod
-            case 'single'
-                minval = 1 + autopara.refstep;
-                maxval = status.nFrames;
-            case 'double'
-                minval = 1 + autopara.refstep;
-                maxval = status.nFrames-autopara.refstep;
+        % clamps frame number indicators to within 1 and status.nFrames
+        % autotrack_field can be 'from'/'to'/'step'/'refstep'/'all'
+        if strcmp(autotrack_field, 'all')
+            sub_limit_fnrs('from', 0)
+            sub_limit_fnrs('to', 0)
+            sub_limit_fnrs('step', 0)
+            return
         end
-        limval = min([maxval max([newval minval])]); % limit to possible frame numbers
+        
+        newval = str2double(get(gui.panel1.(autotrack_field), 'string')) + offset;
+        if ismember(autotrack_field, {'refstep', 'step'})
+            limval = min([status.nFrames max([newval 1])]); % limit to possible frame numbers
+        else
+            switch autoPara.refMethod
+                case 'single'
+                    minval = 1 + autoPara.refStep;
+                    maxval = status.nFrames;
+                case 'double'
+                    minval = 1 + autoPara.refStep;
+                    maxval = status.nFrames-autoPara.refStep;
+            end
+            limval = min([maxval max([newval minval])]); % limit to possible frame numbers
+        end
+        autoPara.(autotrack_field) = limval;
+        set(gui.panel1.(autotrack_field), 'string', num2str(limval));
     end
-    autopara.(autotrack_field) = limval;
-    set(gui.panel1.(autotrack_field), 'string', num2str(limval));
-end
 end

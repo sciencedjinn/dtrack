@@ -24,6 +24,9 @@ if Q.convert
     if isfield(Q, 'zdata')
         Q.data.points(:, :, 4) = full(Q.zdata);
     end
+    if isfield(Q, 'adata')
+        Q.data.points(:, :, 5) = full(Q.adata);
+    end
 end
 
 %% overwrite a few variables that should not be carried over between sessions

@@ -1,23 +1,20 @@
-function dtrack_gui_setdefaults(para, gui)
+function dtrack_gui_setdefaults(gui, status, para)
 
 % autoforward buttons
 switch para.autoforw
     case 0
         set(findobj('tag', 'autoforwpanel'), 'selectedobject', []);
-        set(findobj('tag', 'autoforw_1'), 'cdata', gui.icons.autoforw_1);
-        set(findobj('tag', 'autoforw_x'), 'cdata', gui.icons.autoforw_x);
     case 1
         set(findobj('tag', 'autoforwpanel'), 'selectedobject', findobj('tag', 'autoforw_1'));
-        set(findobj('tag', 'autoforw_1'), 'cdata', 380-gui.icons.autoforw_1);
-        set(findobj('tag', 'autoforw_x'), 'cdata', gui.icons.autoforw_x);
     case 2
         set(findobj('tag', 'autoforwpanel'), 'selectedobject', findobj('tag', 'autoforw_x'));
-        set(findobj('tag', 'autoforw_x'), 'cdata', 380-gui.icons.autoforw_x);
-        set(findobj('tag', 'autoforw_1'), 'cdata', gui.icons.autoforw_1);
 end
+dtrack_gui_updateTogglegroupIcons(findobj('tag', 'autoforw_x'), gui)
 
 set(findobj('tag', 'currpoint'), 'value', para.showcurr);
+dtrack_gui_updateToggleIcons(findobj('tag', 'currpoint'), gui)
 set(findobj('tag', 'lastpoint'), 'value', para.showlast);
+dtrack_gui_updateToggleIcons(findobj('tag', 'lastpoint'), gui)
         
 set(findobj('tag', 'info_greyscale'), 'value', para.im.greyscale);
 set(findobj('tag', 'info_imagesc'), 'value', para.im.imagesc);
@@ -53,3 +50,7 @@ if para.gui.minimap
 else
     set(findobj('tag', 'view_minimap'), 'checked', 'off');
 end
+
+%% Check if the modules have anything to add
+dtrack_support_evalModules('_gui_setdefaults', gui, status, para, []);
+    

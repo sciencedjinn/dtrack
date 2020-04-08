@@ -1177,12 +1177,14 @@ else
       %% Info area
         case {'lastpoint'}
             para.showlast = get(gcbo, 'value');
+            dtrack_gui_updateToggleIcons(gcbo, gui);
             returnfocus; 
             redraw = 11;
             saveneeded = 1/2;
             
         case {'currpoint'}
             para.showcurr = get(gcbo, 'value');
+            dtrack_gui_updateToggleIcons(gcbo, gui);            
             returnfocus; 
             redraw = 11;
             saveneeded = 1/2;
@@ -1190,17 +1192,13 @@ else
         case {'autoforw_1', 'autoforw_x'}
             para.autoforw = 0;
             if ismember(findobj('tag', 'autoforw_1'), get(findobj('tag', 'autoforwpanel'), 'selectedobject'))
-                set(findobj('tag', 'autoforw_1'), 'cdata', 380-gui.icons.autoforw_1);
                 para.autoforw = 1;
-            else
-                set(findobj('tag', 'autoforw_1'), 'cdata', gui.icons.autoforw_1-25);
             end
             if ismember(findobj('tag', 'autoforw_x'), get(findobj('tag', 'autoforwpanel'), 'selectedobject'))
-                set(findobj('tag', 'autoforw_x'), 'cdata', 380-gui.icons.autoforw_x);
                 para.autoforw = 2;
-            else
-                set(findobj('tag', 'autoforw_x'), 'cdata', gui.icons.autoforw_x-25);
             end
+            dtrack_gui_updateTogglegroupIcons(gcbo, gui)
+            
             returnfocus;
             redraw = 0;
             saveneeded = 1/2;

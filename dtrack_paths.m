@@ -1,4 +1,5 @@
 function dtrack_paths(modules)
+if nargin<1, modules = {}; end
 
 thispath = fileparts(mfilename('fullpath'));
 
