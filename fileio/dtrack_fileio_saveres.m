@@ -1,8 +1,8 @@
 function [stat, para] = dtrack_fileio_saveres(status, para, data, ask, convert, auto) 
 
 if nargin<6, auto = false; end % is this an autosave?
-if nargin<5, convert = 1; end %convert to sparse
-if nargin<4, ask = isempty(para.paths.respath); end %Save as...
+if nargin<5, convert = 1; end % convert to sparse
+if nargin<4, ask = isempty(para.paths.respath); end % Save as...
 
 %% get filepath
 if auto
@@ -13,7 +13,7 @@ if auto
         stat = 0;
         return;
     end
-elseif ask || isempty(para.paths.respath) %if there is no path, always ask. even if ask==0
+elseif ask || isempty(para.paths.respath) % if there is no path, always ask. even if ask==0
     if isempty(para.paths.respath) 
         % find recently saved files
         [~, paths] = dtrack_fileio_getrecent(para.maxrecent);
@@ -66,6 +66,7 @@ if stat
     status.maincb       = [];
     status.movecb       = [];
     status.resizecb     = [];
+    status.scrollcb     = [];
     status.ph           = {};
     status.cph          = [];
     status.lph          = [];
@@ -75,8 +76,22 @@ if stat
         xdata = sparse(data.points(:, :, 1)); %#ok<*NASGU>
         ydata = sparse(data.points(:, :, 2));
         tdata = sparse(data.points(:, :, 3));
-        data.points = [];
-        save(savepath, 'para', 'status', 'data', 'convert', 'xdata', 'ydata', 'tdata', '-mat');
+        switch size(data.points, 3)
+            case 3
+                data.points = [];
+                save(savepath, 'para', 'status', 'data', 'convert', 'xdata', 'ydata', 'tdata', '-mat');
+            case 4 % happens for modules, e.g. HOLO
+                zdata = sparse(data.points(:, :, 4));
+                data.points = [];
+                save(savepath, 'para', 'status', 'data', 'convert', 'xdata', 'ydata', 'tdata', 'zdata', '-mat');   
+            case 5 % happens for modules, e.g. HOLO
+                zdata = sparse(data.points(:, :, 4));
+                adata = sparse(data.points(:, :, 5));
+                data.points = [];
+                save(savepath, 'para', 'status', 'data', 'convert', 'xdata', 'ydata', 'tdata', 'zdata', 'adata', '-mat');                   
+            otherwise
+                error('Internal error: data.points is too large')
+        end
     else
         save(savepath, 'para', 'status', 'data', 'convert', '-mat');
     end

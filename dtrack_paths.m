@@ -1,4 +1,5 @@
-function dtrack_paths
+function dtrack_paths(modules)
+if nargin<1, modules = {}; end
 
 thispath = fileparts(mfilename('fullpath'));
 
@@ -15,3 +16,8 @@ addpath(fullfile(thispath, 'analysis'));
 addpath(fullfile(thispath, 'navig'));
 
 addpath(fullfile(fileparts(thispath), 'useful'));
+
+%% Add modules
+for i = 1:length(modules)
+    addpath(fullfile(thispath, 'modules', modules{i}));
+end

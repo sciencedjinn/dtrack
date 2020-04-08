@@ -84,7 +84,7 @@ end
         p(1)=margin_left+1;p(4)=std_height;p(3)=std_width;
         p(2)=figpos(4)-margin_top+std_dist_vert;
         for i=1:para.pnr
-            p(2)=p(2)-p(4)-std_dist_vert;colourgui_gui_panel(i, ['Point #' num2str(i)]);
+            p(2)=p(2)-p(4)-std_dist_vert;colourgui_gui_panel(i, ['Object #' num2str(i)]);
         end
 
         %current point
@@ -197,12 +197,16 @@ end
 
     function nested_close(varargin)
         % CLOSE: close button callback
-        button=questdlg('Do you want to save the changed values?', 'Save changes', 'Save', 'Don''t save', 'Cancel', 'Don''t save');
-        switch button
-            case 'Save'
-                nested_OK();
-            case 'Don''t save'
-                nested_cancel();
+        try
+            button=questdlg('Do you want to save the changed values?', 'Save changes', 'Save', 'Don''t save', 'Cancel', 'Don''t save');
+            switch button
+                case 'Save'
+                    nested_OK();
+                case 'Don''t save'
+                    nested_cancel();
+            end
+        catch
+           closereq; % make sure you close the window.
         end
     end
 

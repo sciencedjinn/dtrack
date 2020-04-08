@@ -1,4 +1,4 @@
-function [success, autopara] = dtrack_tools_autotrack_select(status, para)
+function [success, autopara] = dtrack_tools_autotrack_select(status, para, data)
 % DTRACK_TOOLS_AUTOTRACK_SELECT opens a dialog to select parameters for autotracking
 % Call: [success, autopara] = dtrack_tools_autotrack_select(status, para)
 %
@@ -32,7 +32,6 @@ catch anyerror
 end
 
 %%%%%%%%%%%%%%%%%%%
-
 %% Nested functions for callbacks, writing/drawing and panel creation
 
 
@@ -200,12 +199,12 @@ function sub_preview_update(type)
         % gather parameters
         if ismember(type, {'all', 'ref'}) % update reference frame
             status.framenr  = str2double(get(gui.panel2.ref, 'string'));
-            [~, status]     = dtrack_action([], status, para, [], 'loadonly');
+            [~, status]     = dtrack_action([], status, para, data, 'loadonly');
             prevdata.ref             = status.currim_ori;
         end
         if ismember(type, {'all', 'im'}) % update image frame
             status.framenr  = str2double(get(gui.panel1.from, 'string'));
-            [~, status]     = dtrack_action([], status, para, [], 'loadonly');
+            [~, status]     = dtrack_action([], status, para, data, 'loadonly');
             prevdata.im   = status.currim_ori;
         end
         if ismember(type, {'all', 'roi'}) % update ROI
@@ -358,10 +357,13 @@ function sub_loaddef
         autopara.to         = status.nFrames;
         autopara.step       = 1;
         autopara.pointnr    = status.cpoint;
-        if para.ref.use
-            autopara.ref    = para.ref.framenr;
-        else
-            autopara.ref    = status.framenr;
+        switch para.ref.use
+            case 'none'
+                autopara.ref    = status.framenr;
+            case 'static'
+                autopara.ref    = para.ref.framenr;
+            case 'dynamic'
+                autopara.ref    = -para.ref.frameDiff; %TODO: Make use of this number
         end
         autopara.useroi     = 1;
         autopara.showim     = 1;

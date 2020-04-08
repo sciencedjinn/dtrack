@@ -31,6 +31,9 @@ ctrl  = ismember('control', modifier);
 %% Find the right action %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Init
+autoforward = false;
+
 %% 1. Actions with a modifier
 if alt&&shift&&ctrl
     status.currentaction = status.lastaction;
@@ -42,7 +45,7 @@ elseif alt&&shift
         case {'d', 'r', 's', 'e', 'p'}
             % Move to previous pointmarker
             temp = dtrack_findnextmarker(data, status.framenr, action, 'p');
-            if ~isempty(temp), status.framenr = temp; redraw = 1; else redraw = 0; end
+            if ~isempty(temp), status.framenr = temp; redraw = 1; else, redraw = 0; end
             saveneeded = 0;
         otherwise
             status.currentaction = status.lastaction;
@@ -119,7 +122,7 @@ elseif shift
         case {'d', 'r', 's', 'e', 'p'}
             % Move to next pointmarker
             temp = dtrack_findnextmarker(data, status.framenr, action, 'n');
-            if ~isempty(temp), status.framenr = temp; redraw = 1; else redraw = 0; end
+            if ~isempty(temp), status.framenr = temp; redraw = 1; else, redraw = 0; end
             saveneeded = 0;
             
         case {'leftarrow'}
@@ -160,6 +163,11 @@ else
 %% 2. normal (single) keystrokes/button presses
     switch(action)
       %% Just redraw
+        case 'loadonly_noref'
+            % only load the frame without displaying it
+            redraw = 31;    % this is used by autotracking and "Save as image sequence"
+            saveneeded = 0;
+            
         case 'loadonly'
             % only load the frame without displaying it
             redraw = 30;    % this is used by autotracking and "Save as image sequence"
@@ -178,7 +186,7 @@ else
             
       %% Resize
         case 'resize'
-            if ishandle(gui.minimap.panel) %has to be checked because sometimes this is called before the main figure is drawn
+            if ishandle(gui.minimap.panel) % has to be checked because sometimes this is called before the main figure is drawn
                 oldpos = get(gui.minimap.panel, 'position');
                 minisize    = oldpos(3);
                 axsize      = get(gui.f1, 'Position');
@@ -194,21 +202,36 @@ else
             redraw = 0;
             saveneeded = 0;
             
+      %% Scroll
+        case 'scrollup'
+            axes(gui.ax1);
+            zoom(gui.f1, 1.2);
+            redraw = 0;
+            saveneeded = 0;
+            
+        case 'scrolldown'
+            axes(gui.ax1);
+            zoom(gui.f1, 1/1.2);
+            redraw = 0;
+            saveneeded = 0;
+            
+            
       %% Mouse buttons
         case {'leftclick', 'doubleleftclick'}
             % Set current point
-            switch para.trackingtype  %store data
+            switch para.trackingtype  % store data
                 case 'point'
-                    data.points(status.framenr, status.cpoint, :) = [x y 1]; % 1 means manually tracked
+                    data.points(status.framenr, status.cpoint, 1:3) = [x y 1]; % 1 means manually tracked
                 case 'line'
                     h  = imline(gui.ax1, 'PositionConstraintFcn', dtrack_roi_constrain(para, status));
-                    cp = status.cpoint; %current POINT number (e.g. cp is 3 for line #2)
+                    cp = status.cpoint; % current POINT number (e.g. cp is 3 for line #2)
                     % store data
                     data.points(status.framenr, cp:cp+1, 1:2) = getPosition(h);
                     data.points(status.framenr, cp:cp+1, 3)   = 1; % 1 means manually tracked
                     delete(h); %HACK
             end
             % redraw will be set depending on autoforwarding (see bottom of this file)
+            autoforward = true;
             saveneeded = 1;
             
         case 'rightclick'
@@ -257,7 +280,7 @@ else
             saveneeded  = 1/2; % 1/2 means that this will not increase the count of actions since last save, unless it is 0
                         
       %% delete point
-        case 'delete'
+        case {'delete', 'backspace'}
             % Delete currrent point
             cp = status.cpoint;
             switch para.trackingtype
@@ -353,7 +376,7 @@ else
         case {'d', 'r', 'p'}
             % Move to next point marker
             temp = dtrack_findnextmarker(data, status.framenr, action, 'n');
-            if ~isempty(temp), status.framenr = temp; redraw = 1; else redraw = 0; end 
+            if ~isempty(temp), status.framenr = temp; redraw = 1; else, redraw = 0; end 
             saveneeded = 0;
             
       % Modes
@@ -365,9 +388,13 @@ else
             set(findobj('tag', 'pan'), 'state', 'off'); % toggle the buttons
             set(findobj('tag', 'acquire'), 'state', 'off'); % toggle the buttons
 
-            %replace default keypress callbacks
+            % replace default keypress callbacks
             hManager = uigetmodemanager(gui.f1);
-            set(hManager.WindowListenerHandles,'Enable','off');
+            try
+                set(hManager.WindowListenerHandles, 'Enable', 'off');  % HG1 (Matlab 2014a and before)
+            catch
+                [hManager.WindowListenerHandles.Enabled] = deal(false);  % HG2 (Matlab 2014b and after)
+            end
             set(gui.f1, 'keypressfcn', status.maincb);
 
             status.acquire = 0;
@@ -395,9 +422,13 @@ else
             set(findobj('tag', 'pan'), 'state', 'on'); % toggle the buttons
             set(findobj('tag', 'acquire'), 'state', 'off'); % toggle the buttons
 
-            %replace default keypress callbacks
-            hManager = uigetmodemanager(gui.f1);
-            set(hManager.WindowListenerHandles,'Enable','off');
+            % replace default keypress callbacks
+            hManager = uigetmodemanager(gui.f1); %% NOTE: Does not work anymore in current Matlab version, but seems fine without
+            try
+                set(hManager.WindowListenerHandles, 'Enable', 'off');  % HG1 (Matlab 2014a and before)
+            catch
+                [hManager.WindowListenerHandles.Enabled] = deal(false);  % HG2 (Matlab 2014b and after)
+            end
             set(gui.f1, 'keypressfcn', status.maincb);
 
             status.acquire = 0;
@@ -410,7 +441,7 @@ else
             redraw = 12;
             saveneeded = 1;
                         
-      %% Point and marker selection
+      %% Object and marker selection
         case {'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10'}
             % Select which points are active
             status.trackedpoints = [];
@@ -433,6 +464,11 @@ else
             switch para.trackingtype
                 case 'point'
                     status.cpoint = str2double(action(3:end));
+                    status.trackedpoints = status.cpoint;
+                    for i = 1:para.pnr
+                        set(findobj('tag', ['p' num2str(i)]), 'value', 0);
+                    end
+                    set(findobj('tag', ['p' num2str(status.cpoint)]), 'value', 1);
                 case 'line'
                     % for lines, this sets the current line. The current point (in status) is always the POINT, however.
                     status.cpoint = 2*str2double(action(3:end))-1;
@@ -449,6 +485,11 @@ else
                 case 'point'
                     if n<=para.pnr
                         status.cpoint = n; 
+                        status.trackedpoints = status.cpoint;
+                        for i = 1:para.pnr
+                            set(findobj('tag', ['p' num2str(i)]), 'value', 0);
+                        end
+                        set(findobj('tag', ['p' num2str(status.cpoint)]), 'value', 1);
                         set(findobj('tag', 'pointselpanel'), 'selectedobject', findobj('tag', ['ps' num2str(n)]));
                     end
                 case 'line'
@@ -520,7 +561,7 @@ else
                 status.currentaction='cancelledsave';
                 saveneeded = 0; 
             end
-            set(gui.f1, 'name', ['DTrack: ' para.paths.resname ' (' para.paths.movname ')']);
+            set(gui.f1, 'name', [para.theme.name ': ' para.paths.resname ' (' para.paths.movname ')']);
             redraw = 0;
             
         case 'file_savefileas'
@@ -532,7 +573,7 @@ else
                 status.currentaction='cancelledsave';
                 saveneeded = 0;
             end
-            set(gui.f1, 'name', ['DTrack: ' para.paths.resname ' (' para.paths.movname ')']);
+            set(gui.f1, 'name', [para.theme.name ': ' para.paths.resname ' (' para.paths.movname ')']);
             redraw = 0;
             
         case 'file_export'
@@ -616,12 +657,6 @@ else
             para.gui.infopanel_points=support_togglechecked;
             dtrack_guivisibility(gui, para, status);
             redraw = 0;
-            saveneeded = 1/2;
-            
-        case 'view_infopanel_markers'
-            para.gui.infopanel_markers=support_togglechecked;
-            dtrack_guivisibility(gui, para, status);
-            redraw = 20;
             saveneeded = 1/2;
             
         case 'view_infopanel_mani'
@@ -882,7 +917,7 @@ else
             redraw = 0;
             saveneeded = 1;
             
-      %% ROI menu
+      %% ROI&REF menu
         case 'roi_create_frominput'
             [~, filename] = dtrack_roi_create_frominput(status, fullfile(fileparts(para.paths.movpath), 'defaultroi.roi')); %creates and saves a new ROI
             if filename~=0
@@ -926,109 +961,128 @@ else
             redraw = 2;
             saveneeded = 1/2;
             
-        case 'ref_set'
-            para.ref.framenr = status.framenr;
-            [status, para] = dtrack_ref_prepare(status, para);
-            set(findobj('tag', 'ref_display'), 'enable', 'on', 'checked', 'on');
-            set(findobj('tag', 'refframe'), 'string', ['ref frame ' num2str(status.framenr)]);
-            para.ref.use = 1;
-            redraw = 2;
-            saveneeded = 1;
             
-        case 'ref_display'
-            para.ref.use=support_togglechecked('ref_display');
+            
+%     gui.menus.roi.entries.ref_set_none = uimenu(gui.menus.roi.set_menu, 'label', 'None', 'checked', 'on');
+%     gui.menus.roi.entries.ref_set_static = uimenu(gui.menus.roi.set_menu, 'label', 'Static', 'checked', 'off');
+%     gui.menus.roi.entries.ref_set_dynamic = uimenu(gui.menus.roi.set_menu, 'label', 'Dynamic', 'checked', 'off');
+%     gui.menus.roi.entries.ref_set = uimenu(gui.menus.roi.menu, 'label', 'Use current frame as reference');
+%     gui.menus.roi.entries.ref_frameDiff = uimenu(gui.menus.roi.menu, 'label', 'Set dynamic frame difference...');
+            
+        case 'ref_set_none'
+            para.ref.use = 'none';
+            dtrack_guivisibility(gui, para, status);
             redraw = 2;
             saveneeded = 1/2;
-            
-        case 'ref_clear'
-            para.ref.framenr=[];
-            status.ref.cdata=[];
-            set(findobj('tag', 'ref_display'), 'enable', 'off', 'checked', 'off');
-            set(findobj('tag', 'refframe'), 'string', 'ref frame not set');
-            para.ref.use=0;
+        case 'ref_set_static'
+            para.ref.use = 'static';
+            if isempty(para.ref.framenr)
+                para.ref.framenr = status.framenr;
+                [status, para] = dtrack_ref_prepare(status, para);
+            end
+            dtrack_guivisibility(gui, para, status);
+            redraw = 2;
+            saveneeded = 1/2;
+        case 'ref_set_dynamic'
+            para.ref.use = 'dynamic';
+            dtrack_guivisibility(gui, para, status);
+            redraw = 2;
+            saveneeded = 1/2;
+        case 'ref_set_double_dynamic'
+            para.ref.use = 'double_dynamic';
+            dtrack_guivisibility(gui, para, status);
+            redraw = 2;
+            saveneeded = 1/2;
+        case 'ref_set'
+            para.ref.framenr = status.framenr;
+            set(findobj('tag', 'refframe'), 'string', ['ref frame ' num2str(status.framenr)]);
+            [status, para] = dtrack_ref_prepare(status, para);
+            redraw = 2;
+            saveneeded = 1/2;
+        case 'ref_frameDiff' 
+            answer = inputdlg('Please enter the desired frame subtraction distance:', 'New reference difference', 1, {num2str(para.ref.frameDiff)});
+            if ~isempty(answer)
+                answer = abs(round(str2double(answer{1})));
+                answer = max([answer 0]); % minimum 0
+                if ~isnan(answer)
+                    para.ref.frameDiff = answer; 
+                end
+            end
+            dtrack_guivisibility(gui, para, status);
+            redraw = 2;
+            saveneeded = 1;
+        case 'refframe'
+            % Set the reference frame (for static mode) OR frame difference (dynamic mode)
+            switch para.ref.use
+                case 'none'
+                    % do nothing
+                case 'static'
+                    answer = inputdlg('Please enter a new reference frame number:', 'New reference frame', 1, {num2str(para.ref.framenr)});
+                    if ~isempty(answer)
+                        answer = abs(round(str2double(answer{1})));
+                        answer = min([status.nFrames max([answer 1])]); % limit to valid frames
+                        if ~isnan(answer)
+                            para.ref.framenr = answer; 
+                        end
+                    end
+                    [status, para] = dtrack_ref_prepare(status, para);
+                    dtrack_guivisibility(gui, para, status);
+                case {'dynamic', 'double_dynamic'}
+                    answer = inputdlg('Please enter the desired frame subtraction distance:', 'New reference difference', 1, {num2str(para.ref.frameDiff)});
+                    if ~isempty(answer)
+                        answer = abs(round(str2double(answer{1})));
+                        answer = max([answer 0]); % minimum 0
+                        if ~isnan(answer)
+                            para.ref.frameDiff = answer; 
+                        end
+                    end
+                    dtrack_guivisibility(gui, para, status);
+                otherwise
+                    warning('Uncaptured case, please report this warning');
+                    
+            end
             redraw = 2;
             saveneeded = 1;
             
       %% Tools menu
         case 'tools_imageone_jpg'
             % dump frame as jpg in data folder
-            dtrack_tools_imageone(status, para, 'jpg'); 
+            dtrack_tools_imageone(status, para, 'jpg', false); 
             redraw = 0;
             saveneeded = 0;
             
         case 'tools_imageone_tif'
             % dump frame as jpg in data folder
-            dtrack_tools_imageone(status, para, 'tif'); 
+            dtrack_tools_imageone(status, para, 'tif', false); 
+            redraw = 0;
+            saveneeded = 0;
+            
+        case 'tools_imageoneproc_jpg'
+            % dump frame as jpg in data folder
+            dtrack_tools_imageone(status, para, 'jpg', true); 
+            redraw = 0;
+            saveneeded = 0;
+            
+        case 'tools_imageoneproc_tif'
+            % dump frame as jpg in data folder
+            dtrack_tools_imageone(status, para, 'tif', true); 
             redraw = 0;
             saveneeded = 0;
             
         case 'tools_imageseq'
             % ask for parameters
-            [success, savepara]=dtrack_tools_imageseq(status, para);
+            [success, savepara] = dtrack_tools_imageseq(status, para);
             if success
-                dtrack_tools_imageseq_main(status, para, savepara); 
-                [gui, status, para, data]=dtrack_action(gui, status, para, data, 'redraw');
+                dtrack_tools_imageseq_main(status, para, data, savepara); 
+                [gui, status, para, data] = dtrack_action(gui, status, para, data, 'redraw');
             end
             redraw = 1;
             saveneeded = 0;
-            
-        case 'tools_overlay'
-            videoframes=[3044 3440];%[940 1270];%
-            
-            pointframes={};%{1:767}; %cell of the frames where they should be overlayed; each entry can be a range of frames
-            pointpos={};%{[data.points(1:767, 1, 1:2], [50 60]}; %cell of x/y positions of points to overlay on the movie
-            pointmarkers={};%{'o'};
-            pointcolor={};%{'b'};
-            pointsize={};%{10};
-            pointlinewidth={};%{1};
-
-% START Pachysoma displacement
-            outAR=[16 9];  
-            lineframes={1:767};
-            linepos={squeeze(data.points(1:767, 1, 1:2))};
-            linemarkers={'none'}; %cell of markers for each point of the line. 
-            linemarkersize={};%{5};
-            lineendmarkers={};%{'o'}; %cell of markers for end points of the line. Each entry can be a cell {start,end}
-            linewidth={2};%{2};
-            linecolor={};%{'b'};
-            linestyle={'-'};%{'-'};
-% END Pachysoma displacement
-
-% START walking
-%             outAR=[]; %aspect ratio, use default
-%             tt=videoframes(1):videoframes(2);
-%             lineframes={tt, tt, tt, tt, tt, tt};
-%             linepos={};
-%             for i=1:6
-%                 x=smooth(squeeze(data.points(tt, i, 1)), 3);
-%                 y=smooth(squeeze(data.points(tt, i, 2)), 3);
-%                 linepos=[linepos [x y]];
-%             end
-%             %linepos={squeeze(data.points(tt, 1, 1:2)), squeeze(data.points(tt, 2, 1:2)), squeeze(data.points(tt, 3, 1:2)), squeeze(data.points(tt, 4, 1:2)), squeeze(data.points(tt, 5, 1:2)), squeeze(data.points(tt, 6, 1:2))};%{[data.points(1:767, 1, 1:2], [50 60]}; %cell of x/y positions of points to overlay on the movie
-%             linemarkers={'o'};%{'none'}; %cell of markers for each point of the line. 
-%             linemarkersize={1.5};%{5};
-%             lineendmarkers={};%{'o'}; %cell of markers for end points of the line. Each entry can be a cell {start,end}
-%             linewidth={1};%{2};
-%             linecolor={'r', 'b', 'g', 'r', 'b', 'g'};%{'r', 'b', 'r', 'b', 'r', 'b'};
-%             linestyle={'none'};%{'-'};
-% END walking
-            inpath=fileparts(para.paths.movpath);
-            outpath=inpath;
-            infilename=para.paths.movname;
-            outfilename=[infilename(1:end-4) '_overlay.avi'];
-            outframerate=status.FrameRate;
-            outquality=100;
-            outres=[800 600];%[status.vidWidth status.vidHeight];
-            dynamicline={0, 0, 0, 0, 0, 0};
-            bgr=status.roi; % background roi
-            
-            overlay_on_movie;
-            saveneeded = 0;
-            
+                      
         case 'tools_autotrack_bgs'
             % Autotracking using background subtraction
             %TODO: save last paras
-            [success, autopara] = dtrack_tools_autotrack_select(status, para);
+            [success, autopara] = dtrack_tools_autotrack_select(status, para, data);
             if success
                 [gui, status, para, data] = dtrack_tools_autotrack_main(gui, status, para, data, autopara);
             end
@@ -1046,7 +1100,7 @@ else
             
         case {'vlc', 'm'}
             %First check whether you're on a PC
-            if ~strncmpi(para.os, 'PC', 2) %if not on a PC
+            if ~strncmpi(status.os, 'PC', 2) % if not on a PC
                 warndlg('This function is currently only available for Windows.');
             elseif isempty(para.paths.vlcpath)
                 warndlg('Please enter the path to VLC.EXE in File->Properties.');
@@ -1067,7 +1121,7 @@ else
       %% Debug menu
         case 'debug_publish'
             assignin('base', 'status', status);
-            assignin('base', 'gui', gui); %TODO add more
+            assignin('base', 'gui', gui); % TODO add more
             assignin('base', 'para', para);
             assignin('base', 'data', data);
             redraw = 0;
@@ -1088,7 +1142,7 @@ else
             saveneeded = 0;
             
         case 'debug_closeall'
-            display('Closing all other windows. If the DTrack window is closed, try running dtrack_restore()');
+            disp('Closing all other windows. If the main window is closed, try running dtrack_restore()');
             set(0,'ShowHiddenHandles','on');
             figs = get(0,'Children');
             delete(figs(figs~=1));
@@ -1096,7 +1150,7 @@ else
             saveneeded = 0;
             
         case 'debug_redrawlines'
-            display('Redrawing all points and lines.');
+            disp('Redrawing all points and lines.');
             delete([status.ph{:}]);
             delete(status.cph);
             delete(status.lph);
@@ -1123,48 +1177,56 @@ else
       %% Info area
         case {'lastpoint'}
             para.showlast = get(gcbo, 'value');
+            dtrack_gui_updateToggleIcons(gcbo, gui);
             returnfocus; 
             redraw = 11;
             saveneeded = 1/2;
             
         case {'currpoint'}
             para.showcurr = get(gcbo, 'value');
+            dtrack_gui_updateToggleIcons(gcbo, gui);            
             returnfocus; 
             redraw = 11;
             saveneeded = 1/2;
             
         case {'autoforw_1', 'autoforw_x'}
-            para.autoforw=0;
+            para.autoforw = 0;
             if ismember(findobj('tag', 'autoforw_1'), get(findobj('tag', 'autoforwpanel'), 'selectedobject'))
-                set(findobj('tag', 'autoforw_1'), 'cdata', 380-gui.icons.autoforw_1);
-                para.autoforw=1;
-            else
-                set(findobj('tag', 'autoforw_1'), 'cdata', gui.icons.autoforw_1-25);
+                para.autoforw = 1;
             end
             if ismember(findobj('tag', 'autoforw_x'), get(findobj('tag', 'autoforwpanel'), 'selectedobject'))
-                set(findobj('tag', 'autoforw_x'), 'cdata', 380-gui.icons.autoforw_x);
-                para.autoforw=2;
-            else
-                set(findobj('tag', 'autoforw_x'), 'cdata', gui.icons.autoforw_x-25);
+                para.autoforw = 2;
             end
+            dtrack_gui_updateTogglegroupIcons(gcbo, gui)
+            
             returnfocus;
             redraw = 0;
             saveneeded = 1/2;
             
         otherwise
-            error(['Unknown action: ', action]);
-    end %switch
-end %if
+            %% call modules
+            actionFound = false;
+            for i = 1:length(para.modules)
+                [gui, status, para, data, actionFound, redraw, saveneeded, autoforward] = feval([para.modules{i} '_action'], gui, status, para, data, action, src);
+                if actionFound
+                    break;
+                end
+            end
+            if ~actionFound
+                error(['Unknown action: ', action]);
+            end
+    end % switch
+end % if
 
 % it would be nice if returnfocus was here, but it only works after buttonpresses
 
 % forward point or frame
-if strcmp(action, 'leftclick') || strcmp(action, 'doubleleftclick')
+if autoforward
     switch para.autoforw
         case 0
-            redraw = 11; %do nothing except refresh points
+            redraw = 11; % do nothing except refresh points
         case {1, 2}
-            %find next point in this frame
+            % find next point in this frame
             switch para.trackingtype
                 case 'point'
                     cp = min(status.trackedpoints(status.trackedpoints>status.cpoint));
@@ -1174,14 +1236,14 @@ if strcmp(action, 'leftclick') || strcmp(action, 'doubleleftclick')
                 otherwise
                     error('error');
             end
-            if ~isempty(cp) %go to this point
+            if ~isempty(cp) % go to this point
                 switch para.trackingtype
                     case 'point'
                         [gui, status, para, data] = dtrack_action(gui, status, para, data, num2str(mod(cp, 10))); %mod(cp, 10) necessary to make 10 into 0
                     case 'line'
                         [gui, status, para, data] = dtrack_action(gui, status, para, data, num2str(mod((cp+1)/2, 10))); %mod(cp, 10) necessary to make 10 into 0
                 end
-            else %forward to next frame
+            else % forward to next frame
                 switch para.trackingtype
                     case 'point'
                         status.cpoint = min(status.trackedpoints);
@@ -1191,14 +1253,14 @@ if strcmp(action, 'leftclick') || strcmp(action, 'doubleleftclick')
                         set(findobj('tag', 'pointselpanel'), 'selectedobject', findobj('tag', ['ps' num2str((status.cpoint+1)/2)]));
                 end
                 
-                if para.autoforw == 1 %forward 1
+                if para.autoforw == 1 % forward 1
                     [gui, status, para, data] = dtrack_action(gui, status, para, data, 'forw1');
-                else %forward x
+                else % forward x
                     [gui, status, para, data] = dtrack_action(gui, status, para, data, 'forwx');
                 end
             end
             
-            redraw = 0; %redrawing was already done in autoforward actions
+            redraw = 0; % redrawing was already done in autoforward actions
         otherwise
             error('Internal error: unknown auto-forward mode');
     end
@@ -1206,7 +1268,7 @@ end
 
 %% redraw image
 if redraw
-    [status, gui] = dtrack_image(gui, status, para, data, redraw); %redraw 1 draws image and all points
+    [status, gui] = dtrack_image(gui, status, para, data, redraw); % redraw 1 draws image and all points
 end
 
 %% update number of actions since last save, and autosave if necessary

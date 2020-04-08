@@ -1,8 +1,10 @@
-function [status, para, data] = dtrack_defaults(status, para, data)
+function [status, para, data] = dtrack_defaults(modules)
 % Fields that CAN be empty, MUST be empty in the defaults
 
+if nargin<1, para.modules = {}; else, para.modules = modules; end
+
 %% set the search path
-dtrack_paths;
+dtrack_paths(para.modules);
 
 %% paths
 para.paths.movpath          = '';
@@ -35,9 +37,15 @@ para.gui.stepsize           = 10;
 para.gui.navitoolbar        = true;
 para.gui.infopanel          = true;
 para.gui.infopanel_points   = true;
-para.gui.infopanel_markers  = true;
 para.gui.infopanel_mani     = true;
 para.gui.minimap            = true;
+
+switch computer
+    case {'MACI', 'MACI64'}
+        para.gui.tab_title_spacing = 0.02;
+    otherwise
+        para.gui.tab_title_spacing = 0;
+end
 
 %%
 para.im.roi                 = false;
@@ -52,17 +60,19 @@ para.im.gs1 = .2989; para.im.gs2 = .5870; para.im.gs3 = .1140;
 para.trackingtype           = 'point'; % 'point'/'line' 
 para.pnr                    = 1; % how many points should be tracked; if trackingtype is 'line', pnr MUST be a multiple of 2
 para.usemmread              = 0;
-para.mmreadsize             = 500; %frame chunk size
+para.mmreadsize             = 500; % frame chunk size
 para.mmreadoverlap          = 20;
 para.forceaspectratio       = [];
 para.saveneeded             = 0;
 para.autosavethresh         = 10;
 
+para.defaultz               = 100; % Default z position for plotting of 3D points (holo module)
+
 %% point marker style and colours (can be changed using the colourgui button)
 para.ls.p{1}.col  = [0 0 1];    para.ls.p{1}.shape  = 'o';    para.ls.p{1}.size  = 10; para.ls.p{1}.width  = 1.5;
-para.ls.p{2}.col  = [0 0 1];    para.ls.p{2}.shape  = '*';    para.ls.p{2}.size  = 5; para.ls.p{2}.width  = 1.5;
-para.ls.p{3}.col  = [0 1 0];    para.ls.p{3}.shape  = 'o';    para.ls.p{3}.size  = 10; para.ls.p{3}.width  = 1.5;
-para.ls.p{4}.col  = [0 1 0];    para.ls.p{4}.shape  = '*';    para.ls.p{4}.size  = 5; para.ls.p{4}.width  = 1.5;
+para.ls.p{2}.col  = [0 1 0];    para.ls.p{2}.shape  = 'o';    para.ls.p{2}.size  = 10; para.ls.p{2}.width  = 1.5;
+para.ls.p{3}.col  = [1 0 0];    para.ls.p{3}.shape  = 'o';    para.ls.p{3}.size  = 10; para.ls.p{3}.width  = 1.5;
+para.ls.p{4}.col  = [1 1 0];    para.ls.p{4}.shape  = 'o';    para.ls.p{4}.size  = 10; para.ls.p{4}.width  = 1.5;
 para.ls.p{5}.col  = [1 0 1];    para.ls.p{5}.shape  = 'o';    para.ls.p{5}.size  = 10; para.ls.p{5}.width  = 1.5;
 para.ls.p{6}.col  = [0 1 1];    para.ls.p{6}.shape  = 'o';    para.ls.p{6}.size  = 10; para.ls.p{6}.width  = 1.5;
 para.ls.p{7}.col  = [0 0 0];    para.ls.p{7}.shape  = 'o';    para.ls.p{7}.size  = 10; para.ls.p{7}.width  = 1.5;
@@ -70,23 +80,25 @@ para.ls.p{8}.col  = [1 1 1];    para.ls.p{8}.shape  = 'o';    para.ls.p{8}.size 
 para.ls.p{9}.col  = [.5 0 1];   para.ls.p{9}.shape  = 'o';    para.ls.p{9}.size  = 10; para.ls.p{9}.width  = 1.5;
 para.ls.p{10}.col = [0 .5 1];   para.ls.p{10}.shape = 'o';    para.ls.p{10}.size = 10; para.ls.p{10}.width = 1.5;
 para.ls.cp.col    = [1 1 .5];   para.ls.cp.shape    = 'o';    para.ls.cp.size    = 20; para.ls.cp.width    = 1;
-para.ls.lp.col    = [.8 .8 .8]; para.ls.lp.shape    = 'none';    para.ls.lp.size    = 20; para.ls.lp.width    = 1;
+para.ls.lp.col    = [.8 .8 .8]; para.ls.lp.shape    = 'o';    para.ls.lp.size    = 20; para.ls.lp.width    = 1;
 para.ls.roi.col   = [.8 .8 .8]; para.ls.roi.shape   = 'none'; para.ls.roi.size   = 10; para.ls.roi.width   = 1;
 
 %% ROI and reference frame parameters
 para.roix                   = [];
 para.roiy                   = [];
 para.ref.framenr            = [];
-para.ref.use                = false;
+para.ref.use                = 'none'; % can be 'none'/'static'/'dynamic'
+para.ref.frameDiff          = 0; % when set to 0, para.gui.stepsize will be used instead
+para.ref2.framenr           = [];
 
 %% load local parameter and preferences files
 if exist(fullfile(prefdir, 'dtrack_para.dtp'), 'file')
-    load(fullfile(prefdir, 'dtrack_para.dtp'), '-mat')
+    load(fullfile(prefdir, 'dtrack_para.dtp'), '-mat', 'savepara')
     para = dtrack_support_compstruct(savepara, para, [], false); % non-verbose
     disp('Local default parameters loaded.');
 end
 if exist(fullfile(prefdir, 'dtrack_pref.dtp'), 'file')
-    load(fullfile(prefdir, 'dtrack_pref.dtp'), '-mat');
+    load(fullfile(prefdir, 'dtrack_pref.dtp'), '-mat', 'savepara');
     para = dtrack_support_compstruct(savepara, para, [], false); % non-verbose
     disp('Local preferences loaded.');
 end
@@ -97,7 +109,7 @@ status.cpoint           = 1; % the currently tracked point
 status.framenr          = 1;
 status.acquire          = 1; % set to acquisition mode
 h = figure; status.graycm  = colormap('gray'); close(h);
-status.trackedpoints    = 1:para.pnr;
+status.trackedpoints    = 1;
 status.currentaction    = 'init';
 status.lastaction       = '';
 status.roi              = []; % loaded after new/open
@@ -111,5 +123,13 @@ status.lph              = [];
 %% initialize data structure
 data.points             = [];
 data.markers            = [];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Default Dtrack theme
+para.theme.name = 'DTrack';
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Execute modules
+[~, status, para, data] = dtrack_support_evalModules('_defaults', [], status, para, data);
 
 

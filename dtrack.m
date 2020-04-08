@@ -1,7 +1,11 @@
-function dtrack
+function dtrack(modules)
 % DTRACK is a routine to track animals in HD videos. 
 %   The program uses nested functions for a GUI application with 2 figures.
 % 
+% The inpur variable 'modules' (a cell of strings) can be used to load optional modules. They are loaded sequentially in the order that they are submitted.
+% Therefore, later modules can potentially overload earlier modules' variables. The last of those modules also determines the GUI styling.
+% For example 'dtrack({'holo'})' calls dtrack with the holo module, and the GUI will be holo-styled.
+%
 % It includes 4 running variables:
 % - data contains all tracking data, frame markers, etc.
 % - gui contains handles to all user interface objects (menus, toolbars,
@@ -10,20 +14,23 @@ function dtrack
 %   from parameter file)
 % - status contains temporary session variables that change frequently
 %
-% % Copyright 2010 - 2015 Jochen Smolka - Lund Vision Group 
+% % Copyright 2010 - 2019 Jochen Smolka, ScienceDjinn 
 
-v = 1.87;
-fprintf('Starting DTrack %g\n', v);
+v = 1.92;
+fprintf('Starting DTrack %.2f\n', v);
+
+if nargin<1, modules = {}; end
 
 %% Defaults and paths
-[status, para, data]  = dtrack_defaults;
+[status, para, data]  = dtrack_defaults(modules);
 status.maincb         = @maincb;
 status.movecb         = @movecb;
 status.resizecb       = @resizecb;
+status.scrollcb       = @scrollcb;
 assignin('base', 'dtrack_restore', @nested_restore);
 
 %% version check
-[os, matlabv]         = dtrack_versioncheck; %'PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64'
+[os, matlabv]         = dtrack_versioncheck; % 'PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64'
 
 %% Start with a dialog box offering options:
 [gui, status, para, data, loadaction] = dtrack_fileio_startdlg(status, para); % gui is created inside this function
@@ -47,7 +54,7 @@ switch loadaction
 end
 
 %% save version data
-status.os         = os; %'PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64'
+status.os         = os; % 'PCWIN'/'PCWIN64'/'MACI'/'GLNX86'/'GLNXA64'
 status.matlabv    = matlabv;
 status.dtrackv    = v; 
 status.dtrackbase = mfilename('fullpath');
@@ -66,7 +73,7 @@ status.dtrackbase = mfilename('fullpath');
         
         switch get(src, 'type')
             case {'image', 'figure'} % key or click
-                %a) mouse click
+                % a) mouse click
                 %%%%%% 20150324: in 2014a and older, event is not empty, but EventName does not exist. Introduced "isfield(event, 'EventName') &&" %%%%%% below, which seems to fic it
                 if isempty(event) || strcmp(event.EventName, 'Hit') %isfield(event, 'EventName') && strcmp(event.EventName, 'Hit') % empty happens before 2014b, 'Hit' from 2014b onwards
                     mod = {}; % This cell will collect all modifiers (Alt/Ctrl/Shift) that were pressed while the action happened.
@@ -86,7 +93,7 @@ status.dtrackbase = mfilename('fullpath');
                             mod = {'shift'};
                     end
                 
-                %b) not a mouseclick
+                % b) not a mouseclick
                 else
                     action = event.Key; mod = event.Modifier;
                 end
@@ -99,9 +106,11 @@ status.dtrackbase = mfilename('fullpath');
         end
         
         %fprintf('Entering action %s, with lastaction = %s\n', action, status.lastaction); % for debugging
+        set(gui.f1, 'pointer', 'watch'); drawnow;
         status.currentaction      = action;
         [gui, status, para, data] = dtrack_action(gui, status, para, data, action, mod, x, y, src);
         status.lastaction         = status.currentaction;
+        set(gui.f1, 'pointer', 'custom'); drawnow;
         %fprintf('Finishing action %s, saving it as lastaction = %s\n', action, status.lastaction); % for debugging
     end
 
@@ -115,12 +124,24 @@ status.dtrackbase = mfilename('fullpath');
     end
 
     function resizecb(src, varargin)
-        %main figure window has been resized
-        action='resize';x=[];y=[];mod={};
-        status.lastaction=action;
-        if exist('gui', 'var') %%don't know why, but this is sometimes called before gui is returned
+        % main figure window has been resized
+        action = 'resize'; x = []; y = []; mod = {};
+        status.lastaction = action;
+        if exist('gui', 'var') %% don't know why, but this is sometimes called before gui is returned
             [gui, status, para, data] = dtrack_action(gui, status, para, data, action, mod, x, y, src);
         end
+    end
+
+    function scrollcb(src, callbackdata)
+        % main figure window has had a scroll event
+        if callbackdata.VerticalScrollCount > 0
+            action = 'scrolldown';
+        else
+            action = 'scrollup';
+        end
+        x = []; y = []; mod = {};
+        status.lastaction = action;
+        [gui, status, para, data] = dtrack_action(gui, status, para, data, action, mod, x, y, src);
     end
 
     function nested_restore

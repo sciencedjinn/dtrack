@@ -32,11 +32,11 @@ if isempty(e)
 end
 
 %% ask for format
-button=questdlg('Which data format would you like to save in?', ...
+button = questdlg('Which data format would you like to save in?', ...
                          'Choose format', ...
                          'Full', 'Sparse', 'Cancel', 'Sparse');
 if strcmp(button, 'Cancel')
-    stat=0;errordlg('The project has NOT been saved!');return;
+    stat = 0; errordlg('The project has NOT been saved!'); return;
 end
 
 for i = 1:size(data.points, 2)
@@ -44,10 +44,10 @@ for i = 1:size(data.points, 2)
     %% backup
     if exist(currfile, 'file')
         % backup existing file
-        stat=movefile(currfile, [currfile 'backup']);
+        stat = movefile(currfile, [currfile 'backup']);
         disp(['Backing up ', currfile ' to ' currfile 'backup.']);
     else
-        stat=1;
+        stat = 1;
     end
 
     %% save
@@ -57,7 +57,7 @@ for i = 1:size(data.points, 2)
                 dlmwrite(currfile, squeeze(data.points(:, i, :)), 'delimiter', '\t');
             case 'Sparse'
                 ind = find(data.points(:, i, 3));
-                sparsedata = [ind squeeze(data.points(ind, i, :))];
+                sparsedata = [ind reshape(data.points(ind, i, :), [length(ind) size(data.points, 3)])]; % This used to use squeeze, but that creates an error when there is only a single point
                 dlmwrite(currfile, sparsedata, 'delimiter', '\t');
         end
         disp(['Saving file ', currfile]);
