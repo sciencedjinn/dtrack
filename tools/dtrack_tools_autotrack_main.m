@@ -18,7 +18,7 @@ end
 %% confirm overwriting existing points
 if any(data.points(autopara.from:autopara.step:autopara.to, autopara.pointnr, 3))
     button = questdlg('Some points in the selected range have already been tracked. Overwrite?', 'Warning', 'Yes, overwrite points', 'No, cancel', 'No, cancel');
-    if strcmp(button, 'No, cancel');
+    if strcmp(button, 'No, cancel')
         return;
     end
 else
@@ -45,7 +45,9 @@ set(autowbh, 'OuterPosition', [a(1) a(2)+a(4) a(3) a(4)]);
 %% get reference frame
 status.framenr      = autopara.ref;
 [~, status, para]   = dtrack_action(gui, status, para, [], 'loadonly');
-status.autoref      = status.currim_ori;
+%status.autoref      = status.currim_ori;
+[imout, status.mh] = readframe(status.mh, [1 100], para, status, false);
+status.autoref = median(imout, 4);
 
 %% create roimask                
 if autopara.useroi && ~isempty(status.roi)

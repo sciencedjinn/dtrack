@@ -14,7 +14,7 @@ if nargin<5, areathresh = 50;           end
 if nargin<4, greythr = 3;               end
 if nargin<3 || isempty(roimask), roimask = ones(size(ref)); end
 
-if strcmp(method, 'nearest') && isnan(lastpoint)
+if strcmp(method, 'nearest') && any(isnan(lastpoint))
     method = 'largest';
 end
 
@@ -28,7 +28,7 @@ else
     level = greythr * graythresh(diffim);
 end
 if level>1, level=1; end  % limit level to allowed range
-bwi   = im2bw(diffim, level);
+bwi   = imbinarize(rgb2gray(diffim), level);
 
 %% cut out points outside region of interest
 bwi2 = bwi;
