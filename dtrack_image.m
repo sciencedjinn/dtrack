@@ -14,20 +14,17 @@ function [status, gui] = dtrack_image(gui, status, para, data, redraw)
 
 %% set frame number and frame time displays
 % calculate framenr
-if para.imseq.isimseq
-    status.framenr = min([max([status.framenr para.imseq.from]) status.nFrames]); % restrict range of framenrs, in case it was set out of bounds
-else
-    status.framenr = min([max([status.framenr 1]) status.nFrames]); % restrict range of framenrs, in case it was set out of bounds
-end
+status.framenr = min([max([status.framenr 1]) status.mh.NFrames]); % restrict range of framenrs, in case it was set out of bounds
+
 if redraw==1 || redraw==3
     % set framenr display
-    set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(status.framenr), '/', num2str(status.nFrames)]);
+    set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(status.framenr), '/', num2str(status.mh.NFrames)]);
     
     % set frametime display
     if para.thermal.isthermal
-        timeNumber = status.mh.ts(status.framenr) - status.mh.ts(1);
+        timeNumber = status.mh.Buffer.t(status.framenr) - status.mh.Buffer.t(1);
     else
-        timeNumber = status.framenr / status.FrameRate; % time in seconds
+        timeNumber = status.framenr / status.mh.FrameRate; % time in seconds
     end
     set(findobj('tag', 'frametime'), 'string', datestr(timeNumber/24/3600,'HH:MM:SS.FFF'));
 end
@@ -38,13 +35,13 @@ end
 %% load new image
 if ismember(redraw, [1 3 30 31]) % new frame actions
     % read new frame (this takes more than 95% of the whole function time)
-    [status.currim_ori, status.mh, status.timestamp] = readframe(status.mh, status.framenr, para, status); % this timestamp seems to start at 0, as well. So it's no use.
+    [status.currim_ori, status.timestamp] = status.mh.readFrame(status.framenr); % this timestamp seems to start at 0, as well. So it's no use.
     
     % deinterlace
     if ~isempty(gui) && strcmp(get(gui.controls.navi.entries.deinterlace, 'State'), 'on') % TODO: This should get an entry in para, which should be remembered between sessions
-        hfm = repmat(rot90([0, 1]), status.vidHeight/2, status.vidWidth);
+        hfm = repmat(rot90([0, 1]), status.mh.Height/2, status.mh.Width);
         output = cat(3, hfm, hfm, hfm);
-        status.currim_ori = imresize(reshape(status.currim_ori(output>0), [], status.vidWidth, 3), [status.vidHeight status.vidWidth]);
+        status.currim_ori = imresize(reshape(status.currim_ori(output>0), [], status.mh.Width, 3), [status.mh.Height status.mh.Width]);
     end
 end
 
@@ -74,11 +71,11 @@ if ismember(redraw, [1 2 3 30])
                 if para.ref.frameDiff > 0
                     % frame diff was set in parameter file, use this
                     para.ref.framenr = max([1 status.framenr - para.ref.frameDiff]);
-                    para.ref2.framenr = min([status.framenr + para.ref.frameDiff status.nFrames]);
+                    para.ref2.framenr = min([status.framenr + para.ref.frameDiff status.mh.NFrames]);
                 else
                     % frame diff was not set in parameter file, use the step size
                     para.ref.framenr = max([1 status.framenr - para.gui.stepsize]);
-                    para.ref2.framenr = min([status.framenr + para.gui.stepsize status.nFrames]);
+                    para.ref2.framenr = min([status.framenr + para.gui.stepsize status.mh.NFrames]);
                 end
                 [status, para] = dtrack_ref_prepare(status, para); % load new ref image
                 status.currim = - double(status.currim) + 0.5*double(status.ref.cdata) + 0.5*double(status.ref2.cdata);

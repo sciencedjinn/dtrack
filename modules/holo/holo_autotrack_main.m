@@ -36,10 +36,10 @@ if autoPara.useROI && ~isempty(status.roi)
     para.im.roi = 1;
     switch status.roi(1, 1)
         case 0  %0 indicates polygon vertices
-            [X,Y]   = ndgrid(1:status.vidHeight, 1:status.vidWidth);
+            [X,Y]   = ndgrid(1:status.mh.Height, 1:status.mh.Width);
             autoPara.roiMask = inpolygon(Y, X, status.roi(2:end, 1), status.roi(2:end, 2));   
         case 1  %1 indicates ellipse
-            [X,Y]   = ndgrid(1:status.vidHeight, 1:status.vidWidth);
+            [X,Y]   = ndgrid(1:status.mh.Height, 1:status.mh.Width);
             autoPara.roiMask = inellipse(Y, X, status.roi(2:end)); 
         otherwise %old roi file
             disp('No ROI type indicator found, assuming old ROI file.');
@@ -155,7 +155,7 @@ for currentObject = objectsToTrack(:)'
                 diag.pnr = currentObject;
                 holo_autotrack_plotdiag(diag, gui.diag.ah);   
             end
-        %     set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(trackframe), '/', num2str(status.nFrames)]); % takes an extra 1 second per 100 frames
+        %     set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(trackframe), '/', num2str(status.mh.NFrames)]); % takes an extra 1 second per 100 frames
             if mod((trackFrame-autoPara.from)/autoPara.step, 10)==0
                 waitbar((trackFrame-autoPara.from+1)/(autoPara.to-autoPara.from+1), autowbh);
             end
@@ -188,7 +188,7 @@ dtrack_guivisibility(gui, para, status); % this toggles and activates gui elemen
     function im = nested_loadframe(fnr)
         if isempty(buffer) || ~ismember(fnr, [buffer.fnr])
             % if this frame is not in the buffer yet, load it
-            [im, status.mh] = readframe(status.mh, fnr, para, status); % this timestamp seems to start at 0, as well. So it's no use.
+            im              = status.mh.readFrame(fnr);
             image3d         = double(im);
             im              = para.im.gs1 * image3d(:, :, 1) + para.im.gs2 * image3d(:, :, 2) + para.im.gs3 * image3d(:, :, 3);
             % add image object to buffer

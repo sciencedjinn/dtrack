@@ -14,7 +14,7 @@ function dtrack_ana_plottemp(h, data, status, para)
     %col={'b', 'r', 'm', 'c', 'k', 'g', 'y'};while size(data.points, 2)>length(col),col=[col {'b', 'r', 'm', 'c', 'k', 'g', 'y'}];end %define colors for the different points
     col=[0 0 1;1 0 0;1 0 1;0 1 1;0 0 0;0 1 0;1 1 0];while size(data.points, 2)>size(col, 1),col=[col;col];end %define colors for the different points
     set(h, 'colororder', col); %set this as the default color order
-    ts=(status.mh.ts-status.mh.ts(1))*24*3600; %all timestamps in seconds normalised to start
+    ts=(status.mh.Buffer.t-status.mh.Buffer.t(1))*24*3600; %all timestamps in seconds normalised to start
     
     %% calculate temperatures
     for i=1:size(data.points, 2) %for each point number
@@ -22,7 +22,7 @@ function dtrack_ana_plottemp(h, data, status, para)
         %if ~isempty(sel)
             for j=1:length(sel)
                 f=floor(filtering/2); %how many pixels plus and minus to average
-                thisset=status.mh.data(round(data.points(sel(j), i, 2))-f:round(data.points(sel(j), i, 2))+f, round(data.points(sel(j), i, 1))-f:round(data.points(sel(j), i, 1))+f, sel(j));
+                thisset=status.mh.Buffer.data(round(data.points(sel(j), i, 2))-f:round(data.points(sel(j), i, 2))+f, round(data.points(sel(j), i, 1))-f:round(data.points(sel(j), i, 1))+f, sel(j));
                 temper(sel(j), i)=mean(thisset(:))-273.15; %take the mean of temperature values and correct to Celsius
             end
             %plot(h, ts(sel), temper, ['.' col{i}]); hold all;%and plot the temperature values.

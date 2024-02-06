@@ -11,7 +11,7 @@ disp([datestr(now, 13) ' - Z-autotracking started']);
 waitbar(0, autowbh, 'Automatic z-tracking...');
 
 startframe = status.framenr;
-endframe   = status.nFrames;
+endframe   = status.mh.NFrames;
 stepsize   = para.gui.stepsize;
 for currframe = startframe:stepsize:endframe
     if getappdata(autowbh, 'canceling')

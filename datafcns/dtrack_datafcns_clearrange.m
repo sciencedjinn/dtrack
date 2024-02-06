@@ -5,7 +5,7 @@ if nargin<4
     prompt = {'Frame range', 'Object range'};
     dlg_title = 'Clear data range';
     num_lines = 1;
-    def = {['1:' num2str(status.nFrames)],num2str(status.cpoint)};
+    def = {['1:' num2str(status.mh.NFrames)],num2str(status.cpoint)};
     answer = inputdlg(prompt,dlg_title,num_lines,def);
 
     % cancel
@@ -20,7 +20,7 @@ else
     answer = {num2str(frange), 'all'};
 end
 
-frange_c = frange(ismember(frange, 1:status.nFrames))';
+frange_c = frange(ismember(frange, 1:status.mh.NFrames))';
 prange_c = prange(ismember(prange, 1:size(data.points, 2)))';
 
 if isempty(frange_c)

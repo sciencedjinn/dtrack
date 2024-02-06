@@ -50,10 +50,7 @@ if loadnew
             status.graycm   = oldstatus.graycm;
             status.trackedpoints = oldstatus.trackedpoints;
             status.mh = oldstatus.mh;
-            status.nFrames = oldstatus.nFrames;
-            status.vidHeight = oldstatus.vidHeight;
-            status.vidWidth = oldstatus.vidWidth;
-            status.FrameRate = oldstatus.FrameRate;
+%             status.FrameRate = oldstatus.FrameRate; %TODO
             status.currim_ori = oldstatus.currim_ori;
             status.currim = oldstatus.currim;
             status.roi = oldstatus.roi;
@@ -93,12 +90,12 @@ if loadnew
             pause(0.1); % without this the parameter window doesnt close before the movie loads, which might crash matlab
             % load movie
             set(gcf, 'pointer', 'watch');drawnow;
-            status = dtrack_inistatus(status, para);
+            status = dtrack_inistatus(status);
             [status, para, success] = dtrack_fileio_openmovie(status, para); % success 0 means file not found, 2 means aborted by user. If mmreader can't read it, mmread will be tried (after dialog)
             [status, para] = dtrack_roi_prepare(status, para); % loads roi file, finding the default first if necessary
             [status, para] = dtrack_ref_prepare(status, para); % loads reference frame
             % check if this is a greyscale image sequence
-            if status.GSImage
+            if status.mh.GreyScale
                 para.im.greyscale = 1;
                 para.im.manicheck = 1;
                 para.im.imagesc = 1;
@@ -114,8 +111,8 @@ if loadnew
         end
         
         % create empty data structure
-        data.points = zeros(status.nFrames, para.pnr, 3);
-        data.markers = struct('m', cell(status.nFrames, 1));
+        data.points = zeros(status.mh.NFrames, para.pnr, 3);
+        data.markers = struct('m', cell(status.mh.NFrames, 1));
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%
         %% Load modules

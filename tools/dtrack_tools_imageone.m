@@ -7,7 +7,7 @@ if nargin < 4, proc = false; end
 
 % create filename
 [a, b] = fileparts(para.paths.movpath);
-padding = ceil(log10(status.nFrames));
+padding = ceil(log10(status.mh.NFrames));
 switch type
     case {'tif', 'comptif'}
         filename_short = [b, sprintf(['_%0' num2str(padding) '.0f'], status.framenr) '.tif'];

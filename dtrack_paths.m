@@ -14,6 +14,7 @@ addpath(fullfile(thispath, 'calib'));
 addpath(fullfile(thispath, 'tools'));
 addpath(fullfile(thispath, 'analysis'));
 addpath(fullfile(thispath, 'navig'));
+addpath(fullfile(thispath, 'classes'));
 
 addpath(fullfile(fileparts(thispath), 'useful'));
 

@@ -13,7 +13,7 @@ if continueMode
     autoPara      = [];
     sub_load('lastSession');
     autoPara.from = status.framenr;
-    autoPara.to   = status.nFrames;
+    autoPara.to   = status.mh.NFrames;
     success       = true;
     return
 end
@@ -28,7 +28,7 @@ editcb       = @sub_callback;
 % load last session's parameters, and change the ones that depend on this dataset
 sub_load('lastSession');
 autoPara.from    = status.framenr;
-autoPara.to      = status.nFrames;
+autoPara.to      = status.mh.NFrames;
 autoPara.pointNr = status.cpoint;
 if isempty(status.roi)
     autoPara.useROI = 0;
@@ -217,10 +217,10 @@ function sub_updatePreview(type)
             if get(gui.panel2.useroi, 'value') && ~isempty(status.roi)
                 switch status.roi(1, 1)
                     case 0  % 0 indicates polygon vertices
-                        [X,Y]   = ndgrid(1:status.vidHeight, 1:status.vidWidth);
+                        [X,Y]   = ndgrid(1:status.mh.Height, 1:status.mh.Width);
                         prevpara.roimask = inpolygon(Y, X, status.roi(2:end, 1), status.roi(2:end, 2));   
                     case 1  % 1 indicates ellipse
-                        [X,Y]   = ndgrid(1:status.vidHeight, 1:status.vidWidth);
+                        [X,Y]   = ndgrid(1:status.mh.Height, 1:status.mh.Width);
                         prevpara.roimask = inellipse(Y, X, status.roi(2:end)); 
                     otherwise 
                         error('Internal error: Unknown ROI type');
@@ -361,7 +361,7 @@ end
 %% Defaults
     function sub_load(type)
         defaults.from               = 1;
-        defaults.to                 = status.nFrames;
+        defaults.to                 = status.mh.NFrames;
         defaults.step               = 1;
         defaults.refStep            = para.ref.frameDiff;
         defaults.pointNr            = status.cpoint;
@@ -490,7 +490,7 @@ end
     end % sub_setdef
 
     function sub_limit_fnrs(autotrack_field, offset)
-        % clamps frame number indicators to within 1 and status.nFrames
+        % clamps frame number indicators to within 1 and status.mh.NFrames
         % autotrack_field can be 'from'/'to'/'step'/'refstep'/'all'
         if strcmp(autotrack_field, 'all')
             sub_limit_fnrs('from', 0)
@@ -501,15 +501,15 @@ end
         
         newval = str2double(get(gui.panel1.(autotrack_field), 'string')) + offset;
         if ismember(autotrack_field, {'refstep', 'step'})
-            limval = min([status.nFrames max([newval 1])]); % limit to possible frame numbers
+            limval = min([status.mh.NFrames max([newval 1])]); % limit to possible frame numbers
         else
             switch autoPara.refMethod
                 case 'single'
                     minval = 1 + autoPara.refStep;
-                    maxval = status.nFrames;
+                    maxval = status.mh.NFrames;
                 case 'double'
                     minval = 1 + autoPara.refStep;
-                    maxval = status.nFrames-autoPara.refStep;
+                    maxval = status.mh.NFrames-autoPara.refStep;
             end
             limval = min([maxval max([newval minval])]); % limit to possible frame numbers
         end

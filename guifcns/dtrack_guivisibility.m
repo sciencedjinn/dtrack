@@ -113,7 +113,7 @@ end
 if para.im.manicheck
     set(get(gui.infoarea.image.panel, 'Children'), 'enable', 'on');
     if para.im.greyscale
-        if status.GSImage
+        if status.mh.GreyScale
             set(findobj('tag', 'view_greyscale'), 'enable', 'off');
             set(findobj('tag', 'info_greyscale'), 'enable', 'off');
             set(findobj('tag', 'manicheck'), 'enable', 'off');

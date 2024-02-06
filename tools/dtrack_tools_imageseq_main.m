@@ -29,7 +29,7 @@ if asVideo
         end
     end             
     v = VideoWriter(filename);
-    v.FrameRate = 3*status.FrameRate/savepara.step;
+    v.FrameRate = 3*status.mh.FrameRate/savepara.step;
     open(v);
 end
 

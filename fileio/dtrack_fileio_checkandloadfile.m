@@ -61,7 +61,7 @@ end
 set(gcf, 'pointer', 'watch'); drawnow;
 [status, para, success] = dtrack_fileio_openmovie(status, para); %success 0 means file not found. If mmreader can't read it, mmread will be tried (after dialog)
 % check if this is a greyscale image sequence
-if status.GSImage
+if status.mh.GreyScale
     para.im.greyscale=1;
     para.im.manicheck=1;
     para.im.imagesc=1;

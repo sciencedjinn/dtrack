@@ -1,10 +1,6 @@
-function status = dtrack_inistatus(status, para)
+function status = dtrack_inistatus(status)
 
-if para.imseq.isimseq
-    status.framenr = para.imseq.from;
-else
-    status.framenr = 1;
-end
+status.framenr = 1;
 status.acquire = 1; % set to acquisition mode
 h = figure; status.graycm = colormap('gray'); close(h);
 status.lastaction = '';

@@ -96,7 +96,7 @@ switch(action)
             sel = data.points(:, p, 3)>0 & data.points(:, p, 3)~=43; % select all successfully tracked frames
             xy = squeeze(data.points(sel, p, 1:2));
             f = find(sel); % selected frame numbers
-            t = (f-1)/status.FrameRate; % time in seconds for each selected frame
+            t = (f-1)/status.mh.FrameRate; % time in seconds for each selected frame
             speed = sqrt(sum(diff(xy, 1).^2, 2))./diff(t(:)); % pixels/s
             speed = speed*para.holo.pix_um;        % um/s
             plot(f(2:end), speed, '.-', 'color', para.ls.p{p}.col)
@@ -115,7 +115,7 @@ switch(action)
             xyz = squeeze(data.points(sel, p, [1:2 4]));
             xyz(:, 1:2) = xyz(:, 1:2)*para.holo.pix_um; % um
             f = find(sel); % selected frame numbers
-            t = (f-1)/status.FrameRate; % time in seconds for each selected frame
+            t = (f-1)/status.mh.FrameRate; % time in seconds for each selected frame
             speed = sqrt(sum(diff(xyz, 1).^2, 2))./diff(t(:)); % um/s
             plot(f(2:end), speed, '.-', 'color', para.ls.p{p}.col)
         end
@@ -196,10 +196,10 @@ switch(action)
         autopara.greythr = 0.5;
         autopara.areathr = 3;
         autopara.roimask = [];
-        
-        im = double(readframe(status.mh, status.framenr, para, status));
-        ref1 = double(readframe(status.mh, status.framenr-para.ref.frameDiff, para, status));
-        ref2 = double(readframe(status.mh, status.framenr+para.ref.frameDiff, para, status));
+
+        im = double(status.mh.readFrame(status.framenr));
+        ref1 = double(status.mh.readFrame(status.framenr-para.ref.frameDiff));
+        ref2 = double(status.mh.readFrame(status.framenr+para.ref.frameDiff));
 
         [res, diag] = holo_autotrack_detect(im, ref1, ref2, autopara, para.holo, data.points(status.framenr-para.ref.frameDiff, status.cpoint, :), 'lastframe');
         if isempty(res.message)

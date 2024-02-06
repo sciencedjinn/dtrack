@@ -46,18 +46,18 @@ set(autowbh, 'OuterPosition', [a(1) a(2)+a(4) a(3) a(4)]);
 status.framenr      = autopara.ref;
 [~, status, para]   = dtrack_action(gui, status, para, [], 'loadonly');
 %status.autoref      = status.currim_ori;
-[imout, status.mh] = readframe(status.mh, [1 100], para, status, false);
-status.autoref = median(imout, 4);
+imout               = status.mh.readFrame([1 100]);
+status.autoref      = median(double(imout), 4);
 
 %% create roimask                
 if autopara.useroi && ~isempty(status.roi)
     para.im.roi = 1;
     switch status.roi(1, 1)
         case 0  %0 indicates polygon vertices
-            [X,Y]   = ndgrid(1:status.vidHeight, 1:status.vidWidth);
+            [X,Y]   = ndgrid(1:status.mh.Height, 1:status.mh.Width);
             roimask = inpolygon(Y, X, status.roi(2:end, 1), status.roi(2:end, 2));   
         case 1  %1 indicates ellipse
-            [X,Y]   = ndgrid(1:status.vidHeight, 1:status.vidWidth);
+            [X,Y]   = ndgrid(1:status.mh.Height, 1:status.mh.Width);
             roimask = inellipse(Y, X, status.roi(2:end)); 
         otherwise %old roi file
             disp('No ROI type indicator found, assuming old ROI file.');
@@ -70,10 +70,35 @@ end
 
 %% Init main loop vars
 cancelled = false;
-stats=nan(1, autopara.to);  %this will save the size of the detected area
+stats = nan(1, autopara.to);  % this will save the size of the detected area
 tic
 disp([datestr(now, 13) ' - Autotracking started']);
 waitbar(0.01, autowbh, 'Automatic tracking...');
+
+%% test
+% % v1
+% imout = status.mh.readFrame([1 100]);
+% imout = double(imout);
+% pause(2);
+% tic
+% for i = 1:size(imout, 4)
+%     im1 = imout(:, :, :, 4) - status.autoref;
+%     im2 = rgb2gray(im1);
+%     level = autopara.greythresh * graythresh(im2);
+%     if level>1, level=1; end  % limit level to allowed range
+%     bwi   = imbinarize(im2, level); % without level, takes forever
+% end
+% toc;
+% pause(2);
+% % v2;
+% tic;
+% ims2 = bsxfun(@minus, imout, status.autoref);
+% ims2 = squeeze(0.2989 * ims2(:, :, 1, :) + 0.5870 * ims2(:, :, 2, :) + 0.1140 * ims2(:, :, 3, :));
+% level = autopara.greythresh * graythresh(ims2(:, :, 1));
+% if level>1, level=1; end  % limit level to allowed range
+% bwis   = imbinarize(ims2, level); % without level, takes forever
+% toc
+% return;
 
 %% Main loop
 for trackframe=autopara.from:autopara.step:autopara.to

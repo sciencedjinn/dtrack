@@ -66,7 +66,7 @@ function sub_callback(src, varargin)
     switch get(src, 'tag')
         case {'imageseq_from', 'imageseq_to', 'imageseq_step'}
             newval = str2double(get(src, 'string'));
-            limval = round(min([max([newval 1]) status.nFrames])); % limit to valid numbers
+            limval = round(min([max([newval 1]) status.mh.NFrames])); % limit to valid numbers
             set(src, 'string', num2str(limval));
             switch get(src, 'tag')
                 case 'imageseq_from'
@@ -203,7 +203,7 @@ function sub_loaddef
         autopara = temp.autopara; %TODO: Check that from/to/step/ref are not too large
     else
         autopara.from       = 1;
-        autopara.to         = status.nFrames;
+        autopara.to         = status.mh.NFrames;
         autopara.step       = 1;
         autopara.format     = 1;
         if ~isempty(para.paths.respath)

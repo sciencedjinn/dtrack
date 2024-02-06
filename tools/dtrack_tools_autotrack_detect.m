@@ -12,14 +12,15 @@ if nargin<7, lastpoint = nan;           end
 if nargin<6, method = 'largest';        end
 if nargin<5, areathresh = 50;           end
 if nargin<4, greythr = 3;               end
-if nargin<3 || isempty(roimask), roimask = ones(size(ref)); end
+if nargin<3, roimask = []; end
 
 if strcmp(method, 'nearest') && any(isnan(lastpoint))
     method = 'largest';
 end
 
 %% subtract reference frame
-diffim = uint8(abs(double(current_frame) - double(ref)));
+diffim = abs(double(current_frame(1:100, 1:100, :)) - ref(1:100, 1:100, :));
+diffim = rgb2gray(diffim/max(diffim(:)));
 
 %% gray scale conversion
 if strcmp(method, 'absolute')
@@ -28,11 +29,13 @@ else
     level = greythr * graythresh(diffim);
 end
 if level>1, level=1; end  % limit level to allowed range
-bwi   = imbinarize(rgb2gray(diffim), level);
+bwi   = imbinarize(diffim, level); % without level, takes forever
 
 %% cut out points outside region of interest
 bwi2 = bwi;
-bwi2(~roimask) = 0;
+if ~isempty(roimask)
+    bwi2(~roimask) = 0;
+end
 
 if nargout>3
     % calculate ALL connected regions for later post-processing

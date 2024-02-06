@@ -40,7 +40,7 @@ for pnr = 1:size(data.points, 2)
     x{pnr}  = data.points(sel, pnr, 1); 
     y{pnr}  = data.points(sel, pnr, 2); 
     f{pnr}  = find(sel); 
-    t{pnr}  = 1000*f{pnr}/status.FrameRate;
+    t{pnr}  = 1000*f{pnr}/status.mh.FrameRate;
 end
 
 % Create a useful error message if some points have different numbers of tracked points

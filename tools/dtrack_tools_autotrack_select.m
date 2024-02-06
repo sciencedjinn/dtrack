@@ -42,7 +42,7 @@ function sub_callback(src, varargin)
     switch get(src, 'tag')
         case {'autotrack_from', 'autotrack_to', 'autotrack_step', 'autotrack_ref'}
             newval = str2double(get(src, 'string'));
-            limval = round(min([max([newval 1]) status.nFrames])); % limit to possible frame numbers
+            limval = round(min([max([newval 1]) status.mh.NFrames])); % limit to possible frame numbers
             set(src, 'string', num2str(limval)); 
             switch get(src, 'tag')
                 case 'autotrack_from'
@@ -100,7 +100,7 @@ function sub_callback(src, varargin)
             
         case 'autotrack_from_plus'
             newval = str2double(get(gui.panel1.from, 'string')) + 1;
-            limval = min([newval status.nFrames]); % limit to possible frame numbers
+            limval = min([newval status.mh.NFrames]); % limit to possible frame numbers
             set(gui.panel1.from, 'string', num2str(limval));
             autopara.from = limval;
             sub_preview_update('im');
@@ -113,7 +113,7 @@ function sub_callback(src, varargin)
             
         case 'autotrack_to_plus'
             newval = str2double(get(gui.panel1.to, 'string')) + 1;
-            limval = min([newval status.nFrames]); % limit to possible frame numbers
+            limval = min([newval status.mh.NFrames]); % limit to possible frame numbers
             set(gui.panel1.to, 'string', num2str(limval));
             autopara.to = limval;
             
@@ -125,7 +125,7 @@ function sub_callback(src, varargin)
             
         case 'autotrack_step_plus'
             newval = str2double(get(gui.panel1.step, 'string')) + 1;
-            limval = min([newval status.nFrames]); % limit to possible frame numbers
+            limval = min([newval status.mh.NFrames]); % limit to possible frame numbers
             set(gui.panel1.step, 'string', num2str(limval));
             autopara.step = limval;
             
@@ -181,7 +181,7 @@ end
 
 function sub_preview_gui(varargin)
     % PREVIEW: preview button callback
-    gui.prev.fig   = figure(2973); clf;
+    gui.prev.fig   = uifigure(2973); clf;
     gui.prev.ph(1) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [0 .5 .5 .5]);
     gui.prev.ph(2) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [.5 .5 .5 .5]);
     gui.prev.ph(3) = uipanel('parent', gui.prev.fig, 'units', 'normalized', 'position', [0 0 .5 .5]);
@@ -192,6 +192,19 @@ function sub_preview_gui(varargin)
     gui.prev.ah(3) = axes('parent', gui.prev.ph(3), 'units', 'normalized', 'position', [0 0 1 1]);
     gui.prev.ah(4) = axes('parent', gui.prev.ph(4), 'units', 'normalized', 'position', [0 0 1 1]);
     sub_preview_update('all');
+
+%         gui.prev.fig   = uifigure(2973); clf;
+%     gui.prev.gh    = uigridlayout(gui.prev.fig, [2 2], 'RowSpacing', 0, 'ColumnSpacing', 0);
+% %     gui.prev.ph(1) = uipanel(gui.prev.gh);
+% %     gui.prev.ph(2) = uipanel(gui.prev.gh);
+% %     gui.prev.ph(3) = uipanel(gui.prev.gh);
+% %     gui.prev.ph(4) = uipanel(gui.prev.gh);
+%     
+%     gui.prev.ah(1) = uiaxes(gui.prev.gh, 'units', 'normalized', 'outerposition', [0 0 1 1]);
+%     gui.prev.ah(2) = uiaxes(gui.prev.gh, 'units', 'normalized', 'outerposition', [0 0 1 1]);
+%     gui.prev.ah(3) = uiaxes(gui.prev.gh, 'units', 'normalized', 'outerposition', [0 0 1 1]);
+%     gui.prev.ah(4) = uiaxes(gui.prev.gh, 'units', 'normalized', 'outerposition', [0 0 1 1]);
+%     sub_preview_update('all');
 end
 
 function sub_preview_update(type)
@@ -211,10 +224,10 @@ function sub_preview_update(type)
             if get(gui.panel2.useroi, 'value') && ~isempty(status.roi)
                 switch status.roi(1, 1)
                     case 0  % 0 indicates polygon vertices
-                        [X,Y]   = ndgrid(1:status.vidHeight, 1:status.vidWidth);
+                        [X,Y]   = ndgrid(1:status.mh.Height, 1:status.mh.Width);
                         prevdata.roimask = inpolygon(Y, X, status.roi(2:end, 1), status.roi(2:end, 2));   
                     case 1  % 1 indicates ellipse
-                        [X,Y]   = ndgrid(1:status.vidHeight, 1:status.vidWidth);
+                        [X,Y]   = ndgrid(1:status.mh.Height, 1:status.mh.Width);
                         prevdata.roimask = inellipse(Y, X, status.roi(2:end)); 
                     otherwise 
                         error('Internal error: Unknown ROI type');
@@ -354,7 +367,7 @@ function sub_loaddef
         autopara = temp.autopara; %TODO: Check that from/to/step/ref are not too large
     else
         autopara.from       = 1;
-        autopara.to         = status.nFrames;
+        autopara.to         = status.mh.NFrames;
         autopara.step       = 1;
         autopara.pointnr    = status.cpoint;
         switch para.ref.use

@@ -34,7 +34,7 @@ if para.im.roi
             line(status.roi(:, 1), status.roi(:, 2), 'parent', h);   
     end
 end 
-axis(h, 'equal'); axis(h, [0 status.vidWidth 0 status.vidHeight]);
+axis(h, 'equal'); axis(h, [0 status.mh.Width 0 status.mh.Height]);
 set(h, 'YDir', 'reverse', 'visible', 'off');
 
 

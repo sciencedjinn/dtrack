@@ -306,7 +306,7 @@ else
             % Move to a certain time in the video
             answer = inputdlg('Go to frame minute:', '', 1);
             if ~isempty(answer)
-                status.framenr = round(str2double(answer)*status.FrameRate*60); 
+                status.framenr = round(str2double(answer)*status.mh.FrameRate*60); 
                 disp(['Jumping to frame ' num2str(status.framenr) ' (frame minute ' answer{1} ').']);
             end
             redraw = 1;  
@@ -367,7 +367,7 @@ else
             
         case {'end', 'e'}
             % Move to the last frame
-            status.framenr = status.nFrames;
+            status.framenr = status.mh.NFrames;
             redraw = 1;
             saveneeded = 0;
             
@@ -793,7 +793,7 @@ else
                 calibps=dtrack_calibrate(squeeze(data.points(:, i, 1:2)), para.paths.calibname);
                 plot(calibps(:, 2), calibps(:, 1), [colors{i} '.'], 'markersize', 20);
             end
-            axis equal; %axis([0 status.vidWidth 0 status.vidHeight]); 
+            axis equal; %axis([0 status.mh.Width 0 status.mh.Height]); 
             set(gca, 'YDir', 'reverse'); 
             %grid minor;
             redraw = 0;
@@ -836,7 +836,7 @@ else
                 if ~isempty(ps{jj})
                     seglength{jj}=sqrt(sum(diff(ps{jj}).^2, 2)); %in pixels
                     segx{jj}=find(data.points(:, jj, 3)~=0);
-                    segtime{jj}=1000/status.FrameRate*diff(find(data.points(:, jj, 3)~=0)); % in ms
+                    segtime{jj}=1000/status.mh.FrameRate*diff(find(data.points(:, jj, 3)~=0)); % in ms
                     segspeed{jj}=seglength{jj}./segtime{jj}*1000;% in pixels/s %/18.22; %in cm/s for E3
                     plot(segx{jj}(1:end-1), smooth(segspeed{jj}, smfact), [colors{jj} '-']);
                     plot(segx{jj}(1:end-1), mean(smooth(segspeed{jj}, smfact)), [colors{jj} '--']);
@@ -868,7 +868,7 @@ else
         case 'ana_plotcalibspeed'
             calibps=dtrack_calibrate(squeeze(data.points(data.points(:, 1, 3)~=0, 1, 1:2)), para.paths.calibname);
             seglength=sqrt(sum(diff(calibps).^2, 2));
-            segtime=1000/status.FrameRate*diff(find(data.points(:, 1, 3)~=0)); % in ms
+            segtime=1000/status.mh.FrameRate*diff(find(data.points(:, 1, 3)~=0)); % in ms
             segspeed=seglength./segtime*100; %in cm/s
             figure(4);clf;
             hist(segspeed, 20);xlabel('speed [cm/s]');title({['mean ' num2str(mean(segspeed))], ['median ' num2str(median(segspeed))], ['mean >1 ' num2str(mean(segspeed(segspeed>1)))], ['median >1 ' num2str(median(segspeed(segspeed>1)))]});
@@ -1020,7 +1020,7 @@ else
                     answer = inputdlg('Please enter a new reference frame number:', 'New reference frame', 1, {num2str(para.ref.framenr)});
                     if ~isempty(answer)
                         answer = abs(round(str2double(answer{1})));
-                        answer = min([status.nFrames max([answer 1])]); % limit to valid frames
+                        answer = min([status.mh.NFrames max([answer 1])]); % limit to valid frames
                         if ~isnan(answer)
                             para.ref.framenr = answer; 
                         end
@@ -1081,7 +1081,6 @@ else
                       
         case 'tools_autotrack_bgs'
             % Autotracking using background subtraction
-            %TODO: save last paras
             [success, autopara] = dtrack_tools_autotrack_select(status, para, data);
             if success
                 [gui, status, para, data] = dtrack_tools_autotrack_main(gui, status, para, data, autopara);
@@ -1108,7 +1107,7 @@ else
                 warndlg('Invalid vlc path. Please enter the correct path to VLC.EXE in File->Properties.');
             else
                 %vlcpath='C:\Program Files (x86)\VideoLAN\VLC\vlc.exe';
-                dos(['"' para.paths.vlcpath '" "' para.paths.movpath '" --start-time=' num2str(status.framenr/status.FrameRate) ' &']);
+                dos(['"' para.paths.vlcpath '" "' para.paths.movpath '" --start-time=' num2str(status.framenr/status.mh.FrameRate) ' &']);
             end
             redraw = 0;
             saveneeded = 0;

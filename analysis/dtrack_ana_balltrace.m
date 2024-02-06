@@ -25,9 +25,9 @@ function medtemper=dtrack_ana_balltrace(h, data, status, para)
 %% create a temp array, which for each position has the fr frames before and after
     
     for j=1:length(frames)
-        framerange=max([1 frames(j)-fr]):min([frames(j)+fr status.nFrames]) %FIXME: currently only works if the whole 2*fr+1 frames are present
+        framerange=max([1 frames(j)-fr]):min([frames(j)+fr status.mh.NFrames]) %FIXME: currently only works if the whole 2*fr+1 frames are present
         
-        thisset=status.mh.data(round(x(frames(j))-f:x(frames(j))+f), round(y(frames(j))-f:y(frames(j))+f), framerange);
+        thisset=status.mh.Buffer.data(round(x(frames(j))-f:x(frames(j))+f), round(y(frames(j))-f:y(frames(j))+f), framerange);
         for i=framerange
             %calculate the pixel distance between the ball position in this frame, and every other frame
             if i<frames(j) %if past frame
@@ -37,12 +37,12 @@ function medtemper=dtrack_ana_balltrace(h, data, status, para)
             end
         end
         %if frames(j)<fr+1
-            temper(:, j)=[nan(fr-frames(j)+1, 1);squeeze(mean(mean(thisset, 1), 2)-273.15);nan(fr-(status.nFrames-frames(j)), 1)]; %mssing frames at the beginning
+            temper(:, j)=[nan(fr-frames(j)+1, 1);squeeze(mean(mean(thisset, 1), 2)-273.15);nan(fr-(status.mh.NFrames-frames(j)), 1)]; %mssing frames at the beginning
         %end
-        %if frames(j)>status.nFrames-fr
-        %    temper(:, j)=[squeeze(mean(mean(thisset, 1), 2)-273.15);nan(fr-(status.nFrames-frames(j)), 1)]; %mssing frames at the end
+        %if frames(j)>status.mh.NFrames-fr
+        %    temper(:, j)=[squeeze(mean(mean(thisset, 1), 2)-273.15);nan(fr-(status.mh.NFrames-frames(j)), 1)]; %mssing frames at the end
         %end
-        %if frames(j)>=fr+1 && frames(j)>status.nFrames-fr  %otherwise
+        %if frames(j)>=fr+1 && frames(j)>status.mh.NFrames-fr  %otherwise
         %    temper(:, j)=mean(mean(thisset, 1), 2)-273.15;
         %end
         %normalise to -5:10
