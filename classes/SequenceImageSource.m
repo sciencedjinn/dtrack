@@ -2,6 +2,8 @@ classdef SequenceImageSource < ImageSource
     %SEQUENCEIMAGESOURCE Summary of this class goes here
     %   Detailed explanation goes here
     
+% TODO: in saving, remember framerate for sequences
+
     properties
         NFrames
         Height
