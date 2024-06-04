@@ -4,7 +4,7 @@ if nargin<1, modules = {}; end
 thispath = fileparts(mfilename('fullpath'));
 
 addpath(thispath);
-addpath(fullfile(thispath, 'support'));
+addpath(genpath(fullfile(thispath, 'support')));
 addpath(fullfile(thispath, 'roi'));
 addpath(fullfile(thispath, 'mmread'));
 addpath(fullfile(thispath, 'fileio'));
