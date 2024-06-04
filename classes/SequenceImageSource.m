@@ -1,6 +1,5 @@
 classdef SequenceImageSource < ImageSource
-    %SEQUENCEIMAGESOURCE Summary of this class goes here
-    %   Detailed explanation goes here
+    %SEQUENCEIMAGESOURCE handles an image sequence (consecutively numbered) as an image source
     
 % TODO: in saving, remember framerate for sequences
 
@@ -10,7 +9,6 @@ classdef SequenceImageSource < ImageSource
         Width
         NChannels
         FrameRate
-        GreyScale = false; % by default, not a greyscale sequence
         ImPara % contains the fields .from, .to, .padding, and .ext describing the image sequence parameters
     end
     
@@ -36,16 +34,6 @@ classdef SequenceImageSource < ImageSource
             obj.Height  = info.Height;
             obj.Width   = info.Width;
             obj.NChannels = info.NumberOfSamples;
-            obj.GreyScale = obj.NChannels==1;
-            switch info.ColorType
-                case 'grayscale'
-                    obj.GreyScale = true;
-                case 'truecolor'
-                    obj.GreyScale = false;
-                case 'indexed'
-                    obj.GreyScale = false;
-                    warning('Indexed images have not been tested. Good luck!');
-            end
             temp = inputdlg('Please enter the frame rate for this image sequence:', 'Frame rate', 1, {'25'});
             obj.FrameRate = str2double(temp{1});
         end

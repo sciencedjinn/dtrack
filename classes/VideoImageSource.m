@@ -1,6 +1,5 @@
 classdef VideoImageSource < ImageSource
-    %VIDEOIMAGESOURCE Summary of this class goes here
-    %   Detailed explanation goes here
+    % VIDEOIMAGESOURCE handles a video as an image source
     
     properties
         NFrames
@@ -8,7 +7,6 @@ classdef VideoImageSource < ImageSource
         Width
         NChannels
         FrameRate
-        GreyScale = false; % by default, not a greyscale sequence
     end
 
     properties (Hidden, Access=protected)
@@ -68,8 +66,6 @@ classdef VideoImageSource < ImageSource
                 % Now load the first buffer
                 obj.loadFrameIntoBuffer(1);
             end
-
-            obj.GreyScale = obj.NChannels==1;
         end
 
         function  [ims, ts] = readFrameRange(obj, fnrs)

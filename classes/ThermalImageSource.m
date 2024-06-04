@@ -1,6 +1,5 @@
 classdef ThermalImageSource < ImageSource
-    %THERMALIMAGESOURCE Summary of this class goes here
-    %   Detailed explanation goes here
+    %THERMALIMAGESOURCE handles a thermal video as an image source
     
     properties
         NFrames
@@ -8,7 +7,6 @@ classdef ThermalImageSource < ImageSource
         Width
         NChannels = 1;
         FrameRate
-        GreyScale = true; % Thermal image sources are always greyscale
         Buffer
     end
 
