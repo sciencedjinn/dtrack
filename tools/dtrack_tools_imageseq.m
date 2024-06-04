@@ -93,7 +93,7 @@ function sub_callback(src, varargin)
             filename = dtrack_fileio_selectimageseq(get(gui.panel2.folder, 'string'));
             if filename~=0
                 set(gui.panel2.folder, 'string', filename);
-                autopara.folder = get(src, 'string');
+                autopara.folder = filename;
             end
             
         case 'imageseq_startfile'
