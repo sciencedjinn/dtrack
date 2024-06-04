@@ -19,7 +19,7 @@ if strcmp(method, 'nearest') && any(isnan(lastpoint))
 end
 
 %% subtract reference frame
-diffim = abs(double(current_frame(1:100, 1:100, :)) - ref(1:100, 1:100, :));
+diffim = abs(double(current_frame(:, :, :)) - double(ref(:, :, :)));
 diffim = rgb2gray(diffim/max(diffim(:)));
 
 %% gray scale conversion

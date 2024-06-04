@@ -27,7 +27,7 @@ try
     uiwait(gui.fig);
     delete(gui.fig);
 catch anyerror
-    delete(gui.fig); %delete the modal figure, otherwise we'll be stuck in it forever
+    delete(gui.fig); % delete the modal figure, otherwise we'll be stuck in it forever
     rethrow(anyerror);
 end
 

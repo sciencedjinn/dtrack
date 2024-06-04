@@ -46,7 +46,7 @@ set(autowbh, 'OuterPosition', [a(1) a(2)+a(4) a(3) a(4)]);
 status.framenr      = autopara.ref;
 [~, status, para]   = dtrack_action(gui, status, para, [], 'loadonly');
 %status.autoref      = status.currim_ori;
-imout               = status.mh.readFrame([1 100]);
+imout               = status.mh.readFrameRange([1 100]);
 status.autoref      = median(double(imout), 4);
 
 %% create roimask                
@@ -90,6 +90,7 @@ waitbar(0.01, autowbh, 'Automatic tracking...');
 % end
 % toc;
 % pause(2);
+
 % % v2;
 % tic;
 % ims2 = bsxfun(@minus, imout, status.autoref);
@@ -100,10 +101,10 @@ waitbar(0.01, autowbh, 'Automatic tracking...');
 % toc
 % return;
 
-%% Main loop
+%% Main loops
 for trackframe=autopara.from:autopara.step:autopara.to
     drawnow;
-    if getappdata(autowbh,'canceling')
+    if getappdata(autowbh, 'canceling')
         cancelled = true;
         break;
     end
@@ -132,9 +133,9 @@ delete(autowbh);  % DELETE the waitbar; don't try to CLOSE it.
 
 %% exit
 if cancelled
-    disp([datestr(now, 13) ' - Autotracking canceled after ' num2str(toc) ' seconds after frame ' num2str(trackframe-autopara.step) '.']);
+    Logger.log(LogLevel.INFO, 'Autotracking canceled after %.1f seconds after frame %d.', toc, num2str(trackframe-autopara.step));
 else
-    disp([datestr(now, 13) ' - Autotracking finished after ' num2str(toc) ' seconds.']);
+    Logger.log(LogLevel.INFO, 'Autotracking finished after %.1f seconds.', toc);
 end
 
 %% re-set frame block overlap
