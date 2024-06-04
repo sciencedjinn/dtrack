@@ -21,11 +21,11 @@ if redraw==1 || redraw==3
     set(findobj('tag', 'framenr'), 'string', ['frame ', num2str(status.framenr), '/', num2str(status.mh.NFrames)]);
     
     % set frametime display
-    if para.thermal.isthermal
-        timeNumber = status.mh.Buffer.t(status.framenr) - status.mh.Buffer.t(1);
-    else
+%     if para.thermal.isthermal
+%         timeNumber = status.mh.Buffer.t(status.framenr) - status.mh.Buffer.t(1);
+%     else
         timeNumber = status.framenr / status.mh.FrameRate; % time in seconds
-    end
+%     end
     set(findobj('tag', 'frametime'), 'string', datestr(timeNumber/24/3600,'HH:MM:SS.FFF'));
 end
 

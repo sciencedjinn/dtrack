@@ -14,7 +14,7 @@ function dtrack_ana_plottemp(h, data, status, para)
     %col={'b', 'r', 'm', 'c', 'k', 'g', 'y'};while size(data.points, 2)>length(col),col=[col {'b', 'r', 'm', 'c', 'k', 'g', 'y'}];end %define colors for the different points
     col=[0 0 1;1 0 0;1 0 1;0 1 1;0 0 0;0 1 0;1 1 0];while size(data.points, 2)>size(col, 1),col=[col;col];end %define colors for the different points
     set(h, 'colororder', col); %set this as the default color order
-    ts=(status.mh.Buffer.t-status.mh.Buffer.t(1))*24*3600; %all timestamps in seconds normalised to start
+    ts=(status.mh.Buffer.t-status.mh.Buffer.t(1)); %all timestamps in seconds normalised to start
     
     %% calculate temperatures
     for i=1:size(data.points, 2) %for each point number
