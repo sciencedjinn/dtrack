@@ -8,6 +8,7 @@ classdef SequenceImageSource < ImageSource
         NFrames
         Height
         Width
+        NChannels
         FrameRate
         GreyScale = false; % by default, not a greyscale sequence
         ImPara % contains the fields .from, .to, .padding, and .ext describing the image sequence parameters
@@ -19,9 +20,9 @@ classdef SequenceImageSource < ImageSource
 
     methods
         function obj = SequenceImageSource(para)
-        % opens an image sequence
-        %
-        % use frame=read(mh, frame) to obtain frames
+            % opens an image sequence
+            %
+            % use obj.readFrame(fnr) or obj.readFrameRange([fnr1 fnr2]) to obtain frames
         
             if isempty(para.paths.movpath) % image names are numbers only
                 obj.FileName = sprintf('%s%s', fileparts(para.paths.movpath), filesep);
@@ -34,6 +35,8 @@ classdef SequenceImageSource < ImageSource
             obj.NFrames = obj.ImPara.to - obj.ImPara.from + 1;
             obj.Height  = info.Height;
             obj.Width   = info.Width;
+            obj.NChannels = info.NumberOfSamples;
+            obj.GreyScale = obj.NChannels==1;
             switch info.ColorType
                 case 'grayscale'
                     obj.GreyScale = true;
@@ -48,11 +51,16 @@ classdef SequenceImageSource < ImageSource
         end
 
         function [im, t] = readFrame(obj, fnr, ~)
+            % SequenceImageSource.readFrame(fnr, updateBuffer) reads the frame with number 'fnr' from an image sequence.
+            %
+            % Returns image im as a HxWxC matrix, where H, W and C are image height, width and colour channels.
+            % Returns timestamp t as a vector in seconds, relative to the video start (based on framerate). 
+
             if fnr<1 || fnr>obj.NFrames
                 error('Invalid frame number: %d (frames 1-%d available)', fnr, obj.NFrames)
             end
             im = imread(obj.getFileName(fnr));
-            t  = 0;
+            t  = (fnr-1)/obj.FrameRate;
         end
     end
 
