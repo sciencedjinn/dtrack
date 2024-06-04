@@ -1,12 +1,11 @@
-function [status, para, success]=dtrack_fileio_openmovie(status, para)
+function [status, para, success] = dtrack_fileio_openmovie(status, para)
 
-success=1;
+success = 1;
 try
     status.mh = ImageSource.create(para);
-
 catch movie_loaderror
     if strcmp(movie_loaderror.identifier, 'MATLAB:mmreader:fileNotFound')
-        success=0;
+        success = 0;
     elseif strcmp(movie_loaderror.identifier, 'MATLAB:mmreader:initializationError')
         options.Interpreter='tex';options.Default='Yes';
         choice = questdlg(['The default function mmreader cannot read this filetype. You can try to use mmread instead. However, '...
@@ -15,11 +14,11 @@ catch movie_loaderror
         'Difficult file type', 'Yes', 'Cancel', options);
         switch choice
             case 'Yes'
-                para.usemmread=1;
+                para.usemmread = 1;
                 status.mh = ImageSource.create(para);
             case 'Cancel'
                 disp('Program execution aborted by user. You can try to convert your files to a simpler file type, e.g. avi, mpg, wmv, mov (Mac only).');
-                success=2;
+                success = 2;
                 return;
         end
     else
