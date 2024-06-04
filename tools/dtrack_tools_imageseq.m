@@ -90,8 +90,11 @@ function sub_callback(src, varargin)
             autopara.basename = get(src, 'string');
             
         case 'imageseq_browse'
-            filename = dtrack_fileio_selectimageseq(get(gui.panel2.folder, 'string'));
-            if filename~=0
+            filename = uigetdir(get(gui.panel2.folder, 'string'), 'Please select a folder to save the image sequence in');
+
+            if pathname==0
+                Logger.log(LogLevel.INFO, 'Folder selection aborted.');
+            else
                 set(gui.panel2.folder, 'string', filename);
                 autopara.folder = filename;
             end
