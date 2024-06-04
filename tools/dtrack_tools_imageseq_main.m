@@ -44,7 +44,7 @@ try
         [~, status, para] = dtrack_action([], status, para, data, 'loadonly');
         
         % extract frame
-        frame = status.currim;
+        frame = double(status.currim);
         frame = frame - min(frame(:));
         frame = frame/max(frame(:));
         
