@@ -68,31 +68,58 @@ classdef VideoImageSource < ImageSource
             end
         end
 
-        function  [ims, ts] = readFrameRange(obj, fnrs)
-            % VideoImageSource.readFrameRange(fnrs) reads the frames fnrs(1) to fnrs(2) from an image source. The buffer is not updated.
+        function  [ims, ts] = readFrames(obj, fnrs)
+            % VideoImageSource.readFrames(fnrs) reads the frames in frame number array fnrs from a video.
             % 
             % Returns images ims as a HxWxCxF matrix, where H, W and C are image height, width and colour channels, and F is the number of frames.
             % Returns timestamps ts as a vector in seconds. 
 
-            if length(fnrs)~=2 || fnrs(1)>fnrs(2)
-                error('Input argument fnrs must have two elements indicating an (inclusive) range');
-            end
             if any(fnrs<1 | fnrs>obj.NFrames)                
-                error('Invalid frame range: %d-%d (frames 1-%d available)', fnrs(1), fnrs(2), obj.NFrames)
+                error('Invalid frames (frames 1-%d available)', obj.NFrames)
             end
             
             if ~obj.UseMMRead
                 % use VideoReader, the internal MATLAB function
-                ims = read(obj.FileHandle, fnrs);
-                ts  = (fnrs(1)-1:fnrs(2)-1)/obj.FrameRate;
+                [ims, ts] = readFrames@ImageSource(obj, fnrs); % use the superclass method to read frames one-by-one
             else
                 % use mmread
                 if all(ismember(fnrs, obj.Buffer.range))
-                    sel = obj.Buffer.range>=fnrs(1) & obj.Buffer.range<=fnrs(2);
+                    sel = ismember(obj.Buffer.range, fnrs);
                     ims = obj.Buffer.data(sel).cdata;
                     ts  = obj.Buffer.t(sel);
                 else
-                    video = mmread(obj.FileName, fnrs(1):fnrs(2), [], false, true);
+                    video = mmread(obj.FileName, fnrs, [], false, true);
+                    ims   = video.frames;
+                    ts    = video.times/1000;
+                end
+            end
+        end
+
+        function  [ims, ts] = readFrameRange(obj, fnRange)
+            % VideoImageSource.readFrameRange(fnRange) reads the frames fnRange(1) to fnRange(2) from an image source. The buffer is not updated.
+            % 
+            % Returns images ims as a HxWxCxF matrix, where H, W and C are image height, width and colour channels, and F is the number of frames.
+            % Returns timestamps ts as a vector in seconds. 
+
+            if length(fnRange)~=2 || fnRange(1)>fnRange(2)
+                error('Input argument fnRange must have two elements indicating an (inclusive) range');
+            end
+            if any(fnRange<1 | fnRange>obj.NFrames)                
+                error('Invalid frame range: %d-%d (frames 1-%d available)', fnRange(1), fnRange(2), obj.NFrames)
+            end
+            
+            if ~obj.UseMMRead
+                % use VideoReader, the internal MATLAB function
+                ims = read(obj.FileHandle, fnRange);
+                ts  = (fnRange(1)-1:fnRange(2)-1)/obj.FrameRate;
+            else
+                % use mmread
+                if all(ismember(fnRange, obj.Buffer.range))
+                    sel = obj.Buffer.range>=fnRange(1) & obj.Buffer.range<=fnRange(2);
+                    ims = obj.Buffer.data(sel).cdata;
+                    ts  = obj.Buffer.t(sel);
+                else
+                    video = mmread(obj.FileName, fnRange(1):fnRange(2), [], false, true);
                     ims   = video.frames;
                     ts    = video.times/1000;
                 end

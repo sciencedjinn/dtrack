@@ -37,6 +37,21 @@ classdef ThermalImageSource < ImageSource
             
         end
 
+        function  [ims, ts] = readFrames(obj, fnrs)
+            % ThermalImageSource.readFrames(fnrs) reads the frames in frame number array fnrs. 
+            % 
+            % Returns images ims as a HxWx1xF matrix, where H and W are image height and width, and F is the number of frames.
+            % Returns timestamps ts as a vector in seconds. 
+
+            if any(fnrs<1 | fnrs>obj.NFrames)                
+                error('Invalid frames (frames 1-%d available)', obj.NFrames)
+            end
+            
+            ims = obj.Buffer.data(:, :, fnrs);
+            ims = reshape(ims, [size(ims, 1), size(ims, 2), 1, size(ims, 3)]);
+            ts  = obj.Buffer.t(fnrs);
+        end
+
         function  [ims, ts] = readFrameRange(obj, fnrs)
             % ThermalImageSource.readFrameRange(fnrs) reads the frames fnrs(1) to fnrs(2). 
             % 
