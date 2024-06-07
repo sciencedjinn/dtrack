@@ -4,8 +4,8 @@ function filename=dtrack_fileio_selectfile(type, defaultpath, dlgstring, searchn
 
 if nargin<4
     if strcmp(type, 'new')
-        dlgfilter={'*.avi;*.mpg;*.wmv;*.asf;*.asx;*.mj2;*.mp4;*.m4v;*.mov;*.ogg;*.mts;*.m2t;*.m2ts;*.mat;*.jpg;*.jpeg;*.tif;*.tiff;*.bmp;*.gif;*.pbm;*.png', ...
-            'All movie and image files (*.avi;*.mpg;*.wmv;*.asf;*.asx;*.mj2;*.mp4;*.m4v;*.mov;*.ogg;*.mts;*.m2t;*.m2ts;*.mat;*.jpg;*.jpeg;*.tif;*.tiff;*.bmp;*.gif;*.pbm;*.png)'; 
+        dlgfilter={'*.avi;*.mpg;*.wmv;*.asf;*.asx;*.mj2;*.mp4;*.m4v;*.mov;*.ogg;*.mts;*.m2t;*.m2ts;*.mat;*.jpg;*.jpeg;*.tif;*.tiff;*.bmp;*.gif;*.pbm;*.png;*.flv', ...
+            'All movie and image files (*.avi;*.mpg;*.wmv;*.asf;*.asx;*.mj2;*.mp4;*.m4v;*.mov;*.ogg;*.mts;*.m2t;*.m2ts;*.mat;*.jpg;*.jpeg;*.tif;*.tiff;*.bmp;*.gif;*.pbm;*.png;*.flv)'; 
         '*.avi', 'AVI files (*.avi)'; 
         '*.wmv;*.asf;*.asx', 'Windows Media Video files (Win only) (*.wmv;*.asf;*.asx)'; 
         '*.mj2', 'Motion JPEG 2000 (*.mj2)'; 

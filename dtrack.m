@@ -74,7 +74,6 @@ status.dtrackbase = mfilename('fullpath');
         switch get(src, 'type')
             case {'image', 'figure'} % key or click
                 % a) mouse click
-                %%%%%% 20150324: in 2014a and older, event is not empty, but EventName does not exist. Introduced "isfield(event, 'EventName') &&" %%%%%% below, which seems to fic it
                 if isempty(event) || strcmp(event.EventName, 'Hit') %isfield(event, 'EventName') && strcmp(event.EventName, 'Hit') % empty happens before 2014b, 'Hit' from 2014b onwards
                     mod = {}; % This cell will collect all modifiers (Alt/Ctrl/Shift) that were pressed while the action happened.
                     switch get(gui.f1, 'selectiontype')

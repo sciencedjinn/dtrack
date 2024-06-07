@@ -37,8 +37,8 @@ classdef ThermalImageSource < ImageSource
             
         end
 
-        function  [ims, ts] = readFrames(obj, fnrs)
-            % ThermalImageSource.readFrames(fnrs) reads the frames in frame number array fnrs. 
+        function  [ims, ts] = readFrames(obj, fnrs, ~)
+            % ThermalImageSource.readFrames(fnrs) reads the frames in frame number array fnrs.
             % 
             % Returns images ims as a HxWx1xF matrix, where H and W are image height and width, and F is the number of frames.
             % Returns timestamps ts as a vector in seconds. 

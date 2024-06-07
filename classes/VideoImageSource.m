@@ -68,8 +68,9 @@ classdef VideoImageSource < ImageSource
             end
         end
 
-        function  [ims, ts] = readFrames(obj, fnrs)
+        function  [ims, ts] = readFrames(obj, fnrs, varargin)
             % VideoImageSource.readFrames(fnrs) reads the frames in frame number array fnrs from a video.
+            % Optional input argument d is a uiprogressdlg
             % 
             % Returns images ims as a HxWxCxF matrix, where H, W and C are image height, width and colour channels, and F is the number of frames.
             % Returns timestamps ts as a vector in seconds. 
@@ -80,7 +81,7 @@ classdef VideoImageSource < ImageSource
             
             if ~obj.UseMMRead
                 % use VideoReader, the internal MATLAB function
-                [ims, ts] = readFrames@ImageSource(obj, fnrs); % use the superclass method to read frames one-by-one
+                [ims, ts] = readFrames@ImageSource(obj, fnrs, varargin{:}); % use the superclass method to read frames one-by-one
             else
                 % use mmread
                 if all(ismember(fnrs, obj.Buffer.range))
