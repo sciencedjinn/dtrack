@@ -76,10 +76,11 @@ classdef (Abstract) ImageSource < handle
     %% Public methods %%
     %%%%%%%%%%%%%%%%%%%%%%%
     methods
-        function [ims, ts] = readFrames(obj, fnrs)
+        function [ims, ts] = readFrames(obj, fnrs, d)
             % ImageSource.readFrames(fnrs) reads the frames in frame number array fnrs from an image source.
             % This default function works by loading each frame individually. 
             % Depending on the subclass, this can be overwritten with a more efficient implementation.
+            % Optional input argument d is a uiprogressdlg
             %
             % Returns images ims as a HxWxCxF matrix, where H, W and C are image height, width and colour channels, and F is the number of frames.
             % Returns timestamps ts as a vector in seconds. 
@@ -91,7 +92,15 @@ classdef (Abstract) ImageSource < handle
             ims = zeros(obj.Height, obj.Width, obj.NChannels, length(fnrs));
             ts  = zeros(length(fnrs), 1);
             for ind = 1:length(fnrs)
-                [ims(:, :, :, ind), ts(ind)] = obj.readFrame(fnrs(ind));
+                try
+                    [ims(:, :, :, ind), ts(ind)] = obj.readFrame(fnrs(ind));
+                    d.Value = ind/length(fnrs);
+                catch
+                    warndlg(sprintf("Frame %d could not be loaded successfully. Returning only frames before that.", fnrs(ind)))
+                    ims = ims(:, :, :, 1:ind-1);
+                    ts = ts(1:ind-1);
+                    break
+                end
             end
         end
 
