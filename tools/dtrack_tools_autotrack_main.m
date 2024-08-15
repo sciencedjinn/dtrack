@@ -44,8 +44,9 @@ a = get(autowbh, 'OuterPosition');
 set(autowbh, 'OuterPosition', [a(1) a(2)+a(4) a(3) a(4)]);
 
 %% get reference frame
-imout               = status.mh.readFrameRange([1 100]);
-status.autoref      = median(double(imout), 4);
+status.autoref      = 1;
+
+
 
 %% create roimask                
 if atp.UseRoi && ~isempty(status.roi)
@@ -109,7 +110,7 @@ try
         end
         status.framenr = trackframe;
         [~, status, para] = dtrack_action(gui, status, para, [], 'loadonly');
-        [centroid, stats(status.framenr)] = dtrack_tools_autotrack_detect(status.autoref, status.currim_ori, roimask, atp.GreyThresh, atp.AreaThresh, atp.Method, lastpoint);
+        [centroid, stats(status.framenr)] = dtrack_tools_autotrack_detect(atp.RefFrame.getFrame(), status.currim_ori, roimask, atp.GreyThresh, atp.AreaThresh, atp.Method, lastpoint);
         if isnan(stats(status.framenr)) % no large enough area was found
             data.points(status.framenr, atp.PointNr, 1:2)  = [0 0];
             data.points(status.framenr, atp.PointNr, 3)    = -43; % DEF: -43 means autotracked point, no point found
