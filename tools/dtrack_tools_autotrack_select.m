@@ -96,7 +96,7 @@ end
     function cb_ok(~, ~)
         success = 1;
         atp.saveSettings;
-        uiresume;
+        uiresume(gui.fig);
     end
 
     function cb_cancel(~, ~)
