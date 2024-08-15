@@ -248,7 +248,7 @@ function sub_ok(varargin)
         close(gui.prev.fig);
     end
     save(fullfile(prefdir, 'dtrack_autopara_bgs_current.dtp'), 'autopara', '-mat'); % save current settings
-    uiresume;
+    uiresume(gui.fig);
 end
 
 function sub_cancel(varargin)
