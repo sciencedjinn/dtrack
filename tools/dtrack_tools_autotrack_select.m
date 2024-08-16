@@ -113,10 +113,4 @@ end
                 cb_cancel();
         end
     end
-
-
-
-
-
-
 end

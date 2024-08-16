@@ -226,6 +226,7 @@ gui.menus.tools.menu = uimenu(gui.f1, 'label', 'Tools');
     gui.menus.tools.entries.tools_imageoneproc_tif = uimenu(gui.menus.tools.menu, 'label', 'Save processed frame as tif');
     gui.menus.tools.entries.tools_imageseq = uimenu(gui.menus.tools.menu, 'label', 'Save as image sequence / video...');
     gui.menus.tools.entries.tools_autotrack_bgs = uimenu(gui.menus.tools.menu, 'label', 'Autotracking (BGS) ...', 'separator', 'on');
+    gui.menus.tools.entries.tools_autotrack_bgs_continue = uimenu(gui.menus.tools.menu, 'label', 'Continue autotracking (BGS)', 'accelerator', 't');
     gui.menus.tools.entries.tools_autotrack_mts = uimenu(gui.menus.tools.menu, 'label', 'Autotracking (MTS) ...', 'enable', 'off');
     
 %% Debugging menu

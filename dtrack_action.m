@@ -1088,6 +1088,17 @@ else
             redraw = 1;
             saveneeded = 1;
             
+        case 'tools_autotrack_bgs_continue'
+            % Continue autotracking from the current frame with previous parameters
+            atp         = AutoTrackerPara(status.mh, @(x) cb_updatePreview([], [], x));
+            atp         = atp.loadSettings;
+            atp.PointNr = status.cpoint;
+            atp.From    = status.framenr;
+            [gui, status, para, data] = dtrack_tools_autotrack_main(gui, status, para, data, atp);
+
+            redraw = 1;
+            saveneeded = 1;
+
         case 'tools_autotrack_mts'
             % Autotracking using matching to sample
             comingsoon;
