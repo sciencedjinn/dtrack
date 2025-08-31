@@ -81,6 +81,18 @@ if loadnew
                         i = i+1;
                     end
                     para.imseq.to = i-1;
+
+                    % If not all the files in the folder are included, check whether to use the whole folder in sorted order
+                    allfiles = dir(fullfile(fileparts(para.paths.movpath), ['*' ext]));
+                    capturedfiles = dir(fullfile(fileparts(para.paths.movpath), [name '*' ext]));
+                    if length(capturedfiles)<length(allfiles)
+                        rep = questdlg("Not all image files in the chosen folder confirm to the same naming pattern. Do you want to use all files in the folder in alphabetic order?", "Use all files?", "Yes", "No", "No");
+                        if rep=="Yes"
+                            para.imseq.imseqtype = "wholefolder";
+                            para.imseq.filenames = {allfiles.name};
+                        end
+                    end
+    
                 otherwise
             end
             para = dtrack_editparameters(para); % parameter dialog

@@ -64,7 +64,12 @@ classdef (Abstract) ImageSource < handle
             if isfield(para, 'thermal') && isfield(para.thermal, 'isthermal') && para.thermal.isthermal
                 obj = ThermalImageSource(para);
             elseif isfield(para, 'imseq') && isfield(para.imseq, 'isimseq') && para.imseq.isimseq
-                obj = SequenceImageSource(para);
+                if isfield(para.imseq, 'imseqtype')
+                    imseqtype = para.imseq.imseqtype;
+                else 
+                    imseqtype = "numbered";
+                end
+                obj = SequenceImageSource(para, imseqtype);
             else
                 obj = VideoImageSource(para);
             end
